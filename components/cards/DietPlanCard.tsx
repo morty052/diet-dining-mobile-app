@@ -9,6 +9,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SEMI_BOLD } from "../../constants/fontNames";
 
 type Props = {};
 
@@ -67,41 +68,35 @@ const DietPlanCard = (props: Props) => {
   const [viewingMore, setViewimgMore] = React.useState(false);
 
   return (
-    <ScrollView>
-      <MoreInfoModal
-        setViewingMore={setViewimgMore}
-        viewingMore={viewingMore}
-      />
-      <View style={[styles.container]}>
-        <Text style={styles.dietNameText}>Mediterranean</Text>
-        <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star-outline" size={18} color={Colors.primary} />
-        </View>
-        <View style={styles.allIngredientsContainer}>
-          <IngredientTag title="Fruits" />
-          <IngredientTag title="Vegetables" />
-          <IngredientTag title="Whole grains" />
-          <IngredientTag title="Fish" />
-          <IngredientTag title="Nuts" />
-          {/* <IngredientTag title="Olive Oil" /> */}
-        </View>
-        <View style={styles.dietImageContainer}>
-          <Image
-            resizeMode="contain"
-            style={styles.dietImage}
-            source={seafoods_emoji}
-          />
-        </View>
-
-        <TouchableOpacity onPress={() => setViewimgMore(true)}>
-          <Text style={styles.moreInfotext}>Tap to see more info</Text>
-        </TouchableOpacity>
+    <View style={[styles.container]}>
+      <Text style={styles.dietNameText}>Mediterranean</Text>
+      <View style={styles.ratingContainer}>
+        <Ionicons name="star" size={18} color={Colors.primary} />
+        <Ionicons name="star" size={18} color={Colors.primary} />
+        <Ionicons name="star" size={18} color={Colors.primary} />
+        <Ionicons name="star" size={18} color={Colors.primary} />
+        <Ionicons name="star-outline" size={18} color={Colors.primary} />
       </View>
-    </ScrollView>
+      <View style={styles.allIngredientsContainer}>
+        <IngredientTag title="Fruits" />
+        <IngredientTag title="Vegetables" />
+        <IngredientTag title="Whole grains" />
+        <IngredientTag title="Fish" />
+        <IngredientTag title="Nuts" />
+        {/* <IngredientTag title="Olive Oil" /> */}
+      </View>
+      <View style={styles.dietImageContainer}>
+        <Image
+          resizeMode="contain"
+          style={styles.dietImage}
+          source={seafoods_emoji}
+        />
+      </View>
+
+      <TouchableOpacity onPress={() => setViewimgMore(true)}>
+        <Text style={styles.moreInfotext}>Tap to see more info</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -110,18 +105,18 @@ export default DietPlanCard;
 const styles = StyleSheet.create({
   container: {
     width: width * 0.96,
-    height: height * 0.6,
     borderWidth: 1,
     borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
     backgroundColor: "white",
     borderColor: Colors.primary,
   },
   dietNameText: {
     fontWeight: "600",
-    fontSize: 30,
+    fontSize: 25,
     color: Colors.dark,
+    fontFamily: SEMI_BOLD,
   },
   ratingContainer: {
     flexDirection: "row",
@@ -134,7 +129,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   ingerdientTagContainer: {
-    width: "30%",
     backgroundColor: Colors.primary,
     alignItems: "center",
     paddingHorizontal: 10,
@@ -146,8 +140,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   dietImage: {
-    width: "80%",
-    // height: "70%",
+    width: 200,
+    height: 300,
   },
   dietImageContainer: {
     alignItems: "center",
@@ -155,8 +149,8 @@ const styles = StyleSheet.create({
   },
   moreInfotext: {
     textAlign: "center",
-    fontWeight: "600",
-    fontSize: 20,
+    fontWeight: "500",
+    fontSize: 16,
     color: Colors.link,
   },
 });

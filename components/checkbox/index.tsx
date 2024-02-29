@@ -17,11 +17,12 @@ const AnimatedOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 type Props = {
   handleSelect: (name: string) => void;
+  handleRemove: (name: string) => void;
   selected: boolean;
   name: string;
 };
 
-const CheckBox = ({ handleSelect, selected, name }: Props) => {
+const CheckBox = ({ handleSelect, selected, name, handleRemove }: Props) => {
   const animatedStyles = useAnimatedStyle(() => {
     return {
       backgroundColor: selected ? Colors.primary : "transparent",
@@ -35,7 +36,7 @@ const CheckBox = ({ handleSelect, selected, name }: Props) => {
     <AnimatedOpacity
       style={[animatedStyles, styles.container]}
       onPress={() => {
-        handleSelect(name);
+        !selected ? handleSelect(name) : handleRemove(name);
         // console.log(name);
       }}
     ></AnimatedOpacity>

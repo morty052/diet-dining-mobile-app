@@ -36,6 +36,7 @@ import { QuickFilters, StoreMenuSectionList, StoreTags } from "./components";
 import burger from "../../assets/burger.jpg";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import StoreInfo from "./components/StoreInfo";
+import LikeButton from "../../components/interaction-buttons/LikeButton";
 
 type Props = {};
 
@@ -98,20 +99,21 @@ const Header = ({
               className="h-8 w-8 flex justify-center items-center  bg-white rounded-full"
               onPress={() => navigation.goBack()}
             >
-              <Ionicons size={20} name="arrow-back" color={"black"} />
+              <Ionicons size={20} name="arrow-back" color={Colors.primary} />
             </TouchableOpacity>
             {isVisible && <Text>{store_name}</Text>}
           </View>
           <View className="flex-row gap-2 items-center">
-            <TouchableOpacity
+            {/* <TouchableOpacity
               className="h-8 w-8 flex justify-center items-center  bg-white rounded-full"
               onPress={() => setSearching(true)}
             >
-              <Ionicons size={20} name="search" color={"black"} />
-            </TouchableOpacity>
-            <TouchableOpacity className="h-8 w-8 flex justify-center items-center  bg-white rounded-full">
-              <Ionicons size={20} name="heart" color={"black"} />
-            </TouchableOpacity>
+              <Ionicons size={20} name="star-outline" color={Colors.primary} />
+            </TouchableOpacity> */}
+            {/* <TouchableOpacity className="h-8 w-8 flex justify-center items-center  bg-white rounded-full">
+              <Ionicons size={20} name="heart-outline" color={Colors.primary} />
+            </TouchableOpacity> */}
+            <LikeButton background />
           </View>
         </View>
         {isVisible && filters.length > 1 && <QuickFilters filters={filters} />}
@@ -170,82 +172,6 @@ const HeaderRightButtons = ({
   );
 };
 
-const StoreFront = ({ navigation, route, store_id, store_name }: any) => {
-  const [isViewable, setisViewable] = useState(false);
-  const [searching, setSearching] = useState(false);
-
-  const fetchStore = async () => {
-    const res = await fetch(
-      // `http://localhost:3000/stores/get-single?store_id=${store_id}`
-      `https://diet-dining-server.onrender.com/stores/get-single?store_id=${store_id}`
-    );
-    const data = await res.json();
-    return data[0];
-  };
-
-  const {
-    data: store,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["active store"],
-    queryFn: fetchStore,
-  });
-
-  const scrollRef = useRef<ScrollView>(null);
-
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (e.nativeEvent.contentOffset.y > 200) {
-      setisViewable(true);
-      // navigation.setOptions({
-      //   headerStyle: { backgroundColor: "white" },
-      //   headerTitle: store_name,
-      // });
-    } else if (e.nativeEvent.contentOffset.y < 200) {
-      setisViewable(false);
-      // navigation.setOptions({
-      //   header: undefined,
-      //   headerStyle: { backgroundColor: "transparent" },
-      //   headerTitle: "",
-      // });
-    }
-  };
-
-  if (isLoading) {
-    return <ScrollView ref={scrollRef}></ScrollView>;
-  }
-
-  if (isError) {
-    return <ErrorState />;
-  }
-
-  return (
-    <>
-      <Header
-        filters={store?.categories}
-        setSearching={setSearching}
-        isVisible={isViewable}
-        store_name={store_name}
-      />
-      <ScrollView
-        className="bg-white relative"
-        onScroll={(e) => handleScroll(e)}
-        scrollEventThrottle={16}
-        ref={scrollRef}
-      >
-        <ImageBackground style={[{ height: 300 }]} source={burger} />
-        <View className={`px-2 bg-white`}>
-          <StoreTags store_id={store_id} store_name={store_name} />
-          <View className="mt-4 ">
-            <StoreMenuSectionList data={store?.menu} />
-          </View>
-        </View>
-      </ScrollView>
-      <StoreSearchModal setSearching={setSearching} searching={searching} />
-    </>
-  );
-};
-
 const RestaurantScreen = ({ navigation, route }: any) => {
   const { store_id, store_name } = route.params;
   const [isViewable, setisViewable] = useState(false);
@@ -296,6 +222,8 @@ const RestaurantScreen = ({ navigation, route }: any) => {
     return <ErrorState />;
   }
 
+  const { latitude, longitude } = store?.address ?? {};
+
   return (
     <>
       <Header
@@ -312,7 +240,11 @@ const RestaurantScreen = ({ navigation, route }: any) => {
       >
         <ImageBackground style={[{ height: 300 }]} source={burger} />
         <View className={`px-2 bg-white`}>
-          <StoreTags store_name={store_name} />
+          <StoreTags
+            store_address={store?.store_address}
+            store_id={store_id}
+            store_name={store_name}
+          />
           <View className="mt-4 ">
             <StoreMenuSectionList data={store?.menu} />
           </View>

@@ -11,15 +11,23 @@ const tags = ["Juice", "Burgers", "Halal", "Keto", "Rice", "Soups"];
 
 const { width, height } = Dimensions.get("screen");
 
-const StoreMap = () => {
+const StoreMap = ({
+  latitude,
+  longitude,
+}: {
+  latitude: number;
+  longitude: number;
+}) => {
   return (
     <MapView
       style={styles.map}
       //   ref={mapRef}
-      // provider={PROVIDER_GOOGLE}
+      provider={PROVIDER_GOOGLE}
       initialRegion={{
-        latitude: 49.246292,
-        longitude: -123.116226,
+        // latitude: 49.246292,
+        // longitude: -123.116226,
+        latitude: latitude,
+        longitude: longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       }}
@@ -30,15 +38,15 @@ const StoreMap = () => {
       //     longitudeDelta: 0.0421,
       //   }}
     >
-      {/* {location && (
-            <Marker
-              coordinate={{
-                latitude: latitude as number,
-                longitude: longitude as number,
-              }}
-              title="Delivery location"
-            />
-          )} */}
+      {latitude && longitude && (
+        <Marker
+          coordinate={{
+            latitude: latitude as number,
+            longitude: longitude as number,
+          }}
+          title="Delivery location"
+        />
+      )}
     </MapView>
   );
 };
@@ -47,7 +55,7 @@ const StoreTags = () => {
   return (
     <View style={styles.storeTagsContainer}>
       {tags.map((tag, index) => (
-        <Text style={{ color: Colors.gray }} key={tag}>
+        <Text style={{ color: "gray" }} key={tag}>
           {`${tag}`}
           {index + 1 < tags.length && " -"}
         </Text>
@@ -56,37 +64,74 @@ const StoreTags = () => {
   );
 };
 
+const StoreRating = () => {
+  return (
+    <View className="flex flex-row ">
+      <View className="items-center flex flex-row ">
+        <Ionicons color={"gold"} size={16} name="star" />
+        <Text className=" font-medium"> 4.7 (252 ratings)</Text>
+      </View>
+    </View>
+  );
+};
+
 const StoreInfo = ({ route }) => {
-  const { store_name } = route.params;
+  const { store_name, store_address } = route.params;
+
+  const { latitude, longitude } = store_address;
 
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>
-        <StoreMap />
+        <StoreMap latitude={Number(latitude)} longitude={Number(longitude)} />
       </View>
       <View style={styles.storeInfoContainer}>
         <Text style={styles.storeNameText}>{store_name}</Text>
         <StoreTags />
-        <View className="flex flex-row ">
-          <View className="items-center flex flex-row ">
-            <Ionicons color={"gold"} size={16} name="star" />
-            <Text className=" font-medium"> 4.7 (252 ratings)</Text>
-          </View>
-        </View>
+        <StoreRating />
       </View>
 
       {/* LOCATION */}
-      <View style={styles.infoContainer}>
-        <Ionicons name="location-outline" size={20} color="#1F2937" />
-        <View style={styles.infoInnerContainer}>
-          <View>
-            <Text className=" text-[14px] font-medium text-dark">Address</Text>
-            <Text className=" font-medium text-dark">200 West 74th st</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+      <View className="border-y border-black/10 py-6 px-3 flex flex-row justify-between">
+        <View className="flex-1 flex-row items-center">
+          <Ionicons size={24} name="location-outline" />
+          <Text className="font-medium text-dark ml-2">
+            12 deerfield ln, 90210 Vancouver
+          </Text>
         </View>
+        <Ionicons color={Colors.dark} size={20} name="chevron-forward" />
+      </View>
+      {/* OPENING HOURS */}
+      <View className="border-y border-black/10 py-6 px-3 flex flex-row justify-between">
+        <View className="flex-1 flex-row items-center">
+          <Ionicons size={24} name="time-outline" />
+          <Text className="font-medium text-green-600 ml-2">Open -</Text>
+          <Text className="text-dark">Closes at 9.00PM</Text>
+        </View>
+        <Ionicons color={Colors.dark} size={20} name="chevron-down" />
+      </View>
+
+      {/* Call Store */}
+      <View className="border-y border-black/10 py-6 px-3 flex flex-row justify-between">
+        <View className="flex-1 flex-row items-center">
+          <Ionicons size={24} name="call-outline" />
+          <Text className="text-dark ml-2">Call store</Text>
+        </View>
+        <Ionicons color={Colors.dark} size={20} name="chevron-forward" />
+      </View>
+
+      {/* REFER FRIEND */}
+      <View className="border-y border-black/10 py-6 px-3 flex flex-row justify-between">
+        <View className="flex-1 flex-row items-center">
+          <Ionicons color={Colors.primary} size={24} name="gift" />
+          <Text className="text-dark ml-2">Refer Friend </Text>
+        </View>
+        <Ionicons color={Colors.dark} size={20} name="chevron-forward" />
       </View>
     </View>
+    // <>
+
+    // </>
   );
 };
 
@@ -119,6 +164,7 @@ const styles = StyleSheet.create({
   storeTagsContainer: {
     flexDirection: "row",
     columnGap: 4,
+    paddingVertical: 4,
   },
   infoContainer: {
     flexDirection: "row",

@@ -14,3 +14,5 @@ export * from "./stores";
 export * from "./restaurantscreen";
 export * from "./quiz-routes";
 export * from "./search-screen";
+export * from "./location-permission-screen";
+export * from "./meal-breakdown";

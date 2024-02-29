@@ -22,12 +22,18 @@ import { useNavigation } from "@react-navigation/native";
 import { ceaser_salad, chicken_salad } from "../../assets/dishes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../../components/ui";
+import Colors from "../../constants/colors";
+import DietPlanCard from "../../components/cards/DietPlanCard";
+import { SEMI_BOLD } from "../../constants/fontNames";
+import { seafoods_emoji } from "../../assets/foodcategories";
+import { DietBrowser } from "./components/DietBrowser";
 
 type DietStackParamList = {
   DietHome: undefined;
   DietQuiz: undefined;
   DietPlan: undefined;
   DailyDiet: undefined;
+  DietBrowser: undefined;
 };
 
 const Stack = createNativeStackNavigator<DietStackParamList>();
@@ -115,16 +121,18 @@ function DishPreviewCard({
 }
 
 const Circle = ({ onPress }: { onPress: () => void }) => {
-  const width = useWindowDimensions().width;
+  const { width, height } = useWindowDimensions();
   const circleWidth = width * 2;
+  const circleHeight = height * 0.7;
 
   return (
     <View
       style={{
         width: circleWidth,
+        height: circleHeight,
         transform: [{ translateX: -width / 2 }],
       }}
-      className=" bg-primary rounded-bl-full   h-96 px-2 "
+      className=" bg-primary rounded-bl-full    px-2 "
     >
       <SafeAreaView>
         <View className="flex items-center w-1/2 mx-auto pt-10 ">
@@ -193,41 +201,71 @@ const Tabs = ({
 const DietHomePage = ({ navigation }: { navigation: any }) => {
   return (
     <>
-      <View>
-        <Circle onPress={() => navigation.navigate("QuizRoutes")} />
-        <View className="py-10 space-y-6 px-2">
-          <Text className="text-3xl text-dark font-medium">
-            Vegetarian Diets
-          </Text>
-          <FlatList
-            horizontal
-            data={menu}
-            renderItem={({ item }) => (
-              <DishPreviewCard
-                _id=""
-                image={
-                  "https://img.freepik.com/free-photo/trifle-dessert-with-berries-cream-isolated-white-background-ai-generative_123827-24185.jpg?size=626&ext=jpg&ga=GA1.2.1014310989.1704930583&semt=ais"
-                }
-                title={item.name}
-              />
-            )}
-            keyExtractor={(item) => item.name}
-          />
-          <Text className="text-3xl text-dark font-medium">Balanced</Text>
-          <FlatList
-            horizontal
-            data={menu}
-            renderItem={({ item }) => (
-              <DishPreviewCard
-                _id=""
-                image={
-                  "https://img.freepik.com/free-photo/trifle-dessert-with-berries-cream-isolated-white-background-ai-generative_123827-24185.jpg?size=626&ext=jpg&ga=GA1.2.1014310989.1704930583&semt=ais"
-                }
-                title={item.name}
-              />
-            )}
-            keyExtractor={(item) => item.name}
-          />
+      <View
+        style={{
+          backgroundColor: "white",
+          flex: 1,
+          justifyContent: "center",
+          paddingBottom: 50,
+        }}
+      >
+        <View
+          style={{
+            paddingBottom: 30,
+            rowGap: 50,
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ rowGap: 30, paddingHorizontal: 10 }}>
+            <View>
+              <Text
+                style={{
+                  fontSize: 30,
+                  fontFamily: SEMI_BOLD,
+                  color: Colors.dark,
+                  textAlign: "center",
+                  marginBottom: 20,
+                }}
+              >
+                Find your meal plan
+              </Text>
+              <Text
+                style={{
+                  fontSize: 17,
+                  fontFamily: SEMI_BOLD,
+                  color: Colors.dark,
+                  textAlign: "center",
+                }}
+                className="text-center text-dark font-medium "
+              >
+                Take a short quiz to get a diet plan tailored to your specific
+                needs or browse popular plans on diet dining.
+              </Text>
+            </View>
+            <Image
+              source={seafoods_emoji}
+              style={{ height: 200, width: 200, alignSelf: "center" }}
+            />
+          </View>
+          <View style={{ paddingHorizontal: 20, width: "100%" }}>
+            <Button
+              onPress={() => navigation.navigate("QuizRoutes")}
+              variant="default"
+              title="Start Quiz"
+            />
+            {/* <Text
+              style={{
+                color: Colors.link,
+                fontFamily: SEMI_BOLD,
+                textAlign: "center",
+                marginTop: 8,
+              }}
+              onPress={() => navigation.navigate("DietBrowser")}
+            >
+              Browse popular plans
+            </Text> */}
+          </View>
         </View>
       </View>
       {/* <StatusBar backgroundColor="#90c466" style="light" /> */}
@@ -426,19 +464,63 @@ const DailyDiet = ({ navigation }: { navigation: any }) => {
 
 export const DietPlanner = ({ navigation }: any) => {
   const { plan } = useQuizStore();
+
+  if (!plan) {
+    return (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="DietHome" component={DietHomePage} />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="DailyDiet"
+          component={DailyDiet}
+        />
+        <Stack.Screen
+          options={{
+            headerLeft: () => (
+              <Text onPress={() => navigation.navigate("DietHome")}>Back</Text>
+            ),
+            headerTitle: "",
+            headerShadowVisible: false,
+          }}
+          name="DietBrowser"
+          component={DietBrowser}
+        />
+      </Stack.Navigator>
+    );
+  }
+
   return (
     <>
-      {!plan ? (
-        <Stack.Navigator
-          screenOptions={{ headerShown: false }}
-          initialRouteName="DietHome"
-        >
-          <Stack.Screen name="DietHome" component={DietHomePage} />
-          <Stack.Screen name="DailyDiet" component={DailyDiet} />
-        </Stack.Navigator>
-      ) : (
-        <DailyDiet navigation={navigation} />
-      )}
+      <Stack.Navigator initialRouteName={!plan ? "DietHome" : "DailyDiet"}>
+        <Stack.Screen
+          options={{
+            headerShown: !plan ? true : false,
+            headerLeft: () => (
+              <Text onPress={() => navigation.goBack()}>Back</Text>
+            ),
+            headerTitle: "",
+            headerShadowVisible: false,
+          }}
+          name="DietHome"
+          component={DailyDiet}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="DailyDiet"
+          component={DailyDiet}
+        />
+        <Stack.Screen
+          options={{
+            headerLeft: () => (
+              <Text onPress={() => navigation.navigate("DietHome")}>Back</Text>
+            ),
+            headerTitle: "",
+            headerShadowVisible: false,
+          }}
+          name="DietBrowser"
+          component={DietBrowser}
+        />
+      </Stack.Navigator>
     </>
   );
 };

@@ -90,8 +90,9 @@ const OnboardingControls = ({
     return false;
   }, [activePage]);
 
+  // TODO: MOVE SAVING OF VARIABLE TO SIGN UP
   async function handleFinish() {
-    await save("ONBOARDED", "TRUE");
+    // await save("ONBOARDED", "TRUE");
     console.log("ggg");
     // @ts-ignore
     navigate.navigate("SignUp");

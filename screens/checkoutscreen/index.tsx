@@ -349,16 +349,18 @@ function CheckOutItem({ item, handleRemoveItem }) {
   return (
     <View
       className="flex-row justify-between items-center border-b border-black/10 pb-2"
-      key={item._id}
+      key={item.item_id}
     >
       <View className="flex-row space-x-4 py-4">
         <Text className="font-medium text-dark text-[18px]">
-          {item.quantity}x
+          {item.item_quantity}x
         </Text>
-        <Text className="font-medium text-[18px] text-dark">{item.name}</Text>
+        <Text className="font-medium text-[18px] text-dark">
+          {item.item_name}
+        </Text>
       </View>
       <View className="flex flex-row items-center">
-        <Text className="font-medium text-dark">${item.total}</Text>
+        <Text className="font-medium text-dark">${item.item_total}</Text>
         <TouchableOpacity
           onPress={handleRemoveItem}
           className="ml-4 bg-red-500/10 rounded-full h-8 w-8  justify-center items-center"
@@ -370,8 +372,8 @@ function CheckOutItem({ item, handleRemoveItem }) {
   );
 }
 
-function CheckOutGrid() {
-  const { cartItems, handleCheckout, removeItemFromCart } = useCartStore();
+function CheckOutGrid({ vendorItems }) {
+  const { removeItemFromCart } = useCartStore();
 
   return (
     <View className="border-t px-3 py-4 border-black/10">
@@ -384,9 +386,9 @@ function CheckOutGrid() {
         </TouchableOpacity>
       </View>
       <View className="mt-4">
-        {cartItems.map((item) => (
+        {vendorItems.map((item) => (
           <CheckOutItem
-            handleRemoveItem={() => removeItemFromCart(item._id)}
+            handleRemoveItem={() => removeItemFromCart(item.item_id)}
             key={item._id}
             item={item}
           />
@@ -520,6 +522,8 @@ export function CheckoutScreen({ route, navigation }) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: store_name,
+      headerShown: true,
+      headerShadowVisible: false,
     });
   }, []);
 
@@ -527,10 +531,10 @@ export function CheckoutScreen({ route, navigation }) {
     <>
       {!checkoutComplete && !loading && (
         <View className="flex-1  bg-white">
-          <ScrollView className="relative ">
+          <ScrollView className="relative pt-6 ">
             <Header />
-            <View className="pb-28">
-              <CheckOutGrid />
+            <View className="pb-32">
+              <CheckOutGrid vendorItems={vendorItems} />
               <ExtraInteractionButtons
                 store_id={store_id}
                 store_name={store_name}

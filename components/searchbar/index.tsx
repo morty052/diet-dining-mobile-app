@@ -237,9 +237,9 @@ export const SearchBar = () => {
         >
           <Text>Search Diet Dining</Text>
         </Pressable>
-        <TouchableOpacity onPress={() => setModalOpen(true)}>
+        {/* <TouchableOpacity onPress={() => setModalOpen(true)}>
           <Ionicons name={"options-outline"} size={24} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </Pressable>
       <SortingModal setModalOpen={setModalOpen} modalOpen={modalOpen} />
     </View>

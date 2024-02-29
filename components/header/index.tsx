@@ -15,78 +15,68 @@ const Badge = ({ count }: { count: number }) => {
   );
 };
 
-export const Header = () =>
-  //   {
-  //   focused,
-  //   setFocused,
-  //   query,
-  //   setQuery,
-  // }: {
-  //   focused: boolean;
-  //   setFocused: boolean;
-  //   query: string;
-  //   setQuery: (search: string) => void;
-  // }
-  {
-    const navigation = useNavigation();
-    const { itemsCount } = useCartStore();
+export const Header = () => {
+  const navigation = useNavigation();
+  const { itemsCount } = useCartStore();
 
-    return (
-      <SafeAreaView
-        edges={{
-          bottom: "off",
-          top: "additive",
-        }}
-        className="gap-4 "
-      >
-        <View className={styles.container}>
-          <View className={styles.deliveryInfoContainer}>
-            <Ionicons name="location-outline" size={25} color="black" />
-            <View>
-              <Text>Delivery - Now</Text>
-              <TouchableOpacity onPress={() => deleteKey("ONBOARDED")}>
-                <Text className={styles.locationText}>
-                  Select Delivery Location
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View className={styles.extraButtonsContainer}>
+  return (
+    <SafeAreaView
+      edges={{
+        bottom: "off",
+        top: "additive",
+      }}
+      className="gap-4 bg-white"
+    >
+      <View className={styles.container}>
+        <View className={styles.deliveryInfoContainer}>
+          <Ionicons
+            // @ts-ignore
+            onPress={() => navigation.navigate("LocationScreen")}
+            name="location-outline"
+            size={25}
+            color="black"
+          />
+          <View>
+            <Text>Delivery - Now</Text>
             <TouchableOpacity
-              onPress={() =>
-                // @ts-ignore
-                navigation.navigate("Test", {
-                  store_id: "bda93bf7-3060-46fd-bee4-692cabba7299",
-                  store_name: "Papa Johns",
-                })
-              }
+              // @ts-ignore
+              onPress={() => navigation.navigate("LocationScreen")}
             >
-              <Ionicons name="person-outline" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Cart")}
-              className="relative"
-            >
-              <Ionicons
-                // @ts-ignore
-
-                name="cart-outline"
-                size={24}
-                color="black"
-              />
-              {itemsCount > 0 && <Badge count={itemsCount} />}
+              <Text className={styles.locationText}>
+                Select Delivery Location
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
-        <View className="px-2.5 border-b border-primary ">
-          <SearchBar />
+        <View className={styles.extraButtonsContainer}>
+          <TouchableOpacity
+            onPress={() =>
+              // @ts-ignore
+              // deleteKey("ONBOARDED")
+              navigation.navigate("Account")
+            }
+          >
+            <Ionicons name="person-outline" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            // @ts-ignore
+            onPress={() => navigation.navigate("Cart")}
+            className="relative"
+          >
+            <Ionicons name="cart-outline" size={24} color="black" />
+            {itemsCount > 0 && <Badge count={itemsCount} />}
+          </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    );
-  };
+      </View>
+      <View className="px-2.5 border-b border-primary ">
+        <SearchBar />
+      </View>
+    </SafeAreaView>
+  );
+};
 
 const styles = {
-  container: "px-4 pt-4   flex items-center flex-row justify-between",
+  container: "px-4 pt-4   flex items-center flex-row justify-between ",
   extraButtonsContainer: "flex flex-row gap-x-4",
   deliveryInfoContainer: "flex-row items-center  gap-2",
   locationText: "text-dark font-semibold text-[16px]",

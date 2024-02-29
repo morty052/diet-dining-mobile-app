@@ -5,8 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  KeyboardAvoidingView,
   useWindowDimensions,
+  Pressable,
 } from "react-native";
 import React, { useMemo, useRef, useState } from "react";
 import {
@@ -18,6 +18,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IOS } from "../../utils/Platform";
+import { useQuery } from "@tanstack/react-query";
+import { Ivendor } from "../../store/cartStore";
+import { TcartItem } from "../../contexts/CartContext";
+import Colors from "../../constants/colors";
+import LikeButton from "../../components/interaction-buttons/LikeButton";
 
 const categories = [
   // {
@@ -202,17 +207,76 @@ export const SearchModal = () => {
 
 type Props = {};
 
+//TODO: HANDLE SEARCH PROPERLY
 export const SearchScreen = ({ navigation }: any) => {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  const [searchArray, setSearchArray] = useState<null | Ivendor[]>(null);
+  const [products, setProducts] = useState<null | TcartItem[]>(null);
+
+  const fetchStoresAndProducts = async () => {
+    // const res = await fetch("http://localhost:3000/stores/search-stores");
+    const res = await fetch(
+      "https://diet-dining-server.onrender.com/stores/search-stores"
+    );
+    const data = await res.json();
+
+    const productsRes = await fetch(
+      "https://diet-dining-server.onrender.com/stores/search-products"
+      // "http://localhost:3000/stores/search-products"
+    );
+
+    const productData = await productsRes.json();
+
+    setProducts(productData);
+
+    //
+    setSearchArray(data);
+
+    return data;
+  };
+
+  const { data: stores, isLoading } = useQuery({
+    queryKey: ["searcharray"],
+    queryFn: fetchStoresAndProducts,
+  });
 
   const queryResults = useMemo(() => {
-    if (!query) {
-      return [];
+    // * RETURN NULL IF FETCHING IS ACTIVE OR USER NOT TYPING OR SEARCH ARRAY IS EMOTY
+    if (!searchArray || isLoading || !query) {
+      return null;
     }
 
-    return categories.filter((item) =>
+    // * RETURN NULL IF USER IS TYPING BUT NO STORES MATCH SEARCH QUERY
+    if (
+      !searchArray.filter((item) =>
+        item.store_name.toLowerCase().includes(query.toLowerCase())
+      )
+    ) {
+      return null;
+    }
+
+    // * FINNALY RETURN RESULTS OF QUERY IF STORE ARRAY EXISTS AND USER IS TYPING AND THERE ARE RESULTS
+    return searchArray.filter((item) =>
+      item.store_name.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [query]);
+
+  const productsQueryResults = useMemo(() => {
+    if (!products || isLoading || !query) {
+      return null;
+    }
+
+    if (
+      !products.filter((item) =>
+        item.name.toLowerCase().includes(query.toLowerCase())
+      )
+    ) {
+      return null;
+    }
+
+    return products?.filter((item) =>
       item.name.toLowerCase().includes(query.toLowerCase())
     );
   }, [query]);
@@ -267,10 +331,131 @@ export const SearchScreen = ({ navigation }: any) => {
             </View>
           )}
 
-          {/* SEARCH RESULTS */}
-          {queryResults?.map((item) => (
-            <Text key={item.name}>{item.name}</Text>
-          ))}
+          {/* STORE SEARCH RESULTS */}
+          <View style={{ rowGap: 14, paddingTop: 40 }}>
+            {queryResults && queryResults.length > 0 && (
+              <Text
+                style={{ fontWeight: "800", color: Colors.dark, fontSize: 28 }}
+              >
+                Vendors
+              </Text>
+            )}
+            {queryResults?.map((item) => (
+              <Pressable
+                onPress={() =>
+                  // @ts-ignore
+                  navigation.navigate("Restaurant", {
+                    store_name: item.store_name,
+                    store_id: item._id,
+                    store_image: item.store_image,
+                  })
+                }
+                style={{
+                  flexDirection: "row",
+                  columnGap: 6,
+                  alignItems: "center",
+                }}
+                key={item.store_name}
+              >
+                <Image
+                  resizeMode="cover"
+                  style={{ height: 60, width: 60, borderRadius: 50 }}
+                  source={{ uri: item.store_image }}
+                />
+                {/* ITEM NAME AND OPENING */}
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{ fontSize: 16, fontWeight: "600" }}
+                    className="font-medium"
+                  >
+                    {item.store_name}
+                  </Text>
+                  <Text
+                    style={{ fontSize: 16, fontWeight: "600" }}
+                    className="font-medium"
+                  >
+                    Available at 8:00 AM
+                  </Text>
+                </View>
+
+                {/* LIKE BUTTON */}
+                <Pressable>
+                  <Ionicons size={28} name="heart-outline" />
+                </Pressable>
+              </Pressable>
+            ))}
+          </View>
+          {/* PRODUCTS SEARCH RESULTS */}
+          <View style={{ rowGap: 14, marginTop: 20 }}>
+            {productsQueryResults && productsQueryResults.length > 0 && (
+              <Text
+                style={{ fontWeight: "800", color: Colors.dark, fontSize: 28 }}
+              >
+                Meals
+              </Text>
+            )}
+            {productsQueryResults?.map((item) => (
+              <Pressable
+                onPress={() =>
+                  // @ts-ignore
+                  navigation.navigate("FoodScreen", {
+                    _id: item._id,
+                  })
+                }
+                style={{
+                  flexDirection: "row",
+                  columnGap: 6,
+                  alignItems: "center",
+                }}
+                key={item.name}
+              >
+                <Image
+                  resizeMode="cover"
+                  style={{ height: 60, width: 60, borderRadius: 50 }}
+                  // @ts-ignore
+                  source={{ uri: item.image }}
+                />
+                {/* ITEM NAME AND OPENING */}
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{ fontSize: 16, fontWeight: "600" }}
+                    className="font-medium"
+                  >
+                    {item.name}
+                  </Text>
+                  <Text
+                    style={{ fontSize: 16, fontWeight: "600" }}
+                    className="font-medium"
+                  >
+                    {item.store_name}
+                  </Text>
+                </View>
+
+                {/* LIKE BUTTON */}
+                <LikeButton background />
+              </Pressable>
+            ))}
+          </View>
+
+          {/* NO RESULTS */}
+          {/* FIX ME */}
+          <View style={{ rowGap: 14 }}>
+            {query &&
+              queryResults &&
+              productsQueryResults &&
+              productsQueryResults?.length < 1 &&
+              queryResults?.length < 1 && (
+                <Text
+                  style={{
+                    fontWeight: "800",
+                    color: Colors.dark,
+                    fontSize: 28,
+                  }}
+                >
+                  No Results
+                </Text>
+              )}
+          </View>
         </ScrollView>
       </View>
     </SafeAreaView>

@@ -92,7 +92,7 @@ const HomeMenu = () => {
   }
 
   return (
-    <ScrollView className="relative">
+    <ScrollView className="relative bg-white">
       <Screen style="">
         <View>
           <View>

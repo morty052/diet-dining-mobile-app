@@ -18,6 +18,8 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import Foodbg from "../../assets/foodbg.png";
 import emailImage from "../../assets/emailimage.png";
 import { StatusBar } from "expo-status-bar";
+import { save } from "../../lib/secure-store";
+import Colors from "../../constants/colors";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +36,11 @@ const SignUpForm = ({
 }) => {
   const navigation = useNavigation();
 
+  async function handleOldUser() {
+    await save("ONBOARDED", "TRUE");
+    navigation.navigate("App");
+  }
+
   return (
     <Animated.View
       entering={SlideInDown.duration(900)}
@@ -46,6 +53,8 @@ const SignUpForm = ({
         <Text className="text-center  font-medium text-dark">
           Lets's get started with your email
         </Text>
+
+        {/* BUTTON AND INPUT */}
         <View className="py-4">
           <TextInput
             autoCapitalize="none"
@@ -54,6 +63,7 @@ const SignUpForm = ({
             placeholder="Email"
             className="border border-gray-400 text-center rounded-lg p-2"
           />
+
           <Button
             textStyle="text-white"
             // onPress={() => navigation.navigate("App")}
@@ -61,6 +71,14 @@ const SignUpForm = ({
             style="bg-dark w-full text-white mt-4"
             title="Sign Up"
           />
+
+          <Text
+            onPress={() => handleOldUser()}
+            style={{ color: Colors.link }}
+            className="text-center mt-2  font-medium "
+          >
+            i already have an account
+          </Text>
         </View>
         {/* DIVIDER */}
         <View className="flex pt-4 flex-row justify-center items-center">
@@ -131,7 +149,10 @@ const MainSignUpScreen = () => {
       // change the UI to our pending section.
       // setPendingVerification(true);
 
-      navigation.navigate("EmailVerificationScreen");
+      // @ts-ignore
+      navigation.navigate("EmailVerificationScreen", {
+        emailAddress,
+      });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -249,15 +270,15 @@ const OTPInput = ({
   );
 };
 
-const EmailVerificationScreen = () => {
+const EmailVerificationScreen = ({ navigation, route }: any) => {
   const [code, setCode] = React.useState<string>("");
+
+  const { emailAddress } = route.params;
 
   const { isLoaded, signUp, setActive } = useSignUp();
 
-  const navigation = useNavigation();
-
-  const onPressVerify = async (code) => {
-    if (!isLoaded) {
+  const onPressVerify = async (code: string) => {
+    if (!isLoaded || !emailAddress) {
       return;
     }
 
@@ -268,8 +289,17 @@ const EmailVerificationScreen = () => {
       });
 
       // await setActive({ session: completeSignUp.createdSessionId });
-      console.info("completeSignUp", completeSignUp);
-      navigation.navigate("App");
+
+      const res = await fetch(
+        // `http://localhost:3000/auth/signup?email=${emailAddress}`
+        `https://diet-dining-server.onrender.com/auth/signup?email=${emailAddress}`
+      );
+      const { _id } = await res.json();
+
+      await save("user_id", _id);
+
+      // @ts-ignore
+      navigation.navigate("LocationPermission");
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       setCode("");

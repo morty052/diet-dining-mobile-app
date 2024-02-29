@@ -54,47 +54,6 @@ export default function App() {
     return null;
   }
 
-  if (!Onboarded) {
-    console.info(Onboarded);
-    return (
-      <ClerkProvider
-        publishableKey={
-          "pk_test_c3RlYWR5LWNyb3ctNjIuY2xlcmsuYWNjb3VudHMuZGV2JA"
-        }
-      >
-        <QueryClientProvider client={client}>
-          <RootSiblingParent>
-            <NavigationContainer>
-              <Stack.Navigator
-                initialRouteName={"OnBoarding"}
-                screenOptions={{ headerShown: false }}
-              >
-                <Stack.Screen name="OnBoarding" component={OnboardingRoutes} />
-                <Stack.Screen name="App" component={AppTabsNavigator} />
-                <Stack.Screen name="FoodScreen" component={FoodScreen} />
-                <Stack.Screen
-                  name="LocationScreen"
-                  component={LocationScreen}
-                />
-                <Stack.Screen name="Checkout" component={CheckoutScreen} />
-                <Stack.Screen
-                  options={{
-                    headerShown: false,
-                    headerBackTitleVisible: false,
-                  }}
-                  name="Restaurant"
-                  component={RestaurantScreen}
-                />
-              </Stack.Navigator>
-              {/* {Onboarded ? <AppRoutes /> : <Text>NN</Text>} */}
-            </NavigationContainer>
-          </RootSiblingParent>
-        </QueryClientProvider>
-        <StatusBar hidden={false} style="auto" />
-      </ClerkProvider>
-    );
-  }
-
   return (
     <ClerkProvider
       publishableKey={"pk_test_c3RlYWR5LWNyb3ctNjIuY2xlcmsuYWNjb3VudHMuZGV2JA"}
@@ -103,7 +62,7 @@ export default function App() {
         <RootSiblingParent>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <NavigationContainer>
-              <AppRoutes />
+              <AppRoutes ONBOARDED={Onboarded} />
             </NavigationContainer>
           </GestureHandlerRootView>
         </RootSiblingParent>

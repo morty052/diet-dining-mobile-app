@@ -24,7 +24,7 @@ export const ErrorState = (props: Props) => {
 };
 
 const styles = {
-  container: "align-center items-center  py-28 px-4",
+  container: "align-center items-center bg-white  py-28 px-4 flex-1",
   textContainer: "mb-8",
   errorText: "text-4xl font-medium text-dark text-center",
   subText: "text-center text-lg ",

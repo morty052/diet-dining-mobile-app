@@ -10,6 +10,8 @@ import {
   QuizRoutes,
   Stores,
   SearchScreen,
+  AccountScreen,
+  MealBreakDownScreen,
 } from "../screens";
 import OnboardingRoutes from "./OnboardingRoutes";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -78,7 +80,7 @@ export function AppTabsNavigator({ navigation }) {
             title: "Browse",
           }}
           name="Browse"
-          component={Stores}
+          component={SearchScreen}
         />
 
         <Tab.Screen
@@ -130,6 +132,9 @@ export function AppTabsNavigator({ navigation }) {
               // />
             ),
             tabBarActiveTintColor: "green",
+            // tabBarStyle: {
+            //   display: "none",
+            // },
           }}
           name="Diet"
           component={DietPlanner}
@@ -171,16 +176,21 @@ export type RootStackParamList = {
     store_id: string;
     store_name: string;
   };
+  MealBreakDown: {
+    store_id: string;
+    store_name: string;
+  };
+  Account: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const AppStack = () => {
+const AppStack = ({ ONBOARDED }: { ONBOARDED: boolean }) => {
   const navigation = useNavigation();
 
   return (
     <Stack.Navigator
-      initialRouteName={"App"}
+      initialRouteName={!ONBOARDED ? "OnBoarding" : "App"}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="App" component={AppTabsNavigator} />
@@ -211,16 +221,26 @@ const AppStack = () => {
         name="Checkout"
         component={CheckoutScreen}
       />
+      <Stack.Screen name="Restaurant" component={RestaurantScreen} />
       <Stack.Screen
-        options={
-          {
-            // headerTitle: "",
-            // headerBackTitleVisible: false,
-            // headerTransparent: true,
-          }
-        }
-        name="Restaurant"
-        component={RestaurantScreen}
+        options={{
+          headerShown: true,
+          headerShadowVisible: false,
+          headerBackTitle: "",
+        }}
+        name="MealBreakDown"
+        component={MealBreakDownScreen}
+      />
+      <Stack.Screen
+        options={{
+          // headerTitle: "",
+          headerShown: true,
+          headerBackTitleVisible: false,
+          headerShadowVisible: false,
+          headerTitleAlign: "center",
+        }}
+        name="Account"
+        component={AccountScreen}
       />
       <Stack.Screen
         options={{

@@ -5,9 +5,11 @@ import { useNavigation } from "@react-navigation/native";
 export function StoreTags({
   store_name,
   store_id,
+  store_address,
 }: {
   store_name: string;
   store_id: string;
+  store_address: any;
 }) {
   const navigation = useNavigation();
   return (
@@ -22,11 +24,19 @@ export function StoreTags({
             navigation.navigate("StoreInfo", {
               store_id,
               store_name,
+              store_address,
             })
           }
-          className="bg-gray-200 py-2 px-4 rounded-2xl"
+          className="bg-primary py-2 px-4 rounded-2xl flex flex-row items-center"
         >
-          <Text className="text-[12px] font-medium">Store Info</Text>
+          <Ionicons
+            color={"white"}
+            size={18}
+            name="information-circle-outline"
+          />
+          <Text className="text-[14px] font-medium text-white ml-1 ">
+            Store Info
+          </Text>
         </TouchableOpacity>
       </View>
 

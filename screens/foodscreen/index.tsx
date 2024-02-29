@@ -1,18 +1,7 @@
-import {
-  View,
-  Text,
-  Pressable,
-  Image,
-  TouchableOpacity,
-  Modal,
-  ScrollView,
-  useWindowDimensions,
-} from "react-native";
+import { View, Text, TouchableOpacity, Modal, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
 import { useState, useMemo, useEffect } from "react";
-import { menu } from "../../constants/menu";
-import { StatusBar } from "expo-status-bar";
 import { useCartStore } from "../../store/cartStore";
 import { TcartItem } from "../../contexts/CartContext";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,6 +10,10 @@ import { useQuery } from "@tanstack/react-query";
 
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import HorizontalRule from "../../components/ui/HorizontalRule";
+import ItemInfo from "./components/ItemInfo";
+import ExtraSelectionsGrid from "./components/ExtraSelectionsGrid";
+import FrequentlyBought from "./components/FrequentlyBought";
 
 export function useRefreshOnFocus<T>(refetch: () => Promise<T>) {
   const firstTimeRef = React.useRef(true);
@@ -89,19 +82,21 @@ type Props = {};
 //     _id: "8",
 //   },
 // ];
-const BackButtonheader = ({
-  setNutritionalValue,
-}: {
-  setNutritionalValue: any;
-}) => {
+const BackButtonheader = ({ _id, name }: { _id: string; name: string }) => {
   const navigation = useNavigation();
   return (
-    <View className="px-4 flex flex-row justify-between items-center">
+    <View className="px-4 pt-2 flex flex-row justify-between items-center">
       <TouchableOpacity className="w-20" onPress={() => navigation.goBack()}>
         <AntDesign name="arrowleft" size={24} color="black" />
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => setNutritionalValue(true)}
+        onPress={() =>
+          // @ts-ignore
+          navigation.navigate("MealBreakDown", {
+            _id,
+            name,
+          })
+        }
         className="px-4 py-2 rounded-full bg-primary flex-row items-center space-x-2"
       >
         <Text className="text-white text-xs">Nutritional Value</Text>
@@ -182,7 +177,7 @@ const ServingsDisplay = ({
   return (
     <View className="max-w-sm  mx-auto">
       {/* <Text className="text-2xl font-semibold text-dark">Servings</Text> */}
-      <View className="flex-row items-center space-x-8 ">
+      <View className="flex-row items-center space-x-6 ">
         <TouchableOpacity
           onPress={() =>
             itemQuantity <= 1
@@ -190,15 +185,15 @@ const ServingsDisplay = ({
               : setItemQuantity((prev: number) => prev - 1)
           }
         >
-          <AntDesign size={30} name="minuscircleo" />
+          <Ionicons size={35} name="remove-circle-outline" />
         </TouchableOpacity>
-        <Text className="text-3xl  font-semibold text-dark">
+        <Text className="text-[24px]  font-semibold text-dark">
           {itemQuantity}
         </Text>
         <TouchableOpacity
           onPress={() => setItemQuantity((prev: number) => prev + 1)}
         >
-          <AntDesign name="pluscircleo" size={30} color="black" />
+          <Ionicons name="add-circle-outline" size={35} color="black" />
         </TouchableOpacity>
       </View>
     </View>
@@ -220,188 +215,32 @@ const BuyButton = ({
   const [rating, setRating] = useState(-1);
 
   return (
-    <View className="absolute bottom-0 flex items-center  left-0 right-0 gap-4 pb-8 pt-2  bg-white border-gray-300 px-4 border-t ">
+    <SafeAreaView
+      edges={{
+        bottom: "additive",
+        top: "off",
+      }}
+      className="absolute bottom-0 flex items-center  left-0 right-0 gap-4 pb-4 pt-2  bg-white border-gray-300 px-4 border-t "
+    >
       <ServingsDisplay
         itemQuantity={itemQuantity}
         setItemQuantity={setItemQuantity}
       />
       <TouchableOpacity
         onPress={buyItem}
-        className="  w-[90%] py-4 rounded-lg bg-primary px-4 justify-center items-center"
+        className="  w-[98%] py-4 rounded-lg bg-primary px-4 justify-center items-center"
       >
         <Text className=" text-white text-[20px] font-medium">
-          Add {itemQuantity} to Cart - ${price}
+          Add {itemQuantity} to Cart - ${Math.round(price)}
         </Text>
       </TouchableOpacity>
-      <Ratingsmodal
+      {/* <Ratingsmodal
         rating={rating}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         animationType="slide"
-      />
-    </View>
-  );
-};
-
-const ItemInfo = ({
-  price,
-  name,
-  image,
-  description,
-}: {
-  price: number;
-  name: string;
-  image: any;
-  description: string;
-}) => {
-  return (
-    <>
-      <Image
-        resizeMode="contain"
-        className="w-full h-72  mx-auto "
-        source={{ uri: image }}
-      />
-      <View className="">
-        <Text className="text-[24px] font-medium text-dark">{name}</Text>
-        <View className="flex flex-row gap-2">
-          <Text>Vegetarian</Text>
-          <Text>Halal</Text>
-        </View>
-        <View className="flex flex-row gap-2 py-1">
-          <Ionicons color={Colors.primary} size={20} name="star" />
-          <Ionicons color={Colors.primary} size={20} name="star" />
-          <Ionicons color={Colors.primary} size={20} name="star" />
-          <Ionicons color={Colors.primary} size={20} name="star" />
-          <Ionicons color={Colors.primary} size={20} name="star-outline" />
-        </View>
-        <Text className=" text-[17px] my-4 font-medium text-dark mt-1">
-          {description}
-        </Text>
-      </View>
-    </>
-  );
-};
-
-const NutritionalValue = ({
-  viewingNutritionalValue,
-  setNutritionalValue,
-  name,
-}: {
-  name: string;
-  viewingNutritionalValue: boolean;
-  setNutritionalValue: any;
-}) => {
-  const BackButtonheader = () => {
-    return (
-      <View className="px-4 border-b pb-4 border-gray-200 ">
-        <Pressable
-          className=" flex flex-row justify-between items-center"
-          onPress={() => setNutritionalValue(false)}
-        >
-          <View className="border h-8 w-8 rounded-full flex justify-center items-center">
-            <FontAwesome size={20} color="black" name="close" />
-          </View>
-          <View className=" flex-1">
-            <Text className="text-lg text-right font-medium ">{name}</Text>
-          </View>
-        </Pressable>
-      </View>
-    );
-  };
-  return (
-    <>
-      <Modal
-        animationType="slide"
-        visible={viewingNutritionalValue}
-        className=" relative"
-      >
-        <SafeAreaView>
-          <BackButtonheader />
-          <View className="p-4 border-b border-gray-200">
-            <Text className="text-lg font-medium text-dark">
-              Nutritional Information
-            </Text>
-          </View>
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">Kcal /100 g</Text>
-            <Text className="text-lg font-medium text-dark">483.33 kcal</Text>
-          </View>
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">
-              Protein /100 g
-            </Text>
-            <Text className="text-lg font-medium text-dark">9.29 g</Text>
-          </View>
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">Carbs /100 g</Text>
-            <Text className="text-lg font-medium text-dark">9.29 g</Text>
-          </View>
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">Fat /100 g</Text>
-            <Text className="text-lg font-medium text-dark">9.29 g</Text>
-          </View>
-
-          <View className="px-4 py-6 border-b border-gray-200">
-            <Text className="text-lg font-medium text-dark">
-              Additional Information
-            </Text>
-          </View>
-
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">Sugar</Text>
-            <Text className="text-lg font-medium text-dark">483.33 g</Text>
-          </View>
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">Lettuce</Text>
-            <Text className="text-lg font-medium text-dark">9.29 g</Text>
-          </View>
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">Mandarin Oil</Text>
-            <Text className="text-lg font-medium text-dark">9.29 g</Text>
-          </View>
-          <View className="p-4 border-b border-gray-200 flex-row justify-between">
-            <Text className="text-lg font-medium text-dark">Black Pepper</Text>
-            <Text className="text-lg font-medium text-dark">9.29 g</Text>
-          </View>
-        </SafeAreaView>
-      </Modal>
-    </>
-  );
-};
-
-const NutritionalGrid = () => {
-  const { width } = useWindowDimensions();
-
-  const boxWidth = width * 0.3;
-
-  function NutritionBox({}) {
-    return (
-      <View
-        style={{ width: boxWidth }}
-        className="border-2 border-primary items-center flex p-2 "
-      >
-        <View className="gap-1">
-          <Text className="text-[18px] font-medium text-dark text-center">
-            126g
-          </Text>
-          <Text>Calorie</Text>
-        </View>
-      </View>
-    );
-  }
-
-  return (
-    <View className="flex flex-row flex-wrap">
-      <NutritionBox />
-      <NutritionBox />
-      <NutritionBox />
-      <NutritionBox />
-      <NutritionBox />
-      <NutritionBox />
-      <NutritionBox />
-      <NutritionBox />
-      <NutritionBox />
-    </View>
+      /> */}
+    </SafeAreaView>
   );
 };
 
@@ -439,25 +278,23 @@ export const FoodScreen = ({ navigation, route }) => {
     return null;
   }
 
-  console.log(product);
   const { image, name, price, description, vendor } = product ?? {};
 
   return (
-    <SafeAreaView className="flex-1    ">
-      <BackButtonheader setNutritionalValue={setViewingNutritionalValue} />
+    <SafeAreaView className="flex-1 bg-white    ">
+      <BackButtonheader name={name} _id={_id} />
       <ScrollView className="">
         <View className="flex-1  pb-40  relative ">
-          {!loading && (
-            <View className="px-4 ">
-              <ItemInfo
-                description={description as string}
-                image={image as string}
-                name={name as string}
-                price={price as number}
-              />
-              <NutritionalGrid />
-            </View>
-          )}
+          <ItemInfo
+            description={description as string}
+            image={image as string}
+            name={name as string}
+            price={price as number}
+          />
+          <HorizontalRule marginTop={10} marginBottom={20} />
+          <ExtraSelectionsGrid />
+          <HorizontalRule marginTop={10} marginBottom={20} />
+          <FrequentlyBought />
         </View>
       </ScrollView>
       <BuyButton

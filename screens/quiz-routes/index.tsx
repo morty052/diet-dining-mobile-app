@@ -1,5 +1,5 @@
 import { View, Text, Pressable, TouchableOpacity } from "react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -11,20 +11,20 @@ import { useQuizStore } from "../../store/quizStore";
 import CheckBox from "../../components/checkbox";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 import DietPlanCard from "../../components/cards/DietPlanCard";
+import Colors from "../../constants/colors";
+import { SEMI_BOLD } from "../../constants/fontNames";
 
 type Props = {};
 
-const BackButtonheader = () => {
+const BackButton = () => {
   const navigation = useNavigation();
   return (
-    <View className="px-4 pt-14 bg-gray-200">
+    <View className="">
       <Pressable
         className=" flex flex-row justify-between items-center"
         onPress={() => navigation.goBack()}
       >
-        <FontAwesome size={20} color="black" name="chevron-left" />
-        <Text className="text-lg font-medium text-dark">Diet Planner</Text>
-        <FontAwesome size={20} color="black" name="close" />
+        <Ionicons size={20} color="black" name="chevron-back" />
       </Pressable>
     </View>
   );
@@ -98,6 +98,7 @@ const QuestionItem = ({
   selected,
   name,
   handleSelect,
+  handleRemove,
   subtitle,
 }: {
   title: string;
@@ -105,6 +106,7 @@ const QuestionItem = ({
   selected: boolean;
   name: string;
   handleSelect: (name: string) => void;
+  handleRemove: (name: string) => void;
   subtitle?: string;
 }) => {
   return (
@@ -117,7 +119,12 @@ const QuestionItem = ({
         <Text className="  text-dark text-lg">{title}</Text>
         <Text className="   text-lg">{subtitle}</Text>
       </View>
-      <CheckBox selected={selected} name={name} handleSelect={handleSelect} />
+      <CheckBox
+        handleRemove={handleRemove}
+        selected={selected}
+        name={name}
+        handleSelect={handleSelect}
+      />
     </View>
   );
 };
@@ -126,10 +133,12 @@ const QuestionGrid = ({
   questions,
   selected,
   setSelected,
+  handleRemove,
 }: {
   questions: { name: string; title: string; subtitle?: string }[];
   selected: string;
   setSelected: (name: string) => void;
+  handleRemove: (name: string) => void;
 }) => {
   const [preferences, setPreferences] = useState("");
 
@@ -143,6 +152,7 @@ const QuestionGrid = ({
         // @ts-ignore
         <View key={index}>
           <QuestionItem
+            handleRemove={() => handleRemove(pref.name)}
             name={pref.name}
             subtitle={pref.subtitle}
             selected={selected == pref.name}
@@ -188,8 +198,14 @@ const NextButton = ({
 
   return (
     <>
-      <View className=" px-4">
-        {error && (
+      <SafeAreaView
+        edges={{
+          top: "off",
+          bottom: "additive",
+        }}
+        className=""
+      >
+        {/* {error && (
           <Animated.View
             entering={SlideInDown}
             exiting={SlideOutDown}
@@ -200,14 +216,15 @@ const NextButton = ({
               Please Select at least one option
             </Text>
           </Animated.View>
-        )}
+        )} */}
         <TouchableOpacity
+          style={{ backgroundColor: answer ? Colors.primary : Colors.gray }}
           onPress={() => handleUserSelection(answer)}
-          className="flex w-full max-w-md rounded-lg px-6 py-4 bg-primary  items-center justify-center"
+          className="flex w-full max-w-md rounded-lg px-6 py-4   items-center justify-center"
         >
           <Text className="text-lg font-medium">Next</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </>
   );
 };
@@ -218,20 +235,20 @@ function Preferences({ navigation }: { navigation: any }) {
   const { setMealPreference } = useQuizStore();
 
   return (
-    <SafeAreaView
-      edges={{
-        top: "off",
-        bottom: "additive",
-      }}
-      className="flex-1 flex justify-between bg-gray-200 px-4"
-    >
-      <View className=" py-8">
-        <View className="py-8">
-          <Text className="text-center font-medium text-dark  text-3xl">
-            What best describes your meal preferences?
-          </Text>
-        </View>
+    <View className="flex-1 flex justify-between bg-white px-4">
+      <View style={{ rowGap: 20, paddingTop: 20 }}>
+        <Text
+          style={{
+            textAlign: "center",
+            color: Colors.dark,
+            fontSize: 20,
+            fontFamily: SEMI_BOLD,
+          }}
+        >
+          What best describes your meal preferences?
+        </Text>
         <QuestionGrid
+          handleRemove={() => setSelected("")}
           selected={selected}
           setSelected={setSelected}
           questions={preferenceAnswers}
@@ -247,7 +264,7 @@ function Preferences({ navigation }: { navigation: any }) {
         screen="Allergies"
         navigation={navigation}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -255,20 +272,20 @@ const Allergies = ({ navigation }: { navigation: any }) => {
   const [selected, setSelected] = useState("");
   const { setAllergy } = useQuizStore();
   return (
-    <SafeAreaView
-      edges={{
-        top: "off",
-        bottom: "additive",
-      }}
-      className="flex-1 flex justify-between bg-gray-200 px-4"
-    >
-      <View className=" py-8">
-        <View className="py-8">
-          <Text className="text-center text-dark  text-3xl">
-            Do you have any food allergies?
-          </Text>
-        </View>
+    <View className="flex-1 flex justify-between bg-white px-4">
+      <View style={{ rowGap: 20, paddingTop: 20 }}>
+        <Text
+          style={{
+            textAlign: "center",
+            color: Colors.dark,
+            fontSize: 20,
+            fontFamily: SEMI_BOLD,
+          }}
+        >
+          Do you have any food allergies?
+        </Text>
         <QuestionGrid
+          handleRemove={() => setSelected("")}
           selected={selected}
           setSelected={setSelected}
           questions={allergyAnswers}
@@ -280,13 +297,21 @@ const Allergies = ({ navigation }: { navigation: any }) => {
         screen="DietBudget"
         navigation={navigation}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
 const GettingPlanReadyScreen = () => {
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "",
+    });
+  }, []);
+
   return (
-    <SafeAreaView className="pt-8 bg-gray-200 flex-1">
+    <SafeAreaView className="pt-8 bg-white flex-1">
       <LottieView
         source={sandwich}
         autoPlay
@@ -312,8 +337,8 @@ const DietBudget = ({ navigation }: { navigation: any }) => {
   const { setPlan, answers, dietObject } = useQuizStore();
 
   const handleDietPlan = () => {
-    // setGettingDietPlan(true);
-    navigation.navigate("DietConfirmationScreen");
+    setGettingDietPlan(true);
+    // navigation.navigate("DietConfirmationScreen");
   };
 
   useEffect(() => {
@@ -321,6 +346,7 @@ const DietBudget = ({ navigation }: { navigation: any }) => {
       return;
     }
     const timer = setTimeout(() => {
+      setPlan("plan");
       setGettingDietPlan(false);
       navigation.navigate("Diet");
     }, 8000);
@@ -330,59 +356,66 @@ const DietBudget = ({ navigation }: { navigation: any }) => {
     // };
   }, [gettingDietPlan]);
 
-  const NextButton = ({
-    navigation,
-    screen,
-  }: {
-    navigation: any;
-    screen: string;
-  }) => {
-    return (
-      <View className="flex flex-row justify-center   px-4">
-        <TouchableOpacity
-          onPress={handleDietPlan}
-          className="flex w-full max-w-md rounded-lg px-6 py-4 bg-primary items-center justify-center"
-        >
-          <Text className="text-2xl font-semibold text-white">Next</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  // const NextButton = ({
+  //   navigation,
+  //   screen,
+  // }: {
+  //   navigation: any;
+  //   screen: string;
+  // }) => {
+  //   return (
+  //     <SafeAreaView
+  //       edges={{
+  //         top: "off",
+  //         bottom: "additive",
+  //       }}
+  //       className="flex flex-row justify-center   "
+  //     >
+  //       <TouchableOpacity
+  //         onPress={handleDietPlan}
+  //         className="flex w-full max-w-md rounded-lg px-6 py-4 bg-primary items-center justify-center"
+  //       >
+  //         <Text className="text-2xl font-semibold text-white">Next</Text>
+  //       </TouchableOpacity>
+  //     </SafeAreaView>
+  //   );
+  // };
 
   return (
     <>
-      {!gettingDietPlan ? (
-        <SafeAreaView
-          edges={{
-            top: "off",
-            bottom: "additive",
-          }}
-          className="flex flex-1 justify-between bg-gray-200 px-4"
-        >
-          <View className=" py-8">
-            <View className="py-8">
-              <Text className="text-center text-dark  text-3xl">
-                How much would you like to spend on your daily diet?
-              </Text>
-            </View>
-            <QuestionGrid
-              selected={selected}
-              setSelected={setSelected}
-              questions={budgetAnswers}
-            />
-          </View>
-          <NextButton screen="DietHome" navigation={navigation} />
-        </SafeAreaView>
-      ) : (
-        <GettingPlanReadyScreen />
-      )}
+      <View className="flex flex-1 justify-between bg-white px-4">
+        <View style={{ rowGap: 20, paddingTop: 20 }}>
+          <Text
+            style={{
+              textAlign: "center",
+              color: Colors.dark,
+              fontSize: 20,
+              fontFamily: SEMI_BOLD,
+            }}
+          >
+            How much would you like to spend on your daily diet?
+          </Text>
+          <QuestionGrid
+            handleRemove={() => setSelected("")}
+            selected={selected}
+            setSelected={setSelected}
+            questions={budgetAnswers}
+          />
+        </View>
+        <NextButton
+          answer={selected}
+          handleSelect={handleDietPlan}
+          screen="DietConfirmationScreen"
+          navigation={navigation}
+        />
+      </View>
     </>
   );
 };
 
 const DietConfirmationScreen = ({ navigation }: { navigation: any }) => {
   const [selected, setSelected] = useState("");
-  const [gettingDietPlan, setGettingDietPlan] = useState(false);
+  const [gettingDietPlan, setGettingDietPlan] = useState(true);
 
   const { setPlan, answers, dietObject } = useQuizStore();
 
@@ -426,24 +459,12 @@ const DietConfirmationScreen = ({ navigation }: { navigation: any }) => {
 
   return (
     <>
-      {!gettingDietPlan ? (
-        <SafeAreaView
-          edges={{
-            top: "off",
-            bottom: "additive",
-          }}
-          className="flex flex-1 justify-between bg-gray-200 "
-        >
-          <View className="flex  items-center">
-            <Text className="text-center text-dark  text-3xl my-6">
-              We Found the Best Diet for you!
-            </Text>
-            <DietPlanCard />
-          </View>
-          <NextButton screen="DietHome" navigation={navigation} />
-        </SafeAreaView>
-      ) : (
+      {gettingDietPlan ? (
         <GettingPlanReadyScreen />
+      ) : (
+        <SafeAreaView>
+          <Text>We found a plan for you</Text>
+        </SafeAreaView>
       )}
     </>
   );
@@ -463,12 +484,19 @@ export const QuizRoutes = (props: Props) => {
     <>
       <Stack.Navigator
         screenOptions={{
-          header: (navigation) => <BackButtonheader />,
+          headerLeft: () => <BackButton />,
+          headerShadowVisible: false,
         }}
       >
         <Stack.Screen name="Preferences" component={Preferences} />
         <Stack.Screen name="Allergies" component={Allergies} />
-        <Stack.Screen name="DietBudget" component={DietBudget} />
+        <Stack.Screen
+          options={{
+            title: "Budget",
+          }}
+          name="DietBudget"
+          component={DietBudget}
+        />
         <Stack.Screen
           name="DietConfirmationScreen"
           component={DietConfirmationScreen}

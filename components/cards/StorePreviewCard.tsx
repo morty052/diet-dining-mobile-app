@@ -47,7 +47,8 @@ export function StorePreviewCard({ store }: Props) {
         />
         {/* LIKE BUTTON */}
         <View className="absolute right-2 top-2">
-          <Ionicons color={"white"} size={28} name="heart-outline" />
+          <Ionicons color={"white"} size={24} name="heart-outline" />
+          <Text className="text-white">340</Text>
         </View>
         {/* OVERLAY */}
         <View className="absolute top-0 right-0 left-0 bottom-0 bg-black/10 rounded-lg "></View>
@@ -63,7 +64,9 @@ export function StorePreviewCard({ store }: Props) {
           </View>
           {/* RATING */}
           <View className="bg-primary h-10 w-10 rounded-full items-center justify-center">
-            <Text className="font-medium text-[15px] text-white">4.6</Text>
+            <Text className="font-medium text-[15px] text-white">
+              {store.store_rating}
+            </Text>
           </View>
         </View>
       </View>

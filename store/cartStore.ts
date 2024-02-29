@@ -22,6 +22,8 @@ export interface Ivendor {
   store_logo: string;
   vendorTotal: number;
   vendorItemsCount: number;
+  vendorNote?: string;
+  vendorDriverNote?: string;
   vendorItems: {
     item_name: string;
     item_price: number;
