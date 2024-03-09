@@ -210,8 +210,8 @@ const AllCarts = ({ navigation }) => {
   }, [cartItems]);
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-200">
-      <View className="flex flex-row items-center mb-6">
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex pt-4 flex-row items-center mb-6">
         <Text className="font-semibold ml-4 text-dark text-4xl text-center">
           Carts
         </Text>

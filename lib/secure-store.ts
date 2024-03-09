@@ -4,6 +4,7 @@ import * as SecureStore from "expo-secure-store";
 
 async function save(key: string, value: any) {
   await SecureStore.setItemAsync(key, value);
+  console.log("saved", `key: ${key}, value:${value}`);
 }
 
 async function getValueFor(key: string): Promise<string | boolean> {

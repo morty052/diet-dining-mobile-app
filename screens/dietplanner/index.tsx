@@ -120,21 +120,25 @@ function DishPreviewCard({
   );
 }
 
-const Circle = ({ onPress }: { onPress: () => void }) => {
+const Circle = ({ onPress }: { onPress?: () => void }) => {
   const { width, height } = useWindowDimensions();
   const circleWidth = width * 2;
-  const circleHeight = height * 0.7;
+  const circleHeight = height * 0.6;
 
   return (
     <View
-      style={{
-        width: circleWidth,
-        height: circleHeight,
-        transform: [{ translateX: -width / 2 }],
-      }}
+      style={[
+        {
+          width: circleWidth,
+          height: circleHeight,
+          transform: [{ translateX: -width / 2 }],
+          position: "absolute",
+          top: 0,
+        },
+      ]}
       className=" bg-primary rounded-bl-full    px-2 "
     >
-      <SafeAreaView>
+      {/* <SafeAreaView>
         <View className="flex items-center w-1/2 mx-auto pt-10 ">
           <View className="py-4">
             <Text className="text-center text-4xl tracking-wide text-light font-semibold">
@@ -148,7 +152,7 @@ const Circle = ({ onPress }: { onPress: () => void }) => {
             <Button onPress={onPress} variant="light" title="Get Started" />
           </View>
         </View>
-      </SafeAreaView>
+      </SafeAreaView> */}
     </View>
   );
 };
@@ -399,56 +403,6 @@ const DailyDiet = ({ navigation }: { navigation: any }) => {
                 <Text className="text-center text-2xl text-dark font-medium">
                   Day 1 of 7
                 </Text>
-              </View>
-              <View className="pt-10 pb-28 px-2 space-y-2 ">
-                <View className="flex-row justify-between items-center py-2 ">
-                  <Text className="text-3xl text-dark font-medium">
-                    Breakfast
-                  </Text>
-                  <View className="border-dark bg-primary rounded-3xl px-4 py-2">
-                    <Text className="text-xs text-dark font-medium">
-                      Pending Order
-                    </Text>
-                  </View>
-                </View>
-                <FlatList
-                  horizontal
-                  data={salads}
-                  renderItem={({ item }) => (
-                    <DishPreviewCard
-                      _id={item._id}
-                      image={item.image}
-                      title={item.name}
-                    />
-                  )}
-                  keyExtractor={(item) => item.name}
-                />
-                <Text className="text-3xl text-dark font-medium">Lunch</Text>
-                <FlatList
-                  horizontal
-                  data={seaFood}
-                  renderItem={({ item }) => (
-                    <DishPreviewCard
-                      _id={item._id}
-                      image={item.image}
-                      title={item.name}
-                    />
-                  )}
-                  keyExtractor={(item) => item.name}
-                />
-                <Text className="text-3xl text-dark font-medium">Dinner</Text>
-                <FlatList
-                  horizontal
-                  data={salads}
-                  renderItem={({ item }) => (
-                    <DishPreviewCard
-                      _id={item._id}
-                      image={item.image}
-                      title={item.name}
-                    />
-                  )}
-                  keyExtractor={(item) => item.name}
-                />
               </View>
             </>
           ) : (

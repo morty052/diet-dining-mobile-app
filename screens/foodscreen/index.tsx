@@ -261,8 +261,9 @@ export const FoodScreen = ({ navigation, route }) => {
 
   async function fetchProduct() {
     const res = await fetch(
-      // `http://localhost:3000/stores/get-single-product?product_id=${_id}`
-      `https://diet-dining-server.onrender.com/stores/get-single-product?product_id=${_id}`
+      `http://localhost:3000/stores/get-single-product?product_id=${_id}`
+      // `https://diet-dining-server.onrender.com/stores/get-single-product?product_id=${_id}`
+      // `https://e48d-102-216-10-2.ngrok-free.app/stores/get-single-product?product_id=${_id}`
     );
     const data = await res.json();
     setProduct(data);

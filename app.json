@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.abdulojehumen.dietdining"
@@ -28,8 +26,15 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE"
       ],
-      "package": "com.abdulojehumen.dietdining"
+      "googleServicesFile": "./google-services.json",
+      "package": "com.abdulojehumen.dietdining",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBdE4cgtG-GaHplPTFGDHt1iuegK2rfr7E"
+        }
+      }
     },
+
     "web": {
       "favicon": "./assets/favicon.png"
     },

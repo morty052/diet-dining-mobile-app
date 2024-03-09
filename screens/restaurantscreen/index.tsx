@@ -37,6 +37,8 @@ import burger from "../../assets/burger.jpg";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import StoreInfo from "./components/StoreInfo";
 import LikeButton from "../../components/interaction-buttons/LikeButton";
+import { get_single_store } from "../../lib/supabase";
+import { RestaurantSkeleton } from "../../components/ui/SkeletonBase";
 
 type Props = {};
 
@@ -67,10 +69,12 @@ const Header = ({
   setSearching,
   store_name,
   filters,
+  store_id,
 }: {
   isVisible: boolean;
   setSearching: (b: boolean) => void;
   store_name: string;
+  store_id: string;
   filters: { title: string }[];
 }) => {
   const navigation = useNavigation();
@@ -113,7 +117,7 @@ const Header = ({
             {/* <TouchableOpacity className="h-8 w-8 flex justify-center items-center  bg-white rounded-full">
               <Ionicons size={20} name="heart-outline" color={Colors.primary} />
             </TouchableOpacity> */}
-            <LikeButton background />
+            <LikeButton item_id={store_id} background />
           </View>
         </View>
         {isVisible && filters.length > 1 && <QuickFilters filters={filters} />}
@@ -176,13 +180,19 @@ const RestaurantScreen = ({ navigation, route }: any) => {
   const { store_id, store_name } = route.params;
   const [isViewable, setisViewable] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchStore = async () => {
-    const res = await fetch(
-      // `http://localhost:3000/stores/get-single?store_id=${store_id}`
-      `https://diet-dining-server.onrender.com/stores/get-single?store_id=${store_id}`
-    );
-    const data = await res.json();
+    // const res = await fetch(
+    //   `http://localhost:3000/stores/get-single?store_id=${store_id}`
+    //   // `https://diet-dining-server.onrender.com/stores/get-single?store_id=${store_id}`
+    //   // `https://e48d-102-216-10-2.ngrok-free.app/stores/get-single?store_id=${store_id}`
+    // );
+    // const data = await res.json();
+    // console.log(data);
+    // return data[0];
+
+    const data = await get_single_store(store_id);
     return data[0];
   };
 
@@ -215,18 +225,23 @@ const RestaurantScreen = ({ navigation, route }: any) => {
   };
 
   if (isLoading) {
-    return <ScrollView ref={scrollRef}></ScrollView>;
+    return (
+      <SafeAreaView>
+        <ScrollView ref={scrollRef}>
+          <RestaurantSkeleton />
+        </ScrollView>
+      </SafeAreaView>
+    );
   }
 
   if (isError) {
     return <ErrorState />;
   }
 
-  const { latitude, longitude } = store?.address ?? {};
-
   return (
     <>
       <Header
+        store_id={store_id}
         filters={store?.categories}
         setSearching={setSearching}
         isVisible={isViewable}
@@ -238,7 +253,10 @@ const RestaurantScreen = ({ navigation, route }: any) => {
         scrollEventThrottle={16}
         ref={scrollRef}
       >
-        <ImageBackground style={[{ height: 300 }]} source={burger} />
+        <ImageBackground
+          style={[{ height: 300 }]}
+          source={{ uri: store?.store_image }}
+        />
         <View className={`px-2 bg-white`}>
           <StoreTags
             store_address={store?.store_address}

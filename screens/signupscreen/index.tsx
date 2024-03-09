@@ -18,7 +18,7 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import Foodbg from "../../assets/foodbg.png";
 import emailImage from "../../assets/emailimage.png";
 import { StatusBar } from "expo-status-bar";
-import { save } from "../../lib/secure-store";
+import { getValueFor, save } from "../../lib/secure-store";
 import Colors from "../../constants/colors";
 
 const Stack = createNativeStackNavigator();
@@ -133,22 +133,18 @@ const MainSignUpScreen = () => {
   const navigation = useNavigation();
 
   const onSignUpPress = async () => {
-    if (!isLoaded) {
-      return;
-    }
+    // if (!isLoaded) {
+    //   return;
+    // }
 
     try {
       const emailAddress = email.trim();
-      await signUp.create({
-        emailAddress,
-      });
 
-      // send the email.
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      // change the UI to our pending section.
-      // setPendingVerification(true);
-
+      // await signUp.create({
+      //   emailAddress,
+      // });
+      //* send the email.
+      // await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       // @ts-ignore
       navigation.navigate("EmailVerificationScreen", {
         emailAddress,
@@ -278,28 +274,30 @@ const EmailVerificationScreen = ({ navigation, route }: any) => {
   const { isLoaded, signUp, setActive } = useSignUp();
 
   const onPressVerify = async (code: string) => {
-    if (!isLoaded || !emailAddress) {
-      return;
-    }
+    // if (!isLoaded || !emailAddress) {
+    //   return;
+    // }
 
     try {
       console.log("code", code);
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
-      });
+      // const completeSignUp = await signUp.attemptEmailAddressVerification({
+      //   code,
+      // });
 
-      // await setActive({ session: completeSignUp.createdSessionId });
+      // const expo_push_token = await getValueFor("expo_push_token");
 
-      const res = await fetch(
-        // `http://localhost:3000/auth/signup?email=${emailAddress}`
-        `https://diet-dining-server.onrender.com/auth/signup?email=${emailAddress}`
-      );
-      const { _id } = await res.json();
+      // const url = `https://91d6-102-216-10-2.ngrok-free.app/auth/signup?email=${emailAddress}&expo_push_token=${expo_push_token}`;
+      // const url =  `https://diet-dining-server.onrender.com/auth/signup?email=${emailAddress}`
 
-      await save("user_id", _id);
+      // const res = await fetch(url);
+      // const { _id } = await res.json();
+
+      // await save("user_id", _id);
 
       // @ts-ignore
-      navigation.navigate("LocationPermission");
+      navigation.navigate("UserDetails", {
+        email: emailAddress,
+      });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       setCode("");
@@ -329,60 +327,7 @@ const EmailVerificationScreen = ({ navigation, route }: any) => {
 };
 
 export const SignUpScreen = (props: Props) => {
-  const { isLoaded, signUp, setActive } = useSignUp();
-  const [emailAddress, setEmailAddress] = React.useState("");
-  const [pendingVerification, setPendingVerification] = React.useState(false);
-  const [code, setCode] = React.useState("");
-
-  const onSignUpPress = async () => {
-    if (!isLoaded) {
-      return;
-    }
-
-    try {
-      await signUp.create({
-        emailAddress,
-      });
-
-      // send the email.
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      // change the UI to our pending section.
-      setPendingVerification(true);
-
-      // navigation.navigate("EmailVerificationScreen");
-    } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
-
-  const onPressVerify = async (code: number) => {
-    // if (!isLoaded) {
-    //   return;
-    // }
-
-    // try {
-    //   const completeSignUp = await signUp.attemptEmailAddressVerification({
-    //     code,
-    //   });
-
-    //   // await setActive({ session: completeSignUp.createdSessionId });
-    //   console.info("completeSignUp", completeSignUp);
-    // } catch (err: any) {
-    //   console.error(JSON.stringify(err, null, 2));
-    // }
-
-    console.log("verify email code", code);
-  };
-
   return (
-    // <>
-    //   {!pendingVerification ? (
-    //     <MainSignUpScreen />
-    //   ) : (
-    //     <EmailVerificationScreen />
-    //   )}
-    // </>
     <Stack.Navigator initialRouteName="MainSignUpScreen">
       <Stack.Screen
         name="MainSignUpScreen"

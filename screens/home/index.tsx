@@ -21,6 +21,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useLayoutEffect, useMemo, useState } from "react";
 import SortingModal from "../../components/sortingmodal";
+import { StatusBar } from "expo-status-bar";
+import { get_stores } from "../../lib/supabase";
 
 const categories = [
   {
@@ -64,10 +66,13 @@ const HomeMenu = () => {
 
   const fetchStores = async () => {
     // const res = await fetch("http://localhost:3000/stores/get-all");
-    const res = await fetch(
-      "https://diet-dining-server.onrender.com/stores/get-all"
-    );
-    const data = await res.json();
+    // const res = await fetch(
+    //   "https://diet-dining-server.onrender.com/stores/get-all"
+    // );
+    // const res = await fetch(
+    //   "https://bde0-102-216-10-2.ngrok-free.app/stores/get-all"
+    // );
+    const data = await get_stores();
     // setloading(false);
     return data;
   };
@@ -81,11 +86,9 @@ const HomeMenu = () => {
     queryFn: fetchStores,
   });
 
-  const { addToCart, cartItems } = useCartStore();
-
-  // if (isLoading) {
-  //   return <Loader />;
-  // }
+  if (isLoading) {
+    return <Loader />;
+  }
 
   if (isError) {
     return <ErrorState />;
@@ -109,10 +112,11 @@ const HomeMenu = () => {
           </View>
         </View>
       </Screen>
+      <StatusBar hidden={false} style="dark" />
     </ScrollView>
   );
 };
 
-export const Home = ({ navigation }: { navigation: any }) => {
+export const Home = ({}) => {
   return <HomeMenu />;
 };

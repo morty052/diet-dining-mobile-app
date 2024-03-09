@@ -28,9 +28,21 @@ type Props = {};
 
 const Stack = createNativeStackNavigator();
 
-const tags = ["Juice", "Burgers", "Halal", "Keto", "Rice", "Soups"];
-
 const { width, height } = Dimensions.get("screen");
+
+async function reverseGeocodeAddress({
+  latitude,
+  longitude,
+}: {
+  latitude: string;
+  longitude: string;
+}) {
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDy7zLF31fjoMtFTrkJP9O32oKdqP6npRs`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+  console.log(data.results[0].formatted_address);
+}
 
 const Map = ({
   latitude,
@@ -43,7 +55,7 @@ const Map = ({
     <MapView
       style={styles.map}
       //   ref={mapRef}
-      provider={PROVIDER_DEFAULT}
+      provider={PROVIDER_GOOGLE}
       initialRegion={{
         // latitude: 49.246292,
         // longitude: -123.116226,
@@ -59,7 +71,7 @@ const Map = ({
       //     longitudeDelta: 0.0421,
       //   }}
     >
-      {latitude && longitude && (
+      {/* {latitude && longitude && (
         <Marker
           coordinate={{
             latitude: latitude as number,
@@ -67,7 +79,7 @@ const Map = ({
           }}
           title="Delivery location"
         />
-      )}
+      )} */}
     </MapView>
   );
 };
@@ -102,8 +114,12 @@ const ManualAddressFinderScreen = ({ navigation }: any) => {
     await save("latitude", `${coords.latitude}`);
     await save("longitude", `${coords.longitude}`);
 
+    await reverseGeocodeAddress({
+      latitude: `${coords.latitude}`,
+      longitude: `${coords.longitude}`,
+    });
+
     navigation.navigate("MainLocationScreen");
-    console.log(location);
     // mapRef.current?.animateToRegion({
     //   latitude: location.coords.latitude,
     //   longitude: location.coords.longitude,
@@ -259,10 +275,8 @@ export const LocationScreen = ({ route, navigation }: any) => {
   }
 
   return (
-    <Stack.Navigator
-      initialRouteName={!coords ? "ManualAddressFinder" : "MainLocationScreen"}
-    >
-      <Stack.Screen
+    <Stack.Navigator initialRouteName={"MainLocationScreen"}>
+      {/* <Stack.Screen
         options={{
           headerBackVisible: true,
           headerShadowVisible: false,
@@ -273,7 +287,7 @@ export const LocationScreen = ({ route, navigation }: any) => {
         }}
         name="ManualAddressFinder"
         component={ManualAddressFinderScreen}
-      />
+      /> */}
       <Stack.Screen
         options={{
           headerTransparent: true,

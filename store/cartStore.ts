@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { TcartItem } from "../contexts/CartContext";
 import Toast from "react-native-root-toast";
+import { getValueFor } from "../lib/secure-store";
 
 interface ICart {
   vendors: Ivendor[] | [];
@@ -10,7 +11,11 @@ interface ICart {
   getCartTotal: () => number | undefined;
   decreaseItemQuantity: (_id: string) => void;
   increaseItemQuantity: (_id: string) => void;
-  removeItemFromCart: (_id: string) => void;
+  removeItemFromCart: (
+    _id: string,
+    store_name: string,
+    item_quantity: number
+  ) => void;
   handleCheckout: (store_name: string) => void;
   total?: number;
 }
@@ -195,25 +200,34 @@ const increaseItemQuantityFromState = (_id: string, state: ICart) => {
   };
 };
 
-const removeItemFromCart = (_id: string, state: ICart) => {
-  const itemtoRemove = state.cartItems.find((item) => item._id == _id);
-
+const removeItemFromCart = ({
+  store_name,
+  item_id,
+  item_quantity,
+  state,
+}: {
+  store_name: string;
+  item_id: string;
+  item_quantity: number;
+  state: ICart;
+}) => {
+  // * FILTER OUT ITEM FROM CARTITEMS
   const updatedCartItems = state.cartItems.filter(
-    (cartItem: TcartItem) => cartItem._id != _id
+    (cartItem: TcartItem) => cartItem._id != item_id
   );
 
-  const { quantity, vendor } = itemtoRemove ?? {};
-  const { store_name } = vendor ?? {};
-
+  // * FIND VENDOR THAT MATCHES @Param STORE_NAME,
   const vendorToUpdate = state.vendors.find(
     (vendor) => vendor.store_name == store_name
   );
 
+  //* DESCTRUCTURE VENDOR ITEMS COUNT FROM VENDOR
   const { vendorItemsCount } = vendorToUpdate ?? {};
 
-  if (quantity && (vendorItemsCount as number) - quantity <= 0) {
+  // * REMOVE VENDOR FROM LIST IF VENDORS ITEMS MINUS @param ITEM_QUANTITY EQUALS 0
+  if (vendorItemsCount && vendorItemsCount - item_quantity <= 0) {
     const updatedVendors = state.vendors.filter(
-      (vendor) => vendor.store_name != vendorToUpdate?.store_name
+      (vendor) => vendor.store_name != store_name
     );
     return {
       updatedCartItems,
@@ -225,7 +239,12 @@ const removeItemFromCart = (_id: string, state: ICart) => {
     if (vendor.store_name == store_name) {
       return {
         ...vendor,
-        vendorItems: quantity && vendor.vendorItemsCount - quantity,
+        // * FILTER OUT ITEM FROM VENDOR ITEMS
+        vendorItems: vendor.vendorItems.filter(
+          (vendorItem) => item_id != vendorItem.item_id
+        ),
+        // * SUBTRACT ITEM_QUANTITY FROM VENDOR ITEMS COUNT
+        vendorItemsCount: vendor.vendorItemsCount - item_quantity,
       };
     }
 
@@ -235,7 +254,6 @@ const removeItemFromCart = (_id: string, state: ICart) => {
   return {
     updatedCartItems,
     updatedVendors,
-    quantity,
   };
 };
 
@@ -393,9 +411,14 @@ const addToCart = (item: TcartItem, state: ICart) => {
 const handleCheckout = async (store_name: string, vendors: Ivendor[]) => {
   const vendor = vendors.find((vendor) => vendor.store_name == store_name);
 
-  await fetch("http://localhost:3000/orders/create", {
+  const user_id = await getValueFor("user_id");
+
+  const url = "http://localhost:3000/orders/create";
+  // const url = "https://e48d-102-216-10-2.ngrok-free.app/orders/create";
+
+  await fetch(url, {
     method: "POST",
-    body: JSON.stringify({ vendor }),
+    body: JSON.stringify({ vendor, user_id }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -451,16 +474,19 @@ export const useCartStore = create<ICart>((set, state) => ({
       total: vendorTotal && state.total && state.total - vendorTotal,
     }));
   },
-  removeItemFromCart: (_id) => {
-    const { updatedCartItems, updatedVendors, quantity } = removeItemFromCart(
-      _id,
-      state()
-    );
+  removeItemFromCart: (item_id, store_name, item_quantity) => {
+    const { updatedCartItems, updatedVendors } = removeItemFromCart({
+      item_id,
+      store_name,
+      state: state(),
+      item_quantity,
+    });
 
     set((state) => ({
       cartItems: updatedCartItems,
-      itemsCount: quantity && state.itemsCount - quantity,
-      // vendors:updatedVendors
+      // * SUBTRACT ITEMS QUANTITY FROM STATES ITEMS COUNT
+      itemsCount: state.itemsCount - item_quantity,
+      vendors: updatedVendors as Ivendor[],
     }));
   },
 }));

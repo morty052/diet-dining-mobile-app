@@ -254,16 +254,18 @@ function Preferences({ navigation }: { navigation: any }) {
           questions={preferenceAnswers}
         />
       </View>
-      <NextButton
-        handleSelect={(answer) =>
-          setMealPreference(
-            answer as "NONE" | "PESCATARIAN" | "VEGAN" | "VEGETARIAN"
-          )
-        }
-        answer={selected}
-        screen="Allergies"
-        navigation={navigation}
-      />
+      <View style={{ paddingBottom: 10 }}>
+        <NextButton
+          handleSelect={(answer) =>
+            setMealPreference(
+              answer as "NONE" | "PESCATARIAN" | "VEGAN" | "VEGETARIAN"
+            )
+          }
+          answer={selected}
+          screen="Allergies"
+          navigation={navigation}
+        />
+      </View>
     </View>
   );
 }
@@ -291,12 +293,14 @@ const Allergies = ({ navigation }: { navigation: any }) => {
           questions={allergyAnswers}
         />
       </View>
-      <NextButton
-        handleSelect={(answer) => setAllergy(answer)}
-        answer={selected}
-        screen="DietBudget"
-        navigation={navigation}
-      />
+      <View style={{ paddingBottom: 10 }}>
+        <NextButton
+          handleSelect={(answer) => setAllergy(answer)}
+          answer={selected}
+          screen="DietBudget"
+          navigation={navigation}
+        />
+      </View>
     </View>
   );
 };
@@ -402,12 +406,14 @@ const DietBudget = ({ navigation }: { navigation: any }) => {
             questions={budgetAnswers}
           />
         </View>
-        <NextButton
-          answer={selected}
-          handleSelect={handleDietPlan}
-          screen="DietConfirmationScreen"
-          navigation={navigation}
-        />
+        <View style={{ paddingBottom: 10 }}>
+          <NextButton
+            answer={selected}
+            handleSelect={handleDietPlan}
+            screen="DietConfirmationScreen"
+            navigation={navigation}
+          />
+        </View>
       </View>
     </>
   );

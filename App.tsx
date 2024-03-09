@@ -2,36 +2,97 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import AppRoutes, { AppTabsNavigator } from "./routes/AppRoutes";
 import { ClerkProvider } from "@clerk/clerk-expo";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
-import { getValueFor } from "./lib/secure-store";
-import { Text } from "react-native";
-import OnboardingRoutes from "./routes/OnboardingRoutes";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { CheckoutScreen, FoodScreen, LocationScreen } from "./screens";
-import RestaurantScreen from "./screens/restaurantscreen";
+import { getValueFor, save } from "./lib/secure-store";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-export type RootStackParamList = {
-  App: undefined;
-  OnBoarding: undefined;
-  FoodScreen: undefined;
-  LocationScreen: undefined;
-  Checkout: undefined;
-  Restaurant: {
-    name: string;
-  };
-};
+import NotificationComponent from "./components/NotificationComponent";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants?.expoConfig?.extra?.eas.projectId,
+    });
+    const { data } = token;
+
+    console.log(data);
+    await save("expo_push_token", `${data}`);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  return token?.data;
+}
 
 export default function App() {
   const client = useMemo(() => new QueryClient(), []);
   const [Onboarded, setOnboarded] = useState(null);
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
   SplashScreen.preventAutoHideAsync();
+
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   async function checkForKey() {
     const key = await getValueFor("ONBOARDED");
@@ -69,5 +130,6 @@ export default function App() {
       </QueryClientProvider>
       <StatusBar hidden={false} style="auto" />
     </ClerkProvider>
+    // <NotificationComponent />
   );
 }

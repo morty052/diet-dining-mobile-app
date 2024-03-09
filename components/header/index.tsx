@@ -50,10 +50,11 @@ export const Header = () => {
         </View>
         <View className={styles.extraButtonsContainer}>
           <TouchableOpacity
-            onPress={() =>
-              // @ts-ignore
-              // deleteKey("ONBOARDED")
-              navigation.navigate("Account")
+            onPress={
+              () =>
+                // @ts-ignore
+                deleteKey("ONBOARDED")
+              // navigation.navigate("Account")
             }
           >
             <Ionicons name="person-outline" size={24} color="black" />

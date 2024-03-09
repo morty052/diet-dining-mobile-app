@@ -19,11 +19,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useCartStore } from "../store/cartStore";
 import { Image, View, TouchableOpacity } from "react-native";
 
-import cart_icon from "../assets/icons/cart-icon.png";
-import orders_icon from "../assets/icons/orders-icon.png";
-import home_icon from "../assets/icons/home-icon.png";
-import foodmenu_icon from "../assets/icons/foodmenu-icon.png";
-import dietplanner_icon from "../assets/icons/dietplanner-icon.png";
 import { Header } from "../components";
 import { StatusBar } from "expo-status-bar";
 import RestaurantScreen from "../screens/restaurantscreen";
@@ -141,6 +136,7 @@ export function AppTabsNavigator({ navigation }) {
         />
         <Tab.Screen
           options={{
+            headerShown: false,
             tabBarActiveTintColor: "green",
             tabBarIcon: ({ focused }) => (
               <Ionicons
@@ -155,7 +151,7 @@ export function AppTabsNavigator({ navigation }) {
           component={OrdersPage}
         />
       </Tab.Navigator>
-      <StatusBar />
+      <StatusBar hidden={false} style="dark" />
     </>
   );
 }

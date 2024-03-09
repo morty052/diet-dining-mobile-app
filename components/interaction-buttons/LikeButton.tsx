@@ -5,11 +5,17 @@ import { getValueFor } from "../../lib/secure-store";
 import Colors from "../../constants/colors";
 type Props = {};
 
-const LikeButton = ({ background }: { background?: boolean }) => {
+const LikeButton = ({
+  background,
+  item_id,
+}: {
+  background?: boolean;
+  item_id: string;
+}) => {
   const [liked, setLiked] = React.useState(false);
   const [newLike, setNewLike] = React.useState(false);
 
-  async function handleLikeItem(item_id: string) {
+  async function handleLikeItem() {
     if (newLike) {
       setNewLike(false);
       return;
@@ -18,8 +24,10 @@ const LikeButton = ({ background }: { background?: boolean }) => {
     try {
       setNewLike(true);
       const user_id = await getValueFor("user_id");
-      // const res = await fetch()
-      console.log(user_id, item_id);
+      const url = `http://localhost:3000/user/like?user_id=${user_id}&item_id=${item_id}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log(data);
     } catch (error) {
       console.info(error);
     }
@@ -28,7 +36,7 @@ const LikeButton = ({ background }: { background?: boolean }) => {
   return (
     <Pressable
       style={background ? styles.container : null}
-      onPress={() => handleLikeItem("test_id")}
+      onPress={() => handleLikeItem()}
     >
       <Ionicons
         color={Colors.primary}

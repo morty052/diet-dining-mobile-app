@@ -360,7 +360,7 @@ function CheckOutItem({ item, handleRemoveItem }) {
         </Text>
       </View>
       <View className="flex flex-row items-center">
-        <Text className="font-medium text-dark">${item.item_total}</Text>
+        <Text className="font-medium text-dark">${item.item_price}</Text>
         <TouchableOpacity
           onPress={handleRemoveItem}
           className="ml-4 bg-red-500/10 rounded-full h-8 w-8  justify-center items-center"
@@ -372,7 +372,7 @@ function CheckOutItem({ item, handleRemoveItem }) {
   );
 }
 
-function CheckOutGrid({ vendorItems }) {
+function CheckOutGrid({ vendorItems, store_name }) {
   const { removeItemFromCart } = useCartStore();
 
   return (
@@ -386,10 +386,12 @@ function CheckOutGrid({ vendorItems }) {
         </TouchableOpacity>
       </View>
       <View className="mt-4">
-        {vendorItems.map((item) => (
+        {vendorItems.map((item, index) => (
           <CheckOutItem
-            handleRemoveItem={() => removeItemFromCart(item.item_id)}
-            key={item._id}
+            handleRemoveItem={() =>
+              removeItemFromCart(item.item_id, store_name, item.item_quantity)
+            }
+            key={index}
             item={item}
           />
         ))}
@@ -534,7 +536,7 @@ export function CheckoutScreen({ route, navigation }) {
           <ScrollView className="relative pt-6 ">
             <Header />
             <View className="pb-32">
-              <CheckOutGrid vendorItems={vendorItems} />
+              <CheckOutGrid store_name={store_name} vendorItems={vendorItems} />
               <ExtraInteractionButtons
                 store_id={store_id}
                 store_name={store_name}
