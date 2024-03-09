@@ -15,14 +15,14 @@ type TmenuItem = {
 
 export function MenuItem({ image, name }: any) {
   const navigationParams = {
-    activeCategory: name == "Sea food" ? "SeaFoods" : name,
+    category: name,
   };
   const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       // @ts-ignore
-      onPress={() => navigation.navigate("FoodMenu", navigationParams)}
+      onPress={() => navigation.navigate("Browse", navigationParams)}
       className=" inline-flex pb-2 bg-white shadow   border border-gray-400  mr-4 px-4 rounded-lg   items-center"
     >
       {/* <SvgComponent /> */}

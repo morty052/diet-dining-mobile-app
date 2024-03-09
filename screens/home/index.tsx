@@ -1,26 +1,19 @@
 import { ScrollView, View, Text } from "react-native";
 import {
   Screen,
-  FoodCategoryGrid,
   MenuItemsGrid,
   RestaurantsGrid,
-  SearchModal,
   ErrorState,
   Loader,
 } from "../../components";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { menu, salads as saladsCategory, seaFood } from "../../constants/menu";
-import { useCartStore } from "../../store/cartStore";
 import {
   desserts_emoji,
-  leanmeat_emoji,
   salads_emoji,
   seafoods_emoji,
   soups_emoji,
 } from "../../assets/foodcategories";
 import { useQuery } from "@tanstack/react-query";
-import { useLayoutEffect, useMemo, useState } from "react";
-import SortingModal from "../../components/sortingmodal";
+import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { get_stores } from "../../lib/supabase";
 
@@ -38,28 +31,14 @@ const categories = [
     image: salads_emoji,
   },
   {
-    name: "Lean meat",
-    image: leanmeat_emoji,
+    name: "Chinese",
+    image: soups_emoji,
   },
-  // {
-  //   name: "Smoothies",
-  //   image: smoothie,
-  // },
   {
     name: "Soups",
     image: soups_emoji,
   },
-  // {
-  //   name: "Specials",
-  //   image: special,
-  // },
-  // {
-  //   name: "Parfaits",
-  //   image: parfait,
-  // },
 ];
-
-const Stack = createNativeStackNavigator();
 
 const HomeMenu = () => {
   const [loading, setloading] = useState(true);

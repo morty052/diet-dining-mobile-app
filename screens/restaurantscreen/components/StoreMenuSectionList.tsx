@@ -1,19 +1,22 @@
 import { StyleSheet, Text, View, SectionList, FlatList } from "react-native";
 import React from "react";
 import { StoreMenuCard } from "../../../components/cards";
+import HorizontalRule from "../../../components/ui/HorizontalRule";
 
 type Props = {};
 
 const RenderItem = ({ item }) => {
   return (
-    <StoreMenuCard
-      name={item.name}
-      price={item.price}
-      _id={item._id}
-      vendor={item._id}
-      image={item.image}
-      description={item.description}
-    />
+    <View style={{ padding: 10 }}>
+      <StoreMenuCard
+        name={item.name}
+        price={item.price}
+        _id={item._id}
+        vendor={item._id}
+        image={item.image}
+        description={item.description}
+      />
+    </View>
   );
 };
 
@@ -42,12 +45,16 @@ const StoreMenuSectionList = ({ data }: any) => {
       keyExtractor={(item, index) => item._id}
       renderItem={({ item }) => <RenderItem item={item} />}
       renderSectionHeader={({ section: { title } }) => (
-        <View className="py-2">
-          <Text onPress={scroll} className="text-2xl font-medium text-dark">
+        <View className="p-2">
+          <Text
+            onPress={scroll}
+            className="text-2xl font-medium text-dark my-4"
+          >
             {title}
           </Text>
         </View>
       )}
+      SectionSeparatorComponent={() => <HorizontalRule />}
     />
   );
 };

@@ -13,7 +13,7 @@ export function StoreTags({
 }) {
   const navigation = useNavigation();
   return (
-    <View className="pt-3  ">
+    <View className="pt-3 px-2 ">
       <View className="flex flex-row items-center justify-between pb-2">
         <View className="flex-1 pr-4">
           <Text className={styles.store_name_text}>{store_name}</Text>

@@ -14,6 +14,8 @@ import HorizontalRule from "../../components/ui/HorizontalRule";
 import ItemInfo from "./components/ItemInfo";
 import ExtraSelectionsGrid from "./components/ExtraSelectionsGrid";
 import FrequentlyBought from "./components/FrequentlyBought";
+import { get_single_product } from "../../lib/supabase";
+import { RestaurantSkeleton } from "../../components/ui/SkeletonBase";
 
 export function useRefreshOnFocus<T>(refetch: () => Promise<T>) {
   const firstTimeRef = React.useRef(true);
@@ -149,7 +151,7 @@ const Ratingsmodal = ({ modalVisible, setModalVisible, rating }: any) => {
                 score={i + 1}
                 rating={0}
                 key={i}
-                handleRating={(i) => handleRating(i)}
+                handleRating={(i) => console.log(i)}
               />
             ))}
           </View>
@@ -244,7 +246,7 @@ const BuyButton = ({
   );
 };
 
-export const FoodScreen = ({ navigation, route }) => {
+export const FoodScreen = ({ navigation, route }: any) => {
   const [viewingNutritionalValue, setViewingNutritionalValue] = useState(false);
   const [itemQuantity, setItemQuantity] = useState(1);
   const [rating, setRating] = useState(3);
@@ -259,13 +261,20 @@ export const FoodScreen = ({ navigation, route }) => {
     // setModalVisible(true);
   }
 
+  // async function fetchProduct() {
+  //   const res = await fetch(
+  //     `http://localhost:3000/stores/get-single-product?product_id=${_id}`
+  //     // `https://diet-dining-server.onrender.com/stores/get-single-product?product_id=${_id}`
+  //     // `https://e48d-102-216-10-2.ngrok-free.app/stores/get-single-product?product_id=${_id}`
+  //   );
+  //   const data = await res.json();
+  //   setProduct(data);
+  //   setloading(false);
+  //   return data;
+  // }
+
   async function fetchProduct() {
-    const res = await fetch(
-      `http://localhost:3000/stores/get-single-product?product_id=${_id}`
-      // `https://diet-dining-server.onrender.com/stores/get-single-product?product_id=${_id}`
-      // `https://e48d-102-216-10-2.ngrok-free.app/stores/get-single-product?product_id=${_id}`
-    );
-    const data = await res.json();
+    const data = await get_single_product(_id);
     setProduct(data);
     setloading(false);
     return data;
@@ -275,8 +284,16 @@ export const FoodScreen = ({ navigation, route }) => {
     fetchProduct();
   }, [_id]);
 
+  // if (loading) {
+  //   return null;
+  // }
+
   if (loading) {
-    return null;
+    return (
+      <SafeAreaView>
+        <RestaurantSkeleton />
+      </SafeAreaView>
+    );
   }
 
   const { image, name, price, description, vendor } = product ?? {};

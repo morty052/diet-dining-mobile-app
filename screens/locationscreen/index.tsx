@@ -71,7 +71,7 @@ const Map = ({
       //     longitudeDelta: 0.0421,
       //   }}
     >
-      {/* {latitude && longitude && (
+      {latitude && longitude && (
         <Marker
           coordinate={{
             latitude: latitude as number,
@@ -79,7 +79,7 @@ const Map = ({
           }}
           title="Delivery location"
         />
-      )} */}
+      )}
     </MapView>
   );
 };

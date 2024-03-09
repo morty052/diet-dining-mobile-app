@@ -4,18 +4,20 @@ import {
   useWindowDimensions,
   Text,
   TouchableOpacity,
+  StyleSheet,
+  Dimensions,
 } from "react-native";
 import { useState, useMemo } from "react";
 import LottieView from "lottie-react-native";
 import { healthyFoodLottie, rateFoodLottie, saladLottie } from "../../assets";
 import { useNavigation } from "@react-navigation/native";
 import Animated, {
-  useSharedValue,
   withTiming,
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { save } from "../../lib/secure-store";
+import { SEMI_BOLD } from "../../constants/fontNames";
+import Colors from "../../constants/colors";
 
 type TOnboardingScreenProps = {
   description: string;
@@ -38,10 +40,21 @@ const PageCountCircle = ({
 }) => {
   return (
     <Pressable
+      style={[
+        styles.pageCountItemStyle,
+        active
+          ? {
+              backgroundColor: "white",
+            }
+          : {
+              backgroundColor: "rgb(75 85 99)",
+              borderColor: "white",
+            },
+      ]}
       onPress={() => setActive()}
-      className={`  h-2 w-[30vw] z-10 p-1  mx-1 rounded-full ${
-        active ? " bg-white" : "border bg-gray-600 border-white"
-      }`}
+      // className={`  h-2 w-[30vw] z-10 p-1  mx-1 rounded-full ${
+      //   active ? " bg-white" : "border bg-gray-600 border-white"
+      // }`}
     ></Pressable>
   );
 };
@@ -53,10 +66,11 @@ const PageCountVisuals = ({
   activePage: number;
   setActivePage: any;
 }) => {
+  // * CREATE MOCK LIST OF  3 ITEMS TO MAP THROUGH
   const onBoardingArray = [1, 2, 3];
 
   return (
-    <View className=" flex-row items-center space-x-4 mt-2">
+    <View style={styles.pageCountContainer}>
       {onBoardingArray?.map((item, index) => {
         return (
           <PageCountCircle
@@ -90,30 +104,23 @@ const OnboardingControls = ({
     return false;
   }, [activePage]);
 
-  // TODO: MOVE SAVING OF VARIABLE TO SIGN UP
   async function handleFinish() {
-    // await save("ONBOARDED", "TRUE");
-    console.log("ggg");
     // @ts-ignore
     navigate.navigate("SignUp");
   }
 
   return (
-    <View className="bg-black/30 absolute bottom-0  py-5 px-3 left-0 right-0 ">
-      <View className="flex-row justify-between  items-center">
-        {/* @ts-ignore */}
+    <View style={styles.onboardingControlsContainer}>
+      <View style={styles.onboardingControlsInnerContainer}>
         <Pressable onPress={() => handleFinish()}>
-          <Text className="text-white font-medium">Skip</Text>
+          <Text style={{ color: "white", fontFamily: SEMI_BOLD }}>Skip</Text>
         </Pressable>
 
         <TouchableOpacity
-          className="bg-white px-3 py-3  w-4/5   items-center rounded-full"
-          onPress={
-            // @ts-ignore
-            isLastItem ? () => handleFinish() : () => handleNext()
-          }
+          style={styles.nextButtonContainer}
+          onPress={isLastItem ? () => handleFinish() : () => handleNext()}
         >
-          <Text className="text-dark text-[16px] font-medium">
+          <Text style={styles.nextButtonText}>
             {isLastItem ? "Done" : "Next"}
           </Text>
         </TouchableOpacity>
@@ -135,8 +142,6 @@ export const OnboardingScreenItem = (props: TOnboardingScreenProps) => {
     setActivePage,
   } = props;
 
-  const randomWidth = useSharedValue(10);
-
   const config = {
     duration: 900,
   };
@@ -148,23 +153,16 @@ export const OnboardingScreenItem = (props: TOnboardingScreenProps) => {
   });
 
   return (
-    <SafeAreaView>
-      <Animated.View
-        style={[
-          {
-            display: "flex",
-            alignItems: "center",
-            position: "relative",
-            height: "100%",
-          },
-          style,
-        ]}
-      >
+    <Animated.View style={[StyleSheet.absoluteFill, style]}>
+      <SafeAreaView style={styles.container}>
         <PageCountVisuals
           activePage={activePage}
           setActivePage={setActivePage}
         />
-        <View className=" h-1/2 w-full items-center mt-2  pt-28 px-4 ">
+        <View
+          style={styles.lottieContainer}
+          // className=" h-1/2 w-full items-center mt-2  pt-28 px-4 "
+        >
           <LottieView
             resizeMode="cover"
             style={{ width: width * 0.9, height: width }}
@@ -172,22 +170,31 @@ export const OnboardingScreenItem = (props: TOnboardingScreenProps) => {
             source={lottie}
           />
         </View>
-        <View className=" h-1/2 pb-48 pl-2  flex  justify-end  space-y-2">
+        <View
+          style={styles.bottomContainer}
+          // className=" h-1/2 pb-48 pl-2  flex  justify-end border  space-y-2"
+        >
           <Animated.Text
-            style={{ color: textColor ? textColor : "white" }}
-            className="text-3xl font-semibold text-white text-left "
+            style={[
+              { color: textColor ? textColor : "white" },
+              styles.titleText,
+            ]}
+            // className="text-3xl font-semibold text-white text-left "
           >
             {title}
           </Animated.Text>
           <Animated.Text
-            style={{ color: textColor ? textColor : "white" }}
-            className="text-lg font-semibold text-white "
+            style={[
+              styles.subtitle,
+              { color: textColor ? textColor : "white" },
+            ]}
+            // className="text-lg font-semibold text-white "
           >
             {description}
           </Animated.Text>
         </View>
-      </Animated.View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Animated.View>
   );
 };
 
@@ -249,7 +256,7 @@ export const OnboardingScreen = () => {
   }
 
   return (
-    <View className="flex-1">
+    <View style={{ flex: 1, position: "relative" }}>
       {onboardingPages[onboardingIndex as keyof typeof onboardingPages]}
       <OnboardingControls
         setActivePage={setonboardingIndex}
@@ -257,11 +264,72 @@ export const OnboardingScreen = () => {
         onBoardingArray={onBoardingArray}
         handleNext={handleNext}
       />
-      {/* <StatusBar
-        animated={true}
-        backgroundColor={colors[onboardingIndex as keyof typeof colors]}
-        style="light"
-      /> */}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    alignItems: "center",
+    position: "relative",
+    justifyContent: "space-between",
+    flex: 1,
+  },
+  pageCountContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  pageCountItemStyle: {
+    height: 8,
+    width: Dimensions.get("screen").width * 0.3,
+    zIndex: 10,
+    marginHorizontal: 4,
+    borderRadius: 10,
+    padding: 1,
+  },
+  lottieContainer: {
+    height: "50%",
+    width: "100%",
+    alignItems: "center",
+    paddingTop: 70,
+    paddingHorizontal: 16,
+  },
+  bottomContainer: {
+    height: "50%",
+    paddingLeft: 8,
+    // justifyContent: "center",
+    gap: 2,
+    paddingTop: 60,
+    // borderWidth: 1,
+  },
+  titleText: { fontSize: 30, fontFamily: SEMI_BOLD, textAlign: "left" },
+  subtitle: { fontSize: 16, fontFamily: SEMI_BOLD },
+  onboardingControlsContainer: {
+    position: "absolute",
+    backgroundColor: "rgba(0 0 0 / 0.3)",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 12,
+    // paddingVertical: 20,
+    height: 80,
+    justifyContent: "center",
+  },
+  onboardingControlsInnerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  skipButton: {},
+  nextButtonContainer: {
+    backgroundColor: "white",
+    padding: 12,
+    width: "80%",
+    alignItems: "center",
+    borderRadius: 20,
+  },
+  nextButtonText: { color: Colors.dark, fontSize: 16, fontFamily: SEMI_BOLD },
+});

@@ -22,7 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ErrorState, Screen } from "../../components";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Colors from "../../constants/colors";
 import { StoreMenuCard } from "../../components/cards";
 import Animated, {
@@ -40,7 +40,7 @@ import LikeButton from "../../components/interaction-buttons/LikeButton";
 import { get_single_store } from "../../lib/supabase";
 import { RestaurantSkeleton } from "../../components/ui/SkeletonBase";
 
-type Props = {};
+type StoreProps = {};
 
 const Stack = createNativeStackNavigator();
 
@@ -181,6 +181,7 @@ const RestaurantScreen = ({ navigation, route }: any) => {
   const [isViewable, setisViewable] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [store, setStore] = useState(null);
 
   const fetchStore = async () => {
     // const res = await fetch(
@@ -193,17 +194,45 @@ const RestaurantScreen = ({ navigation, route }: any) => {
     // return data[0];
 
     const data = await get_single_store(store_id);
+    setStore(data[0]);
+    setLoading(false);
     return data[0];
   };
 
-  const {
-    data: store,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["active store"],
-    queryFn: fetchStore,
-  });
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchStore = async () => {
+        // const res = await fetch(
+        //   `http://localhost:3000/stores/get-single?store_id=${store_id}`
+        //   // `https://diet-dining-server.onrender.com/stores/get-single?store_id=${store_id}`
+        //   // `https://e48d-102-216-10-2.ngrok-free.app/stores/get-single?store_id=${store_id}`
+        // );
+        // const data = await res.json();
+        // console.log(data);
+        // return data[0];
+
+        const data = await get_single_store(store_id);
+        setStore(data[0]);
+        setLoading(false);
+        return data[0];
+      };
+
+      fetchStore();
+
+      // return () => {
+      //   setStore(null);
+      // };
+    }, [store_id])
+  );
+
+  // const {
+  //   data: store,
+  //   isLoading,
+  //   isError,
+  // } = useQuery({
+  //   queryKey: ["active store"],
+  //   queryFn: fetchStore,
+  // });
 
   const scrollRef = useRef<ScrollView>(null);
 
@@ -224,7 +253,7 @@ const RestaurantScreen = ({ navigation, route }: any) => {
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <SafeAreaView>
         <ScrollView ref={scrollRef}>
@@ -234,9 +263,19 @@ const RestaurantScreen = ({ navigation, route }: any) => {
     );
   }
 
-  if (isError) {
-    return <ErrorState />;
-  }
+  // if (isError) {
+  //   return <ErrorState />;
+  // }
+
+  // if (!store) {
+  //   return (
+  //     <SafeAreaView>
+  //       <ScrollView ref={scrollRef}>
+  //         <RestaurantSkeleton />
+  //       </ScrollView>
+  //     </SafeAreaView>
+  //   );
+  // }
 
   return (
     <>
@@ -257,7 +296,7 @@ const RestaurantScreen = ({ navigation, route }: any) => {
           style={[{ height: 300 }]}
           source={{ uri: store?.store_image }}
         />
-        <View className={`px-2 bg-white`}>
+        <View className={` bg-white`}>
           <StoreTags
             store_address={store?.store_address}
             store_id={store_id}

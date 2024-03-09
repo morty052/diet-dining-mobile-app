@@ -7,8 +7,10 @@ import {
   Image,
   useWindowDimensions,
   Pressable,
+  Dimensions,
+  ImageSourcePropType,
 } from "react-native";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   desserts_emoji,
   salads_emoji,
@@ -23,6 +25,7 @@ import { Ivendor } from "../../store/cartStore";
 import { TcartItem } from "../../contexts/CartContext";
 import Colors from "../../constants/colors";
 import LikeButton from "../../components/interaction-buttons/LikeButton";
+import { SEMI_BOLD } from "../../constants/fontNames";
 
 const categories = [
   // {
@@ -40,13 +43,13 @@ const categories = [
     image: seafoods_emoji,
   },
   {
-    name: "Halal",
-    category: "Halal",
+    name: "Soups",
+    category: "Soups",
     image: salads_emoji,
   },
   {
-    name: "Vegitarian",
-    category: "Vegitarian",
+    name: "Desserts",
+    category: "Desserts",
     image: desserts_emoji,
   },
   // {
@@ -55,8 +58,8 @@ const categories = [
   //   category: "Lean meat",
   // },
   {
-    name: "Soups",
-    category: "Soups",
+    name: "Chinese",
+    category: "Chinese",
     image: soups_emoji,
   },
 ];
@@ -100,17 +103,53 @@ const CategorySelectItem = ({
   );
 };
 
-const CategoryCard = ({ name, icon }: { name: string; icon: any }) => {
+const CategoryCard = ({
+  name,
+  icon,
+  navigation,
+}: {
+  name: string;
+  icon: any;
+  navigation: any;
+}) => {
+  const width = Dimensions.get("screen").width;
+  const cardWidth = width * 0.45;
   return (
-    <View className="px-2 pt-6 flex flex-row items-center gap-4">
-      <View className="pb-4">
-        {/* <Ionicons size={30} name="pizza" /> */}
-        <Image resizeMode="contain" className="h-10 w-10" source={icon} />
+    <Pressable
+      onPress={() =>
+        navigation.setParams({
+          category: name,
+        })
+      }
+      style={{
+        width: cardWidth,
+        borderWidth: 1,
+        height: cardWidth,
+        borderRadius: 10,
+        borderColor: Colors.primary,
+      }}
+    >
+      <Image
+        resizeMode="contain"
+        style={{
+          width: cardWidth * 0.7,
+          height: cardWidth * 0.7,
+          alignSelf: "center",
+        }}
+        source={icon}
+      />
+      <View
+        style={{
+          backgroundColor: "white",
+          flex: 1,
+          borderBottomRightRadius: 10,
+          borderBottomLeftRadius: 10,
+          padding: 5,
+        }}
+      >
+        <Text style={{ fontFamily: SEMI_BOLD, fontSize: 15 }}>{name}</Text>
       </View>
-      <View className="flex-1 pb-4   border-b border-black/10">
-        <Text className=" font-medium text-[18px]">{name}</Text>
-      </View>
-    </View>
+    </Pressable>
   );
 };
 
@@ -205,26 +244,46 @@ export const SearchModal = () => {
   );
 };
 
-type Props = {};
+type TsearchItem = {
+  price: number;
+  name: string;
+  _id: string;
+  quantity: number;
+  category: string;
+  total?: number;
+  image?: ImageSourcePropType;
+  vendor: {
+    store_name: string;
+    store_image: string;
+  };
+};
 
 //TODO: HANDLE SEARCH PROPERLY
-export const SearchScreen = ({ navigation }: any) => {
+export const SearchScreen = ({ navigation, route }: any) => {
+  const { category } = route.params ?? {};
+
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const [searchArray, setSearchArray] = useState<null | Ivendor[]>(null);
-  const [products, setProducts] = useState<null | TcartItem[]>(null);
+  const [products, setProducts] = useState<null | TsearchItem[]>(null);
+  const [activeCategory, setactiveCategory] = useState<null | string>(category);
 
   const fetchStoresAndProducts = async () => {
-    // const res = await fetch("http://localhost:3000/stores/search-stores");
     const res = await fetch(
-      "https://diet-dining-server.onrender.com/stores/search-stores"
+      "https://ea0e-102-216-10-2.ngrok-free.app/stores/search-stores"
     );
-    const data = await res.json();
+    // const res = await fetch("http://localhost:3000/stores/search-stores");
+    // const res = await fetch(
+    //   "https://diet-dining-server.onrender.com/stores/search-stores"
+    // );
+
+    const stores = await res.json();
 
     const productsRes = await fetch(
-      "https://diet-dining-server.onrender.com/stores/search-products"
+      // "https://diet-dining-server.onrender.com/stores/search-products"
       // "http://localhost:3000/stores/search-products"
+      "https://ea0e-102-216-10-2.ngrok-free.app/stores/search-products"
     );
 
     const productData = await productsRes.json();
@@ -232,15 +291,25 @@ export const SearchScreen = ({ navigation }: any) => {
     setProducts(productData);
 
     //
-    setSearchArray(data);
+    setSearchArray(stores);
 
-    return data;
+    return stores;
   };
 
-  const { data: stores, isLoading } = useQuery({
+  const {
+    data: stores,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["searcharray"],
     queryFn: fetchStoresAndProducts,
   });
+
+  // useEffect(() => {
+  //   if (!catory) {
+
+  //   }
+  // }, [])
 
   const queryResults = useMemo(() => {
     // * RETURN NULL IF FETCHING IS ACTIVE OR USER NOT TYPING OR SEARCH ARRAY IS EMOTY
@@ -281,6 +350,14 @@ export const SearchScreen = ({ navigation }: any) => {
     );
   }, [query]);
 
+  const categoryQueryResults = useMemo(() => {
+    return products?.filter((item) =>
+      item.category.toLowerCase().includes(category.toLowerCase())
+    );
+
+    // * ADDED ISLOADING TO DEPENDENCIES BECAUSE PRODUCTS IS NULL AT FIRST
+  }, [category, isLoading]);
+
   return (
     <SafeAreaView className="flex-1">
       <View
@@ -290,7 +367,7 @@ export const SearchScreen = ({ navigation }: any) => {
         className="px-2 flex-1"
       >
         {/* SEARCHBAR */}
-        <View className=" rounded-2xl flex flex-row items-center border border-gray-300 bg-gray-300/40 py-2   px-4 ">
+        <View className=" rounded-2xl flex flex-row items-center border border-gray-300 bg-gray-300/40 pt-2   px-4 ">
           <TouchableOpacity
             onPress={() => {
               navigation.goBack();
@@ -312,22 +389,39 @@ export const SearchScreen = ({ navigation }: any) => {
             </TouchableOpacity>
           )}
         </View>
-        <ScrollView className=" flex-1 px-2  ">
+        <ScrollView keyboardDismissMode="on-drag" className=" flex-1 px-2  ">
           {/*  */}
 
           {/* CATEGORIES */}
-          {!query && (
-            <View className="pt-8">
-              <Text className="font-medium text-dark text-[20px]">
+          {!query && !categoryQueryResults && (
+            <View style={{ paddingTop: 32 }}>
+              <Text
+                style={{
+                  fontFamily: SEMI_BOLD,
+                  color: Colors.dark,
+                  fontSize: 20,
+                }}
+              >
                 Top Categories
               </Text>
-              {categories.map((category) => (
-                <CategoryCard
-                  icon={category.image}
-                  name={category.name}
-                  key={category.name}
-                />
-              ))}
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  justifyContent: "space-between",
+                  rowGap: 20,
+                  paddingTop: 10,
+                }}
+              >
+                {categories.map((category) => (
+                  <CategoryCard
+                    navigation={navigation}
+                    icon={category.image}
+                    name={category.name}
+                    key={category.name}
+                  />
+                ))}
+              </View>
             </View>
           )}
 
@@ -435,6 +529,67 @@ export const SearchScreen = ({ navigation }: any) => {
                 <LikeButton background />
               </Pressable>
             ))}
+          </View>
+
+          {/* CATEGORY SEARCH RESULTS */}
+          <View style={{ rowGap: 14 }}>
+            {categoryQueryResults &&
+              categoryQueryResults.length > 0 &&
+              !productsQueryResults && (
+                <Text
+                  style={{
+                    fontWeight: "800",
+                    color: Colors.dark,
+                    fontSize: 28,
+                  }}
+                >
+                  {category}
+                </Text>
+              )}
+            {categoryQueryResults &&
+              categoryQueryResults.length > 0 &&
+              !productsQueryResults &&
+              categoryQueryResults?.map((item) => (
+                <Pressable
+                  onPress={() =>
+                    // @ts-ignore
+                    navigation.navigate("FoodScreen", {
+                      _id: item._id,
+                    })
+                  }
+                  style={{
+                    flexDirection: "row",
+                    columnGap: 6,
+                    alignItems: "center",
+                  }}
+                  key={item.name}
+                >
+                  <Image
+                    resizeMode="cover"
+                    style={{ height: 60, width: 60, borderRadius: 50 }}
+                    // @ts-ignore
+                    source={{ uri: item.image }}
+                  />
+                  {/* ITEM NAME AND OPENING */}
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{ fontSize: 16, fontWeight: "600" }}
+                      className="font-medium"
+                    >
+                      {item.name}
+                    </Text>
+                    <Text
+                      style={{ fontSize: 16, fontWeight: "600" }}
+                      className="font-medium"
+                    >
+                      {item.store_name}
+                    </Text>
+                  </View>
+
+                  {/* LIKE BUTTON */}
+                  <LikeButton item_id={item._id} background />
+                </Pressable>
+              ))}
           </View>
 
           {/* NO RESULTS */}

@@ -30,3 +30,14 @@ export const get_single_store = async (store_id: string) => {
     console.error(error);
   }
 };
+
+export const get_single_product = async (product_id: string) => {
+  try {
+    const { data } = await supabase.functions.invoke("get_single_product", {
+      body: { product_id },
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
