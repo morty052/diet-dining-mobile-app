@@ -14,7 +14,10 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.abdulojehumen.dietdining"
+      "bundleIdentifier": "com.abdulojehumen.dietdining",
+      "config": {
+        "googleMapsApiKey": "AIzaSyBShNH_HLsiXU6yinLqBqOJr-GueyVH3ss"
+      }
     },
     "android": {
       "adaptiveIcon": {

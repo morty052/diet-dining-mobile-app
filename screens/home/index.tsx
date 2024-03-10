@@ -74,8 +74,8 @@ const HomeMenu = () => {
   }
 
   return (
-    <ScrollView className="relative bg-white">
-      <Screen style="">
+    <ScrollView style={{ position: "relative", backgroundColor: "white" }}>
+      <Screen>
         <View>
           <View>
             <MenuItemsGrid categories={categories} />

@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useCartStore } from "../../store/cartStore";
 import { SearchBar } from "../searchbar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { deleteKey } from "../../lib/secure-store";
+import { deleteKey, getValueFor } from "../../lib/secure-store";
 
 const Badge = ({ count }: { count: number }) => {
   return (
@@ -18,6 +18,17 @@ const Badge = ({ count }: { count: number }) => {
 export const Header = () => {
   const navigation = useNavigation();
   const { itemsCount } = useCartStore();
+  const [loading, setLoading] = React.useState(false);
+  const [addy, setAddy] = React.useState<string | boolean>("");
+
+  React.useEffect(() => {
+    const getAddy = async () => {
+      const addy = await getValueFor("DELIVERY_ADDRESS");
+      setAddy(addy);
+    };
+
+    getAddy();
+  }, []);
 
   return (
     <SafeAreaView
@@ -39,12 +50,16 @@ export const Header = () => {
           <View>
             <Text>Delivery - Now</Text>
             <TouchableOpacity
+              style={{ flexDirection: "row", gap: 2, alignItems: "center" }}
               // @ts-ignore
               onPress={() => navigation.navigate("LocationScreen")}
             >
               <Text className={styles.locationText}>
-                Select Delivery Location
+                {!addy
+                  ? " Select Delivery Location"
+                  : addy.toString().slice(0, 21)}
               </Text>
+              <Ionicons size={10} name="chevron-down-outline" />
             </TouchableOpacity>
           </View>
         </View>

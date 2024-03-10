@@ -205,7 +205,17 @@ const AppStack = ({ ONBOARDED }: { ONBOARDED: boolean }) => {
         name="FoodScreen"
         component={FoodScreen}
       />
-      <Stack.Screen name="LocationScreen" component={LocationScreen} />
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerTitle: "Delivery Info",
+          headerBackTitleVisible: false,
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+        }}
+        name="LocationScreen"
+        component={LocationScreen}
+      />
       <Stack.Screen
         options={{
           headerShown: true,
