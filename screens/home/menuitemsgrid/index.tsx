@@ -8,10 +8,40 @@ import {
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 
+import {
+  desserts_emoji,
+  salads_emoji,
+  seafoods_emoji,
+  soups_emoji,
+} from "../../../assets/foodcategories";
+
 type TmenuItem = {
   image: string;
   name: string;
 };
+
+const categories = [
+  {
+    name: "Desserts",
+    image: desserts_emoji,
+  },
+  {
+    name: "Sea food",
+    image: seafoods_emoji,
+  },
+  {
+    name: "Salads",
+    image: salads_emoji,
+  },
+  {
+    name: "Chinese",
+    image: soups_emoji,
+  },
+  {
+    name: "Soups",
+    image: soups_emoji,
+  },
+];
 
 export function MenuItem({ image, name }: any) {
   const navigationParams = {
@@ -32,7 +62,7 @@ export function MenuItem({ image, name }: any) {
   );
 }
 
-export function MenuItemsGrid({ categories }: any) {
+export function MenuItemsGrid() {
   return (
     <ScrollView
       contentContainerStyle={{

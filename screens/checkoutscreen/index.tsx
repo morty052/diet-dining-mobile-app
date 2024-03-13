@@ -23,6 +23,7 @@ import fryingPan from "../../assets/lottie/fryingpan.json";
 import LottieView from "lottie-react-native";
 import Colors from "../../constants/colors";
 import { IOS } from "../../utils/Platform";
+import { TcartItem } from "../../contexts/CartContext";
 
 const Header = () => {
   const navigation = useNavigation();
@@ -30,14 +31,14 @@ const Header = () => {
     <View className="pb-6 px-3">
       <View style={{ gap: 8 }} className="">
         <Text className="text-2xl font-bold text-dark">Checkout</Text>
-        <View className="flex flex-row items-center">
+        {/* <View className="flex flex-row items-center">
           <Ionicons
             color={Colors.primary}
             size={18}
             name="storefront-outline"
           />
           <Text className="ml-2 font-medium text-primary">Store Name</Text>
-        </View>
+        </View> */}
       </View>
     </View>
   );
@@ -345,17 +346,30 @@ function Summary({ total }: { total: number | undefined }) {
   );
 }
 
-function CheckOutItem({ item, handleRemoveItem }) {
+function CheckOutItem({
+  item,
+  handleRemoveItem,
+}: {
+  item: TcartItem;
+  handleRemoveItem: () => void;
+}) {
   return (
     <View
       className="flex-row justify-between items-center border-b border-black/10 pb-2"
       key={item.item_id}
     >
-      <View className="flex-row space-x-4 py-4">
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 5,
+          paddingVertical: 16,
+          alignItems: "center",
+        }}
+      >
         <Text className="font-medium text-dark text-[18px]">
           {item.item_quantity}x
         </Text>
-        <Text className="font-medium text-[18px] text-dark">
+        <Text style={{ fontSize: 12 }} className="font-medium  text-dark">
           {item.item_name}
         </Text>
       </View>
@@ -372,21 +386,40 @@ function CheckOutItem({ item, handleRemoveItem }) {
   );
 }
 
-function CheckOutGrid({ vendorItems, store_name }) {
-  const { removeItemFromCart } = useCartStore();
+function CheckOutGrid({ store_name }: { store_name: string }) {
+  const { removeItemFromCart, getVendor, cartItems } = useCartStore();
+
+  const navigation = useNavigation();
+
+  const vendorItems = useMemo(() => {
+    const vendor = getVendor(store_name);
+    console.log(vendor);
+    const items = vendor?.vendorItems;
+    return items;
+  }, [cartItems]);
+
+  useEffect(() => {
+    if (!vendorItems) {
+      navigation.goBack();
+    }
+  }, [cartItems]);
 
   return (
     <View className="border-t px-3 py-4 border-black/10">
       <View className="flex-row justify-between">
-        <Text className="text-lg font-bold text-dark">Items</Text>
-        <TouchableOpacity>
-          <Text className="text-[14px] font-medium text-red-500">
-            Clear all
-          </Text>
-        </TouchableOpacity>
+        {vendorItems && (
+          <>
+            <Text className="text-lg font-bold text-dark">Items</Text>
+            <TouchableOpacity>
+              <Text className="text-[14px] font-medium text-red-500">
+                Clear all
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
       <View className="mt-4">
-        {vendorItems.map((item, index) => (
+        {vendorItems?.map((item, index) => (
           <CheckOutItem
             handleRemoveItem={() =>
               removeItemFromCart(item.item_id, store_name, item.item_quantity)
@@ -505,10 +538,19 @@ export function CheckoutScreen({ route, navigation }) {
 
   console.info(store_name);
 
-  const activeVendor = useMemo(
-    () => vendors.find((vendor) => vendor.store_name == store_name),
-    []
-  );
+  const { getVendor } = useCartStore();
+
+  // const activeVendor = useMemo(
+  //   () => vendors.find((vendor) => vendor.store_name == store_name),
+  //   []
+  // );
+
+  const activeVendor = useMemo(() => {
+    const vendor = getVendor(store_name);
+    console.log(vendor);
+
+    return vendor;
+  }, [cartItems]);
 
   const { vendorItems, vendorTotal, vendorItemsCount } = activeVendor ?? {};
 
@@ -536,7 +578,7 @@ export function CheckoutScreen({ route, navigation }) {
           <ScrollView className="relative pt-6 ">
             <Header />
             <View className="pb-32">
-              <CheckOutGrid store_name={store_name} vendorItems={vendorItems} />
+              <CheckOutGrid store_name={store_name} />
               <ExtraInteractionButtons
                 store_id={store_id}
                 store_name={store_name}

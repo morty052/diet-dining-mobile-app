@@ -25,32 +25,13 @@ import { useNavigation } from "@react-navigation/native";
 import Map from "./components/Map";
 import { reverseGeocodeAddress } from "./features/reverseGeocodeAddress";
 import AutoCompleteInput from "./components/AutoCompleteInput";
+import { useLocationStore } from "../../store/locationStore";
 
 type Props = {};
 
 const Stack = createNativeStackNavigator();
 
 const { width, height } = Dimensions.get("screen");
-
-// async function reverseGeocodeAddress({
-//   latitude,
-//   longitude,
-// }: {
-//   latitude: string;
-//   longitude: string;
-// }) {
-//   try {
-//     console.log(latitude, longitude);
-//     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDy7zLF31fjoMtFTrkJP9O32oKdqP6npRs`;
-
-//     const res = await fetch(url);
-//     const data = await res.json();
-//     console.log(data.results[0].formatted_address);
-//     return data.results[0].formatted_address;
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
 
 const BackButton = () => {
   const navigation = useNavigation();
@@ -154,21 +135,50 @@ export const LocationScreen = ({ navigation }: any) => {
   } | null>(null);
 
   const [addy, setAddy] = React.useState<null | string>(null);
-  const [addyInput, setaddyInput] = React.useState("");
+
+  const [newCoords, setNewCoords] = React.useState();
 
   const [loading, setLoading] = React.useState(false);
 
+  const [markerLocation, setMarkerLocation] = React.useState<null | {
+    latitude: number;
+    longitude: number;
+  }>();
+
+  const { setHeader } = useLocationStore();
+
+  const mapRef = React.useRef<MapView>(null);
+
+  const moveMapToInput = (e: any) => {
+    const { lat, lng } = e;
+
+    const region = {
+      latitude: lat,
+      longitude: lng,
+      latitudeDelta: 0.1,
+      longitudeDelta: 0.1,
+    };
+
+    setMarkerLocation(region);
+    mapRef.current?.animateToRegion(region);
+  };
+
   React.useEffect(() => {
+    if (newCoords) {
+      return;
+    }
     const getCoords = async () => {
       const latitude = await getValueFor("latitude");
       const longitude = await getValueFor("longitude");
 
-      const addy = await reverseGeocodeAddress({
-        latitude: latitude as string,
-        longitude: longitude as string,
-      });
+      const address = await getValueFor("DELIVERY_ADDRESS");
 
-      setAddy(addy);
+      // const addy = await reverseGeocodeAddress({
+      //   latitude: latitude as string,
+      //   longitude: longitude as string,
+      // });
+
+      setAddy(address);
 
       setCoords({
         latitude,
@@ -179,33 +189,63 @@ export const LocationScreen = ({ navigation }: any) => {
     getCoords();
   }, []);
 
+  React.useEffect(() => {
+    if (!newCoords) {
+      return;
+    }
+
+    moveMapToInput(newCoords);
+  }, [newCoords]);
+
+  async function handleConfirmLocation() {
+    setLoading(true);
+    await save("DELIVERY_ADDRESS", addy);
+    await setHeader();
+    await save("ONBOARDED", "TRUE");
+    setLoading(false);
+    console.log(newCoords);
+    navigation.navigate("App");
+  }
+
+  const moveMap = async (e: any) => {
+    const { latitude, longitude } = e.coordinate;
+
+    const region = {
+      latitude,
+      longitude,
+      latitudeDelta: 0.1,
+      longitudeDelta: 0.1,
+    };
+
+    const addy = await reverseGeocodeAddress({
+      latitude,
+      longitude,
+    });
+
+    setAddy(addy);
+    // setNewCoords({ latitude, longitude });
+    setMarkerLocation(region);
+    // mapRef.current?.animateToRegion(region);
+  };
+
   if (!coords) {
     return null;
   }
 
-  async function handleConfirmLocation() {
-    setLoading(true);
-    const addy = await reverseGeocodeAddress({
-      latitude: coords?.latitude as string,
-      longitude: coords?.longitude as string,
-    });
-    await save("DELIVERY_ADDRESS", addy);
-    setLoading(false);
-    navigation.navigate("App");
-  }
-
-  async function handleAutoComplete(text: string) {
-    console.log(text);
-    setaddyInput(text);
-  }
-
   return (
     <View style={styles.container}>
-      {/* <View style={{ padding: 10, flexDirection: "row", alignItems: "center" }}>
-      </View> */}
-      <AutoCompleteInput />
+      <AutoCompleteInput
+        addy={addy as string}
+        setAddy={setAddy}
+        setNewCoords={setNewCoords}
+      />
       <View style={styles.mapContainer}>
         <Map
+          markerLocation={markerLocation}
+          setMarkerLocation={setMarkerLocation}
+          // @ts-ignore
+          moveMap={(e) => moveMap(e)}
+          mapRef={mapRef}
           addy={addy as string}
           latitude={Number(coords.latitude)}
           longitude={Number(coords.longitude)}
@@ -214,7 +254,7 @@ export const LocationScreen = ({ navigation }: any) => {
 
       <View style={styles.addressContainer}>
         <View>
-          <Text style={styles.deliveryText}>{addy?.slice(0, 21)}</Text>
+          {/* <Text style={styles.deliveryText}>{addy}</Text> */}
           <Text style={styles.subtitle}>{addy}</Text>
         </View>
 
@@ -295,6 +335,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    paddingTop: 10,
   },
   mapContainer: {
     backgroundColor: "rgb(134 239 172)",
@@ -307,7 +348,8 @@ const styles = StyleSheet.create({
   addressContainer: {
     paddingHorizontal: 10,
     paddingTop: 10,
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: 40,
     flex: 1,
     paddingBottom: Platform.select({
       android: 20,
@@ -317,7 +359,7 @@ const styles = StyleSheet.create({
   },
   deliveryText: {
     fontWeight: "500",
-    fontSize: 22,
+    fontSize: 17,
     marginBottom: 10,
     fontFamily: Platform.select({
       android: "Inter_600SemiBold",

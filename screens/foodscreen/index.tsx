@@ -16,6 +16,7 @@ import ExtraSelectionsGrid from "./components/ExtraSelectionsGrid";
 import FrequentlyBought from "./components/FrequentlyBought";
 import { get_single_product } from "../../lib/supabase";
 import { RestaurantSkeleton } from "../../components/ui/SkeletonBase";
+import BuyButton from "./components/BuyButton";
 
 export function useRefreshOnFocus<T>(refetch: () => Promise<T>) {
   const firstTimeRef = React.useRef(true);
@@ -84,7 +85,15 @@ type Props = {};
 //     _id: "8",
 //   },
 // ];
-const BackButtonheader = ({ _id, name }: { _id: string; name: string }) => {
+const BackButtonheader = ({
+  _id,
+  name,
+  image,
+}: {
+  _id: string;
+  name: string;
+  image: string;
+}) => {
   const navigation = useNavigation();
   return (
     <View className="px-4 pt-2 flex flex-row justify-between items-center">
@@ -97,6 +106,7 @@ const BackButtonheader = ({ _id, name }: { _id: string; name: string }) => {
           navigation.navigate("MealBreakDown", {
             _id,
             name,
+            image,
           })
         }
         className="px-4 py-2 rounded-full bg-primary flex-row items-center space-x-2"
@@ -169,91 +179,16 @@ const Ratingsmodal = ({ modalVisible, setModalVisible, rating }: any) => {
   );
 };
 
-const ServingsDisplay = ({
-  setItemQuantity,
-  itemQuantity,
-}: {
-  setItemQuantity: any;
-  itemQuantity: number;
-}) => {
-  return (
-    <View className="max-w-sm  mx-auto">
-      {/* <Text className="text-2xl font-semibold text-dark">Servings</Text> */}
-      <View className="flex-row items-center space-x-6 ">
-        <TouchableOpacity
-          onPress={() =>
-            itemQuantity <= 1
-              ? setItemQuantity(1)
-              : setItemQuantity((prev: number) => prev - 1)
-          }
-        >
-          <Ionicons size={35} name="remove-circle-outline" />
-        </TouchableOpacity>
-        <Text className="text-[24px]  font-semibold text-dark">
-          {itemQuantity}
-        </Text>
-        <TouchableOpacity
-          onPress={() => setItemQuantity((prev: number) => prev + 1)}
-        >
-          <Ionicons name="add-circle-outline" size={35} color="black" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
-const BuyButton = ({
-  buyItem,
-  itemQuantity,
-  setItemQuantity,
-  price,
-}: {
-  buyItem: () => void;
-  itemQuantity: number;
-  setItemQuantity: any;
-  price: number;
-}) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [rating, setRating] = useState(-1);
-
-  return (
-    <SafeAreaView
-      edges={{
-        bottom: "additive",
-        top: "off",
-      }}
-      className="absolute bottom-0 flex items-center  left-0 right-0 gap-4 pb-4 pt-2  bg-white border-gray-300 px-4 border-t "
-    >
-      <ServingsDisplay
-        itemQuantity={itemQuantity}
-        setItemQuantity={setItemQuantity}
-      />
-      <TouchableOpacity
-        onPress={buyItem}
-        className="  w-[98%] py-4 rounded-lg bg-primary px-4 justify-center items-center"
-      >
-        <Text className=" text-white text-[20px] font-medium">
-          Add {itemQuantity} to Cart - ${Math.round(price)}
-        </Text>
-      </TouchableOpacity>
-      {/* <Ratingsmodal
-        rating={rating}
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        animationType="slide"
-      /> */}
-    </SafeAreaView>
-  );
-};
-
 export const FoodScreen = ({ navigation, route }: any) => {
-  const [viewingNutritionalValue, setViewingNutritionalValue] = useState(false);
   const [itemQuantity, setItemQuantity] = useState(1);
   const [rating, setRating] = useState(3);
+  const [isInCart, setIsInCart] = useState(false);
   const { addToCart } = useCartStore();
-  const { _id } = route.params;
+
   const [loading, setloading] = useState(true);
   const [product, setProduct] = useState<null | any>(null);
+
+  const { _id, image, name, price, description } = route.params;
 
   function handleRating(rating: number) {
     console.info(rating);
@@ -288,19 +223,19 @@ export const FoodScreen = ({ navigation, route }: any) => {
   //   return null;
   // }
 
-  if (loading) {
-    return (
-      <SafeAreaView>
-        <RestaurantSkeleton />
-      </SafeAreaView>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <SafeAreaView>
+  //       <RestaurantSkeleton />
+  //     </SafeAreaView>
+  //   );
+  // }
 
-  const { image, name, price, description, vendor } = product ?? {};
+  // const { vendor } = product ?? {};
 
   return (
     <SafeAreaView className="flex-1 bg-white    ">
-      <BackButtonheader name={name} _id={_id} />
+      <BackButtonheader image={image} name={name} _id={_id} />
       <ScrollView className="">
         <View className="flex-1  pb-40  relative ">
           <ItemInfo
@@ -309,13 +244,19 @@ export const FoodScreen = ({ navigation, route }: any) => {
             name={name as string}
             price={price as number}
           />
-          <HorizontalRule marginTop={10} marginBottom={20} />
-          <ExtraSelectionsGrid />
-          <HorizontalRule marginTop={10} marginBottom={20} />
-          <FrequentlyBought />
+          {!loading && (
+            <View>
+              <HorizontalRule marginTop={10} marginBottom={20} />
+              <ExtraSelectionsGrid />
+              <HorizontalRule marginTop={10} marginBottom={20} />
+              <FrequentlyBought />
+            </View>
+          )}
         </View>
       </ScrollView>
+      <Text>View Cart</Text>
       <BuyButton
+        isInCart={isInCart}
         price={
           itemQuantity > 1
             ? ((price && itemQuantity * price) as number)
@@ -323,12 +264,13 @@ export const FoodScreen = ({ navigation, route }: any) => {
         }
         itemQuantity={itemQuantity}
         setItemQuantity={setItemQuantity}
-        buyItem={() =>
+        buyItem={() => {
           addToCart({
             ...(product as TcartItem),
             quantity: itemQuantity,
-          })
-        }
+          });
+          navigation.goBack();
+        }}
       />
     </SafeAreaView>
   );

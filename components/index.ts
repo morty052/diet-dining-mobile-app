@@ -6,7 +6,6 @@ export * from "./emptystate";
 export * from "./text";
 export * from "./dishpreviewcard";
 export * from "./foodcategorygrid";
-export * from "./menuitemsgrid";
 export * from "./restaurantsGrid";
 export * from "./sortingmodal";
 export * from "./error-state";

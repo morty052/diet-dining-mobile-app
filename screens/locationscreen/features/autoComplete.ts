@@ -8,8 +8,8 @@ export async function autoComplete(
       locationBias: {
         circle: {
           center: {
-            latitude: "7.438107",
-            longitude: "3.9648241",
+            latitude: "48.7988296",
+            longitude: "-95.3421687",
           },
           radius: "500.0",
         },

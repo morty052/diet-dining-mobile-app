@@ -11,6 +11,7 @@ interface ICart {
   getCartTotal: () => number | undefined;
   decreaseItemQuantity: (_id: string) => void;
   increaseItemQuantity: (_id: string) => void;
+  getVendor: (store_name: string) => Ivendor | null;
   removeItemFromCart: (
     _id: string,
     store_name: string,
@@ -408,6 +409,13 @@ const addToCart = (item: TcartItem, state: ICart) => {
   return state;
 };
 
+const getVendor = (store_name: string, vendors: Ivendor[]) => {
+  const activeVendor = vendors.find(
+    (vendor) => vendor.store_name == store_name
+  );
+  return activeVendor;
+};
+
 const handleCheckout = async (store_name: string, vendors: Ivendor[]) => {
   const vendor = vendors.find((vendor) => vendor.store_name == store_name);
 
@@ -444,6 +452,13 @@ export const useCartStore = create<ICart>((set, state) => ({
     const { cartItems } = state();
     const total = getCartTotalFromState(cartItems);
     return total;
+  },
+  getVendor: (store_name) => {
+    const activeVendor = state().vendors.find(
+      (vendor) => vendor.store_name == store_name
+    );
+
+    return activeVendor;
   },
   handleCheckout: (store_name) => {
     handleCheckout(store_name, state().vendors);

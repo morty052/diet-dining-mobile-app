@@ -162,7 +162,7 @@ const Tabs = ({
   setActiveTab,
 }: {
   activeTab: string;
-  setActiveTab: (s: string) => void;
+  setActiveTab: React.Dispatch<React.SetStateAction<"TODAY" | "TRACKER">>;
 }) => {
   return (
     <View className="flex-row justify-between border-y border-gray-300 ">
@@ -371,6 +371,25 @@ const Planner = ({ today }: { today: string }) => {
   );
 };
 
+const DietSuggestions = ({ today }: { today: string }) => {
+  const DateHeader = () => {
+    return (
+      <View className="px-2 border-b border-gray-300 py-2.5 w-full space-y-2 ">
+        <Text className="text-center text-lg">{today}</Text>
+        <Text className="text-center text-2xl text-dark font-medium">
+          Day 1 of 7
+        </Text>
+      </View>
+    );
+  };
+
+  return (
+    <>
+      <DateHeader />
+    </>
+  );
+};
+
 const DailyDiet = ({ navigation }: { navigation: any }) => {
   const [activeTab, setactiveTab] = useState<"TODAY" | "TRACKER">("TODAY");
 
@@ -390,27 +409,16 @@ const DailyDiet = ({ navigation }: { navigation: any }) => {
     }
   }, [activeTab]);
 
+  const tabs = {
+    TODAY: <DietSuggestions today={today} />,
+    TRACKER: <Planner today={today} />,
+  };
+
   return (
     <>
       <SafeAreaView>
-        <ScrollView>
-          {/* @ts-ignore */}
-          <Tabs activeTab={activeTab} setActiveTab={setactiveTab} />
-          {isViewingToday ? (
-            <>
-              <View className="px-2 border-b border-gray-300 py-2.5 w-full space-y-2 ">
-                <Text className="text-center text-lg">{today}</Text>
-                <Text className="text-center text-2xl text-dark font-medium">
-                  Day 1 of 7
-                </Text>
-              </View>
-            </>
-          ) : (
-            <ScrollView>
-              <Planner today={today} />
-            </ScrollView>
-          )}
-        </ScrollView>
+        <Tabs activeTab={activeTab} setActiveTab={setactiveTab} />
+        <ScrollView>{tabs[activeTab]}</ScrollView>
       </SafeAreaView>
     </>
   );

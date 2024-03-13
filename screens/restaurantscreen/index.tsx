@@ -1,6 +1,4 @@
 import {
-  ActivityIndicator,
-  Image,
   ImageBackground,
   Modal,
   NativeScrollEvent,
@@ -11,58 +9,27 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, {
-  LegacyRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorState, Screen } from "../../components";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Colors from "../../constants/colors";
-import { StoreMenuCard } from "../../components/cards";
 import Animated, {
-  interpolate,
-  useAnimatedRef,
   useAnimatedStyle,
-  useScrollViewOffset,
   withTiming,
 } from "react-native-reanimated";
-import { QuickFilters, StoreMenuSectionList, StoreTags } from "./components";
-import burger from "../../assets/burger.jpg";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import StoreInfo from "./components/StoreInfo";
+import { StoreMenuSectionList, StoreTags } from "./components";
 import LikeButton from "../../components/interaction-buttons/LikeButton";
 import { get_single_store } from "../../lib/supabase";
 import { RestaurantSkeleton } from "../../components/ui/SkeletonBase";
-
-type StoreProps = {};
-
-const Stack = createNativeStackNavigator();
-
-const AnimatedImageBackground =
-  Animated.createAnimatedComponent(ImageBackground);
+import TstoreProps from "../../types/Store";
+import { Ivendor, useCartStore } from "../../store/cartStore";
+import BuyButton from "../foodscreen/components/BuyButton";
+import Basketbutton from "./components/BasketButton";
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
-
-const quickFiltersArray = [
-  {
-    title: "Most Popular",
-  },
-  {
-    title: "Meal Combos",
-  },
-  {
-    title: "Beverages",
-  },
-  {
-    title: "Sweets and Treats",
-  },
-];
 
 const Header = ({
   isVisible,
@@ -75,7 +42,7 @@ const Header = ({
   setSearching: (b: boolean) => void;
   store_name: string;
   store_id: string;
-  filters: { title: string }[];
+  filters?: { title: string }[];
 }) => {
   const navigation = useNavigation();
 
@@ -120,59 +87,9 @@ const Header = ({
             <LikeButton item_id={store_id} background />
           </View>
         </View>
-        {isVisible && filters.length > 1 && <QuickFilters filters={filters} />}
+        {/* {isVisible && filters.length > 1 && <QuickFilters filters={filters} />} */}
       </AnimatedSafeAreaView>
     </>
-  );
-};
-
-const BackButton = () => {
-  const navigation = useNavigation();
-  return (
-    <TouchableOpacity
-      className="bg-white h-8 w-8 rounded-full flex justify-center items-center"
-      onPress={() => navigation.goBack()}
-    >
-      <Ionicons size={20} name="arrow-back" />
-    </TouchableOpacity>
-  );
-};
-
-const HeaderRightButtons = ({
-  setSearching,
-}: {
-  setSearching: (b: boolean) => void;
-}) => {
-  const navigation = useNavigation();
-  return (
-    <View className="flex flex-row gap-4">
-      <TouchableOpacity
-        style={{
-          backgroundColor: "white",
-          alignItems: "center",
-          justifyContent: "center",
-          height: 30,
-          width: 30,
-          borderRadius: 30,
-        }}
-        onPress={() => setSearching(true)}
-      >
-        <Ionicons size={20} name="search" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "white",
-          alignItems: "center",
-          justifyContent: "center",
-          height: 30,
-          width: 30,
-          borderRadius: 30,
-        }}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons size={20} name="heart" />
-      </TouchableOpacity>
-    </View>
   );
 };
 
@@ -181,7 +98,15 @@ const RestaurantScreen = ({ navigation, route }: any) => {
   const [isViewable, setisViewable] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [store, setStore] = useState(null);
+  const [store, setStore] = useState<null | TstoreProps>(null);
+
+  const { getVendor, cartItems } = useCartStore();
+
+  const activeVendor: Ivendor | null = useMemo(() => {
+    const vendor = getVendor(store_name);
+    console.log(vendor);
+    return vendor;
+  }, [store_name, cartItems]);
 
   const fetchStore = async () => {
     // const res = await fetch(
@@ -278,16 +203,15 @@ const RestaurantScreen = ({ navigation, route }: any) => {
   // }
 
   return (
-    <>
+    <View style={activeVendor && { paddingBottom: 120 }}>
       <Header
         store_id={store_id}
-        filters={store?.categories}
         setSearching={setSearching}
         isVisible={isViewable}
         store_name={store_name}
       />
       <ScrollView
-        className="bg-white relative"
+        className="bg-white relative "
         onScroll={(e) => handleScroll(e)}
         scrollEventThrottle={16}
         ref={scrollRef}
@@ -307,8 +231,16 @@ const RestaurantScreen = ({ navigation, route }: any) => {
           </View>
         </View>
       </ScrollView>
-      <StoreSearchModal setSearching={setSearching} searching={searching} />
-    </>
+      {activeVendor && (
+        <Basketbutton
+          store_id={activeVendor._id}
+          store_name={activeVendor.store_name}
+          vendorTotal={activeVendor.vendorTotal}
+          vendorItemsCount={activeVendor.vendorItemsCount}
+        />
+      )}
+      {/* <StoreSearchModal setSearching={setSearching} searching={searching} /> */}
+    </View>
   );
 };
 

@@ -6,7 +6,7 @@ import NutritionalValue from "./components/NutritionalValue";
 type Props = {};
 
 export const MealBreakDownScreen = ({ navigation, route }: any) => {
-  const { _id, name } = route.params ?? {};
+  const { _id, name, image } = route.params ?? {};
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -29,7 +29,7 @@ export const MealBreakDownScreen = ({ navigation, route }: any) => {
           resizeMode="contain"
           style={{ height: 288, width: "100%" }}
           source={{
-            uri: "https://cdn.sanity.io/images/xnrrhmkl/production/4c19fd308e5e1da0e68acbde81b9a3cb6e329a3e-900x720.png",
+            uri: image,
           }}
         />
         <NutritionalValue />

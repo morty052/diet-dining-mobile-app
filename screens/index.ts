@@ -16,3 +16,4 @@ export * from "./quiz-routes";
 export * from "./search-screen";
 export * from "./location-permission-screen";
 export * from "./meal-breakdown";
+export * from "./login-screen";

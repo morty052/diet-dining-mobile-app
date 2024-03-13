@@ -6,6 +6,8 @@ import {
   Keyboard,
   ImageBackground,
   Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React from "react";
 import { Button } from "../../components";
@@ -37,16 +39,16 @@ const SignUpForm = ({
   const navigation = useNavigation();
 
   async function handleOldUser() {
-    await save("ONBOARDED", "TRUE");
-    navigation.navigate("App");
+    // await save("ONBOARDED", "TRUE");
+    navigation.navigate("Login");
   }
 
   return (
     <Animated.View
       entering={SlideInDown.duration(900)}
-      className=" absolute bottom-0 h-[50%] left-0 right-0 z-10"
+      style={{ backgroundColor: "white" }}
     >
-      <Animated.View className="flex bg-white flex-1  rounded-t-2xl pt-4 px-4">
+      <Animated.View className="flex bg-white pb-6   rounded-t-2xl pt-2 px-4">
         <Text className="text-center text-lg font-medium text-dark">
           Welcome
         </Text>
@@ -80,8 +82,9 @@ const SignUpForm = ({
             i already have an account
           </Text>
         </View>
+
         {/* DIVIDER */}
-        <View className="flex pt-4 flex-row justify-center items-center">
+        <View className="flex mb-4 flex-row justify-center items-center">
           <View className="border border-gray-300 flex-1"></View>
           <Text className="text-center   mx-2">Or with</Text>
           <View className="border border-gray-300 flex-1"></View>
@@ -89,16 +92,18 @@ const SignUpForm = ({
 
         {/* GOOGLE BUTTON */}
         <View>
-          <View className="font-medium flex-row items-center text-center border-gray-300 border rounded-2xl p-2 mt-4">
-            <Image className="h-8 w-8" source={googleLogo} />
+          <View className="font-medium flex-row items-center text-center border-gray-300 border rounded-2xl p-2 ">
+            <Image className="h-6 w-6" source={googleLogo} />
             <View className="flex-1  pr-6">
-              <Text className="text-lg font-medium text-center">Google</Text>
+              <Text className="text-[15px] font-medium text-center">
+                Google
+              </Text>
             </View>
           </View>
         </View>
 
         {/* TERMS */}
-        <Pressable onPress={() => navigation.navigate("App")} className=" mt-3">
+        <Pressable onPress={() => navigation.navigate("App")} className=" mt-1">
           <Text className="text-center text-sm text-gray-500">
             By continuing, you agree to our Terms of Service
           </Text>
@@ -158,14 +163,28 @@ const MainSignUpScreen = () => {
     <ImageBackground
       resizeMode="cover"
       source={Foodbg}
-      className="flex flex-1 h-screen pt-12 px-4  relative"
+      style={{ flex: 1, position: "relative", justifyContent: "flex-end" }}
     >
-      <View className="absolute bottom-0 top-0 left-0 right-0 bg-black/40"></View>
-      <SignUpForm
-        handlePress={onSignUpPress}
-        emailAddress={email}
-        setEmailAddress={setEmail}
-      />
+      {/* OVERLAY */}
+      <View
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          top: 0,
+          backgroundColor: "rgba(0 0 0 / 0.4)",
+        }}
+      ></View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <SignUpForm
+          handlePress={onSignUpPress}
+          emailAddress={email}
+          setEmailAddress={setEmail}
+        />
+      </KeyboardAvoidingView>
       {/* <StatusBar hidden={true} /> */}
     </ImageBackground>
   );

@@ -8,34 +8,19 @@ const Map = ({
   latitude,
   longitude,
   addy,
+  mapRef,
+  moveMap,
+  markerLocation,
+  setMarkerLocation,
 }: {
   latitude: number;
   longitude: number;
   addy: string;
+  mapRef: React.RefObject<MapView>;
+  moveMap: any;
+  markerLocation: any;
+  setMarkerLocation: any;
 }) => {
-  const mapRef = React.useRef<MapView>(null);
-
-  const [markerLocation, setMarkerLocation] = React.useState<null | {
-    latitude: number;
-    longitude: number;
-  }>();
-
-  const moveMap = (e: any) => {
-    const { latitude, longitude } = e.coordinate;
-
-    const region = {
-      latitude,
-      longitude,
-      latitudeDelta: 0.1,
-      longitudeDelta: 0.1,
-    };
-
-    setMarkerLocation(region);
-
-    console.log(region);
-    mapRef.current?.animateToRegion(region);
-  };
-
   return (
     <MapView
       ref={mapRef}

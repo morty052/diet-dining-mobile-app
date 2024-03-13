@@ -46,10 +46,10 @@ export function StorePreviewCard({ store }: Props) {
           source={{ uri: store.store_image }}
         />
         {/* LIKE BUTTON */}
-        <View className="absolute right-2 top-2">
+        {/* <View className="absolute right-2 top-2">
           <Ionicons color={"white"} size={24} name="heart-outline" />
           <Text className="text-white">340</Text>
-        </View>
+        </View> */}
         {/* OVERLAY */}
         <View className="absolute top-0 right-0 left-0 bottom-0 bg-black/10 rounded-lg "></View>
       </View>
@@ -60,7 +60,7 @@ export function StorePreviewCard({ store }: Props) {
             <Text className="text-dark font-semibold text-[18px]">
               {store.store_name}
             </Text>
-            <Text>1.9km Away</Text>
+            <Text>{store.distance} Away</Text>
           </View>
           {/* RATING */}
           <View className="bg-primary h-10 w-10 rounded-full items-center justify-center">

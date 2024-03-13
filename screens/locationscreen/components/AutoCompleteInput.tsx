@@ -4,9 +4,13 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../../constants/colors";
 import { autoComplete } from "../features/autoComplete";
 import { SEMI_BOLD } from "../../../constants/fontNames";
-type Props = {};
+type Props = {
+  setNewCoords: any;
+  addy: string;
+  setAddy: (addy: string) => void;
+};
 
-const AutoCompleteInput = (props: Props) => {
+const AutoCompleteInput = ({ setNewCoords, addy, setAddy }: Props) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [suggestions, setSuggestions] = React.useState<
     null | { address: string; placeId: string }[]
@@ -17,12 +21,24 @@ const AutoCompleteInput = (props: Props) => {
     if (text.length <= 0) {
       setSuggestions(null);
     }
-    console.log(text);
     if (text.length > 4) {
-      console.log(text.length);
-      console.log("enough");
       const data = await autoComplete(text);
       setSuggestions(data);
+    }
+  }
+
+  async function moveMapWithGeocode(
+    placeId: string
+  ): Promise<{ lat: number; lng: number } | null> {
+    try {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?place_id=${placeId}&key=AIzaSyDy7zLF31fjoMtFTrkJP9O32oKdqP6npRs`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const geocode = data.results[0].geometry.location;
+      return geocode;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   }
 
@@ -71,9 +87,11 @@ const AutoCompleteInput = (props: Props) => {
             {suggestions &&
               suggestions.map((item, index) => (
                 <Text
-                  onPress={() => {
+                  onPress={async () => {
                     setSearchQuery(item.address);
-                    console.log(item.placeId);
+                    setAddy(item.address);
+                    const coords = await moveMapWithGeocode(item.placeId);
+                    setNewCoords(coords);
                     setSuggestions(null);
                   }}
                   style={{

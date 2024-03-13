@@ -7,49 +7,7 @@ import Colors from "../../constants/colors";
 import { Button } from "../../components/ui";
 import { LocationObject } from "expo-location";
 import * as Location from "expo-location";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
-
-const Map = ({
-  latitude,
-  longitude,
-}: {
-  latitude: number;
-  longitude: number;
-}) => {
-  return (
-    <MapView
-      style={styles.map}
-      //   ref={mapRef}
-      provider={PROVIDER_GOOGLE}
-      // initialRegion={{
-      //   // latitude: 49.246292,
-      //   // longitude: -123.116226,
-      //   latitude: latitude,
-      //   longitude: longitude,
-      //   latitudeDelta: 0.0922,
-      //   longitudeDelta: 0.0421,
-      // }}
-      //   region={{
-      //     latitude: latitude as number,
-      //     longitude: longitude as number,
-      //     latitudeDelta: 0.0922,
-      //     longitudeDelta: 0.0421,
-      //   }}
-    >
-      {/* {latitude && longitude && (
-        <Marker
-          coordinate={{
-            latitude: latitude as number,
-            longitude: longitude as number,
-          }}
-          title="Delivery location"
-        />
-      )} */}
-    </MapView>
-  );
-};
-
-type Props = {};
+import { reverseGeocodeAddress } from "../locationscreen/features/reverseGeocodeAddress";
 
 export const LocationPermissionScreen = ({ navigation }: any) => {
   const [location, setLocation] = React.useState<LocationObject | null>(null);
@@ -69,17 +27,19 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
 
     await save("latitude", `${latitude}`),
       await save("longitude", `${longitude}`);
+
+    const delivery_address = await reverseGeocodeAddress({
+      latitude: `${location?.coords.latitude}`,
+      longitude: `${location?.coords.longitude}`,
+    });
+
+    console.info(delivery_address);
+
     navigation.navigate("LocationConfirmation", {
       latitude: location?.coords.latitude,
       longitude: location?.coords.longitude,
+      delivery_address,
     });
-    console.log(location);
-    // mapRef.current?.animateToRegion({
-    //   latitude: location.coords.latitude,
-    //   longitude: location.coords.longitude,
-    //   latitudeDelta: 0.0922,
-    //   longitudeDelta: 0.0421,
-    // });
   }
 
   const handleNext = async () => {
@@ -90,14 +50,6 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
       longitude: location?.coords.longitude,
     });
   };
-
-  React.useEffect(() => {
-    // const getKey = async () => {
-    //   const _id = await getValueFor("user_id");
-    //   console.log(_id);
-    // };
-    // getKey();
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

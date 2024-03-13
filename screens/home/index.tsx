@@ -1,58 +1,25 @@
 import { ScrollView, View, Text } from "react-native";
-import {
-  Screen,
-  MenuItemsGrid,
-  RestaurantsGrid,
-  ErrorState,
-  Loader,
-} from "../../components";
-import {
-  desserts_emoji,
-  salads_emoji,
-  seafoods_emoji,
-  soups_emoji,
-} from "../../assets/foodcategories";
+import { RestaurantsGrid, ErrorState, Loader } from "../../components";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { get_stores } from "../../lib/supabase";
+import { getValueFor } from "../../lib/secure-store";
+import { MenuItemsGrid } from "./menuitemsgrid";
 
-const categories = [
-  {
-    name: "Desserts",
-    image: desserts_emoji,
-  },
-  {
-    name: "Sea food",
-    image: seafoods_emoji,
-  },
-  {
-    name: "Salads",
-    image: salads_emoji,
-  },
-  {
-    name: "Chinese",
-    image: soups_emoji,
-  },
-  {
-    name: "Soups",
-    image: soups_emoji,
-  },
-];
+const HomeMenu = () => {};
 
-const HomeMenu = () => {
-  const [loading, setloading] = useState(true);
-
+export const Home = ({}) => {
   const fetchStores = async () => {
-    // const res = await fetch("http://localhost:3000/stores/get-all");
+    // const data = await get_stores();
+    const latitude = await getValueFor("latitude");
+    const longitude = await getValueFor("longitude");
     // const res = await fetch(
-    //   "https://diet-dining-server.onrender.com/stores/get-all"
+    //   `http://localhost:3000/stores/get-stores-around?latitude=${latitude}&longitude=${longitude}`
     // );
-    // const res = await fetch(
-    //   "https://bde0-102-216-10-2.ngrok-free.app/stores/get-all"
-    // );
-    const data = await get_stores();
-    // setloading(false);
+    const res = await fetch(
+      `https://diet-dining-server.onrender.com/stores/get-stores-around?latitude=${latitude}&longitude=${longitude}`
+    );
+    const data = await res.json();
     return data;
   };
 
@@ -65,37 +32,30 @@ const HomeMenu = () => {
     queryFn: fetchStores,
   });
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   if (isError) {
     return <ErrorState />;
   }
 
   return (
     <ScrollView style={{ position: "relative", backgroundColor: "white" }}>
-      <Screen>
+      <View style={{ flex: 1, paddingHorizontal: 10 }}>
         <View>
-          <View>
-            <MenuItemsGrid categories={categories} />
-            {isLoading ? (
-              <Loader />
-            ) : (
-              <View>
-                <RestaurantsGrid stores={stores} title="Top Picks For you" />
-                <RestaurantsGrid stores={stores} title="Nearby Stores" />
-                <RestaurantsGrid stores={stores} title="New in your Area" />
-              </View>
-            )}
-          </View>
+          <MenuItemsGrid />
+          {!isLoading && stores && stores?.length > 0 && (
+            <View>
+              <RestaurantsGrid stores={stores} title="Nearby Stores" />
+              <RestaurantsGrid stores={stores} title="Top Picks For You" />
+              <RestaurantsGrid stores={stores} title="New in your Area" />
+            </View>
+          )}
+
+          {!isLoading && stores && stores?.length == 0 && (
+            <Text>Nothing found in your area</Text>
+          )}
+          {isLoading && <Loader />}
         </View>
-      </Screen>
+      </View>
       <StatusBar hidden={false} style="dark" />
     </ScrollView>
   );
-};
-
-export const Home = ({}) => {
-  return <HomeMenu />;
 };

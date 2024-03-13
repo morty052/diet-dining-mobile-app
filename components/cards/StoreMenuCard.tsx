@@ -28,6 +28,10 @@ export function StoreMenuCard({
           // @ts-ignore
           navigation.navigate("FoodScreen", {
             _id,
+            image,
+            name,
+            price,
+            description,
           })
         // console.log(_id)
       }

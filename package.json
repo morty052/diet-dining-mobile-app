@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "install-ios": "eas build:run -p ios",
+    "install-android": "eas build:run -p ios"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^0.20.1",
@@ -40,7 +42,8 @@
     "react-native-screens": "~3.29.0",
     "react-native-svg": "13.9.0",
     "socket.io-client": "^4.7.4",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "expo-image": "~1.10.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

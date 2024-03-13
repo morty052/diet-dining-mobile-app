@@ -1,11 +1,12 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useMemo } from "react";
-import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useCartStore } from "../../store/cartStore";
 import { SearchBar } from "../searchbar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { deleteKey, getValueFor } from "../../lib/secure-store";
+import { deleteKey } from "../../lib/secure-store";
+import { useLocationStore } from "../../store/locationStore";
 
 const Badge = ({ count }: { count: number }) => {
   return (
@@ -21,13 +22,14 @@ export const Header = () => {
   const [loading, setLoading] = React.useState(false);
   const [addy, setAddy] = React.useState<string | boolean>("");
 
+  const { setHeader, delivery_address } = useLocationStore();
+
   React.useEffect(() => {
-    const getAddy = async () => {
-      const addy = await getValueFor("DELIVERY_ADDRESS");
-      setAddy(addy);
+    const getDeliveryAddress = async () => {
+      await setHeader();
     };
 
-    getAddy();
+    getDeliveryAddress();
   }, []);
 
   return (
@@ -55,9 +57,9 @@ export const Header = () => {
               onPress={() => navigation.navigate("LocationScreen")}
             >
               <Text className={styles.locationText}>
-                {!addy
+                {!delivery_address
                   ? " Select Delivery Location"
-                  : addy.toString().slice(0, 21)}
+                  : delivery_address.toString().slice(0, 21)}
               </Text>
               <Ionicons size={10} name="chevron-down-outline" />
             </TouchableOpacity>

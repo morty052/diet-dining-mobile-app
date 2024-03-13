@@ -10,10 +10,12 @@ import {
 import StoreInfo from "../screens/restaurantscreen/components/StoreInfo";
 import UserDetails from "../screens/signupscreen/UserDetails";
 import UserPasswordScreen from "../screens/signupscreen/UserPasswordScreen";
+import LoginScreen from "../screens/login-screen";
 type OnboardingRoutesList = {
   SplashScreen: undefined;
   Onboarding: undefined;
   SignUp: undefined;
+  Login: undefined;
   LocationPermission: undefined;
   LocationConfirmation: {
     latitude: number;
@@ -35,13 +37,25 @@ const OnboardingRoutes = () => {
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="SplashScreen" component={SplashScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="UserDetails" component={UserDetails} />
       <Stack.Screen name="PasswordScreen" component={UserPasswordScreen} />
       <Stack.Screen
         name="LocationPermission"
         component={LocationPermissionScreen}
       />
-      <Stack.Screen name="LocationConfirmation" component={LocationScreen} />
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerTitle: "Delivery Info",
+          headerBackTitleVisible: false,
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerStyle: {},
+        }}
+        name="LocationConfirmation"
+        component={LocationScreen}
+      />
       <Stack.Screen name="DeliveryAddressScreen" component={LocationScreen} />
     </Stack.Navigator>
   );

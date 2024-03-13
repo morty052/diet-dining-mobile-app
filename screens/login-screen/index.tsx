@@ -1,0 +1,197 @@
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { SEMI_BOLD } from "../../constants/fontNames";
+import Colors from "../../constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { save } from "../../lib/secure-store";
+
+type LoginResponseProps = { _id: string | null; status: "SUCCESS" | "ERROR" };
+
+const BackButton = () => {
+  const navigation = useNavigation();
+  return (
+    <Pressable
+      onPress={() => navigation.goBack()}
+      style={{
+        backgroundColor: Colors.gray,
+        height: 50,
+        width: 50,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 20,
+      }}
+    >
+      <Ionicons size={30} name="arrow-back" />
+    </Pressable>
+  );
+};
+
+const NextButton = ({ handlePress }: { handlePress: () => void }) => {
+  return (
+    <Pressable
+      onPress={handlePress}
+      style={{
+        backgroundColor: Colors.primary,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 10,
+      }}
+    >
+      <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD, color: "white" }}>
+        Next
+      </Text>
+    </Pressable>
+  );
+};
+
+const LoginScreen = ({ navigation, route }: any) => {
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState(false);
+  const [hidePassword, setHidePassword] = React.useState(true);
+
+  async function handlePress() {
+    if (!email || !password) {
+      return;
+    }
+
+    try {
+      const cleanEmail = email.trim().toLowerCase();
+      const url = `http://localhost:3000/auth/signin?user_email=${cleanEmail}&user_password=${password}`;
+
+      const res = await fetch(url);
+      const data: LoginResponseProps = await res.json();
+
+      const { _id, status } = data;
+
+      if (status === "SUCCESS") {
+        await save("user_id", _id);
+        navigation.navigate("LocationPermission");
+      }
+
+      if (status === "ERROR") {
+        console.log(status);
+        throw new Error("Invalid email or password");
+      }
+    } catch (error) {
+      console.error(error);
+      setError(true);
+    }
+
+    // navigation.navigate("PasswordScreen", {
+    //   email,
+    //   password,
+    // });
+  }
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <View style={styles.container}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.mainText}>Welcome back.</Text>
+          <Text style={styles.subtitle}>
+            Please enter your email and password to continue.
+          </Text>
+          <View style={styles.inputsContainer}>
+            <TextInput
+              value={email}
+              onChangeText={(text) => {
+                if (error) {
+                  setError(false);
+                }
+                setEmail(text);
+              }}
+              placeholderTextColor={Colors.dark}
+              placeholder="Email"
+              style={styles.input}
+            />
+            <View
+              style={[
+                { flexDirection: "row", alignItems: "center" },
+                styles.input,
+              ]}
+            >
+              <TextInput
+                value={password}
+                secureTextEntry={hidePassword}
+                autoCapitalize="none"
+                onChangeText={(text) => {
+                  if (error) {
+                    setError(false);
+                  }
+                  setPassword(text);
+                }}
+                placeholderTextColor={Colors.dark}
+                placeholder="Password"
+                style={styles.passwordInput}
+              />
+              <Ionicons
+                name={!hidePassword ? "eye-off" : "eye-outline"}
+                size={18}
+                onPress={() => setHidePassword(!hidePassword)}
+              />
+            </View>
+            {error && (
+              <Text style={{ textAlign: "center", color: Colors.danger }}>
+                Invalid email or password
+              </Text>
+            )}
+          </View>
+        </View>
+        <SafeAreaView>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingBottom: 20,
+            }}
+          >
+            <BackButton />
+            <NextButton handlePress={handlePress} />
+          </View>
+        </SafeAreaView>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default LoginScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+    backgroundColor: "white",
+    flex: 1,
+    justifyContent: "space-between",
+  },
+  innerContainer: {
+    padding: 10,
+  },
+  mainText: {
+    fontFamily: SEMI_BOLD,
+    color: Colors.dark,
+    fontSize: 24,
+  },
+  subtitle: {
+    marginTop: 10,
+    fontSize: 16,
+  },
+  inputsContainer: {
+    gap: 20,
+    paddingTop: 28,
+  },
+  input: {
+    backgroundColor: Colors.gray,
+    padding: 20,
+    borderRadius: 10,
+  },
+  passwordInput: {
+    backgroundColor: "transparent",
+    // padding: 20,
+    borderRadius: 10,
+    flex: 1,
+  },
+});
