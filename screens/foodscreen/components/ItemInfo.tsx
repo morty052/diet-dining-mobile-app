@@ -4,6 +4,7 @@ import HorizontalRule from "../../../components/ui/HorizontalRule";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../../constants/colors";
 import { SEMI_BOLD } from "../../../constants/fontNames";
+import Animated from "react-native-reanimated";
 
 const ItemInfo = ({
   price,
@@ -53,12 +54,12 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontFamily: SEMI_BOLD,
-    fontSize: 24,
+    fontSize: 20,
     color: Colors.dark,
   },
   itemPrice: {
     fontFamily: SEMI_BOLD,
-    fontSize: 24,
+    fontSize: 20,
     color: "rgba(31 41 55 / 0.7)",
   },
   ratingsContainer: {},

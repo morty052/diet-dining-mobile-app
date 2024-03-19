@@ -26,6 +26,8 @@ import TestScreen from "../screens/TestScreen";
 import { useNavigation } from "@react-navigation/native";
 import Colors from "../constants/colors";
 import StoreInfo from "../screens/restaurantscreen/components/StoreInfo";
+import { DietBrowser } from "../screens/dietplanner/components/DietBrowser";
+import BackButton from "../components/ui/BackButton";
 
 type RootTabsParamList = {
   Home: undefined;
@@ -177,6 +179,7 @@ export type RootStackParamList = {
     store_name: string;
   };
   Account: undefined;
+  DietBrowser: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -262,6 +265,17 @@ const AppStack = ({ ONBOARDED }: { ONBOARDED: boolean }) => {
         options={{ headerShown: false, headerBackTitleVisible: false }}
         name="QuizRoutes"
         component={QuizRoutes}
+      />
+      <Stack.Screen
+        options={{
+          headerLeft: () => <BackButton />,
+          headerTitle: "Diet Plans",
+          headerShown: true,
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+        }}
+        name="DietBrowser"
+        component={DietBrowser}
       />
       <Stack.Screen
         options={{

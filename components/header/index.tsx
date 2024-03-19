@@ -67,14 +67,13 @@ export const Header = () => {
         </View>
         <View className={styles.extraButtonsContainer}>
           <TouchableOpacity
-            onPress={
-              () =>
-                // @ts-ignore
-                deleteKey("ONBOARDED")
-              // navigation.navigate("Account")
+            onPress={() =>
+              // deleteKey("ONBOARDED")
+              // @ts-ignore
+              navigation.navigate("Account")
             }
           >
-            <Ionicons name="person-outline" size={24} color="black" />
+            <Ionicons name="person-outline" size={22} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
             // @ts-ignore
@@ -86,7 +85,7 @@ export const Header = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <View className="px-2.5 border-b border-primary ">
+      <View className="px-2.5 border-b border-gray-300 ">
         <SearchBar />
       </View>
     </SafeAreaView>
@@ -95,7 +94,7 @@ export const Header = () => {
 
 const styles = {
   container: "px-4 pt-4   flex items-center flex-row justify-between ",
-  extraButtonsContainer: "flex flex-row gap-x-4",
+  extraButtonsContainer: "flex flex-row items-center gap-x-2",
   deliveryInfoContainer: "flex-row items-center  gap-2",
   locationText: "text-dark font-semibold text-[16px]",
 };

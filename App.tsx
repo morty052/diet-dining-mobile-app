@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
-import { getValueFor, save } from "./lib/secure-store";
+import { getValueFor} from "./lib/secure-store";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -15,6 +15,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { setItem } from "./utils/storage";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -54,7 +55,7 @@ async function registerForPushNotificationsAsync() {
     const { data } = token;
 
     console.log(data);
-    await save("expo_push_token", `${data}`);
+    setItem("expo_push_token", `${data}`);
   }
 
   return token?.data;
@@ -126,7 +127,7 @@ export default function App() {
           </GestureHandlerRootView>
         </RootSiblingParent>
       </QueryClientProvider>
-      <StatusBar hidden={false} style="auto" />
+      <StatusBar hidden={false} style="dark" />
     </ClerkProvider>
     // <NotificationComponent />
   );

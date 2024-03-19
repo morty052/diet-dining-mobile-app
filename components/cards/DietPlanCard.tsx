@@ -1,4 +1,13 @@
-import { Dimensions, StyleSheet, Text, View, Image, Modal } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Modal,
+  Pressable,
+  ImageBackground,
+} from "react-native";
 import React from "react";
 import Colors from "../../constants/colors";
 import { seafoods_emoji } from "../../assets/foodcategories";
@@ -15,7 +24,13 @@ type Props = {};
 
 const { width, height } = Dimensions.get("screen");
 
-const IngredientTag = ({ title }: { title: string }) => {
+export const IngredientTag = ({
+  title,
+  handlePress,
+}: {
+  title: string;
+  handlePress?: () => void;
+}) => {
   return (
     <View style={styles.ingerdientTagContainer}>
       <Text style={styles.ingerdientTagText}>{title}</Text>
@@ -23,110 +38,114 @@ const IngredientTag = ({ title }: { title: string }) => {
   );
 };
 
-const MoreInfoModal = ({ viewingMore, setViewingMore }) => {
+const DietPlanCard = ({
+  name,
+  handlePress,
+  tags,
+  image,
+}: {
+  name: string;
+  handlePress: () => void;
+  tags: string[];
+  image: any;
+}) => {
   return (
-    <Modal animationType="slide" visible={viewingMore}>
-      <SafeAreaView
-        edges={{
-          bottom: "additive",
-        }}
-        className="flex-1 py-16 justify-between bg-white px-2"
-      >
-        <Text
-          style={[styles.dietNameText]}
-          onPress={() => setViewingMore(false)}
-        >
-          Mediterranean
-        </Text>
-        <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star" size={18} color={Colors.primary} />
-          <Ionicons name="star-outline" size={18} color={Colors.primary} />
+    <Pressable
+      style={{
+        width: "100%",
+        height: 200,
+        marginBottom: 20,
+        position: "relative",
+      }}
+      onPress={handlePress}
+    >
+      <Image style={styles.image} source={image}>
+        {/* OVERLAY */}
+      </Image>
+      <View style={styles.overlay}></View>
+      <View style={styles.container}>
+        <View style={styles.nameAndRatingsContainer}>
+          <Text style={styles.dietNameText}>{name}</Text>
+          <View style={styles.ratingContainer}>
+            <Ionicons name="star" size={15} color={Colors.primary} />
+            <Ionicons name="star" size={15} color={Colors.primary} />
+            <Ionicons name="star" size={15} color={Colors.primary} />
+            <Ionicons name="star" size={15} color={Colors.primary} />
+            <Ionicons name="star-outline" size={15} color={Colors.primary} />
+          </View>
         </View>
-        <Image
-          resizeMode="contain"
-          className=" w-full h-1/2 mx-auto"
-          source={seafoods_emoji}
-        />
-        <View className="flex-1 pt-4 ">
-          <Text className="text-2xl font-medium text-dark ">Overview</Text>
-          <Text className="mt-4 font-light text-[18px]">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Consequuntur totam, culpa architecto molestias libero praesentium
-            dignissimos quasi ut saepe perferendis nobis consectetur fugiat
-            illo. Consequatur accusamus impedit quis dolor exercitationem?
-          </Text>
+        <View style={styles.allIngredientsContainer}>
+          {tags?.map((tag, index) => (
+            <IngredientTag key={index} title={tag} />
+          ))}
         </View>
-      </SafeAreaView>
-    </Modal>
-  );
-};
 
-const DietPlanCard = (props: Props) => {
-  const [viewingMore, setViewimgMore] = React.useState(false);
-
-  return (
-    <View style={[styles.container]}>
-      <Text style={styles.dietNameText}>Mediterranean</Text>
-      <View style={styles.ratingContainer}>
-        <Ionicons name="star" size={18} color={Colors.primary} />
-        <Ionicons name="star" size={18} color={Colors.primary} />
-        <Ionicons name="star" size={18} color={Colors.primary} />
-        <Ionicons name="star" size={18} color={Colors.primary} />
-        <Ionicons name="star-outline" size={18} color={Colors.primary} />
+        {/* BUTTON */}
+        <View style={{ zIndex: 10 }}>
+          <Pressable onPress={handlePress}>
+            <Text style={styles.moreInfotext}>Tap to see more info</Text>
+          </Pressable>
+        </View>
       </View>
-      <View style={styles.allIngredientsContainer}>
-        <IngredientTag title="Fruits" />
-        <IngredientTag title="Vegetables" />
-        <IngredientTag title="Whole grains" />
-        <IngredientTag title="Fish" />
-        <IngredientTag title="Nuts" />
-        {/* <IngredientTag title="Olive Oil" /> */}
-      </View>
-      <View style={styles.dietImageContainer}>
-        <Image
-          resizeMode="contain"
-          style={styles.dietImage}
-          source={seafoods_emoji}
-        />
-      </View>
-
-      <TouchableOpacity onPress={() => setViewimgMore(true)}>
-        <Text style={styles.moreInfotext}>Tap to see more info</Text>
-      </TouchableOpacity>
-    </View>
+    </Pressable>
   );
 };
 
 export default DietPlanCard;
 
 const styles = StyleSheet.create({
+  image: {
+    width: "100%",
+    height: 200,
+    borderRadius: 15,
+    // borderColor: Colors.primary,
+    gap: 10,
+  },
   container: {
-    width: width * 0.96,
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
+    gap: 10,
     paddingVertical: 20,
-    backgroundColor: "white",
-    borderColor: Colors.primary,
+    paddingHorizontal: 10,
+    position: "absolute",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "black",
+    borderRadius: 15,
+    opacity: 0.4,
+    height: 200,
+    // zIndex: -10,
+  },
+  nameAndRatingsContainer: {
+    zIndex: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 10,
   },
   dietNameText: {
     fontWeight: "600",
-    fontSize: 25,
-    color: Colors.dark,
+    fontSize: 18,
+    color: "white",
     fontFamily: SEMI_BOLD,
   },
   ratingContainer: {
     flexDirection: "row",
-    paddingVertical: 2,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    borderRadius: 8,
+    backgroundColor: "white",
+    width: 100,
+    justifyContent: "center",
   },
   allIngredientsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    paddingTop: 10,
+    zIndex: 10,
   },
   ingerdientTagContainer: {
     backgroundColor: Colors.primary,
@@ -150,7 +169,7 @@ const styles = StyleSheet.create({
   moreInfotext: {
     textAlign: "center",
     fontWeight: "500",
-    fontSize: 16,
-    color: Colors.link,
+    fontSize: 14,
+    color: "white",
   },
 });

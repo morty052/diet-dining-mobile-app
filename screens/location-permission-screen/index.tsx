@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { getValueFor, save } from "../../lib/secure-store";
+import { getValueFor } from "../../lib/secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/colors";
@@ -8,6 +8,7 @@ import { Button } from "../../components/ui";
 import { LocationObject } from "expo-location";
 import * as Location from "expo-location";
 import { reverseGeocodeAddress } from "../locationscreen/features/reverseGeocodeAddress";
+import { setItem } from "../../utils/storage";
 
 export const LocationPermissionScreen = ({ navigation }: any) => {
   const [location, setLocation] = React.useState<LocationObject | null>(null);
@@ -25,16 +26,19 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
     const { coords } = location ?? {};
     const { longitude, latitude } = coords;
 
-    await save("latitude", `${latitude}`),
-      await save("longitude", `${longitude}`);
+    // * SAVE LATITUDE AND LONGITUDE TO SECURE STORE
+    setItem("latitude", `${latitude}`), setItem("longitude", `${longitude}`);
 
+    // * GET USER ADDRESS USING LATITUDE AND LONGITUDE
     const delivery_address = await reverseGeocodeAddress({
       latitude: `${location?.coords.latitude}`,
       longitude: `${location?.coords.longitude}`,
     });
 
-    console.info(delivery_address);
+    //  * SAVE USER ONBOARDING
+    setItem("ONBOARDED", "TRUE");
 
+    // * PASS LATITUDE AND LONGITUDE TO LOCATION CONFIRMATION SCREEN
     navigation.navigate("LocationConfirmation", {
       latitude: location?.coords.latitude,
       longitude: location?.coords.longitude,
@@ -42,9 +46,9 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
     });
   }
 
-  const handleNext = async () => {
-    console.log(location);
-    await save("ONBOARDED", "TRUE");
+  const handleSkip = async () => {
+    //  * SAVE USER ONBOARDING
+    setItem("ONBOARDED", "TRUE");
     navigation.navigate("DeliveryAddressScreen", {
       latitude: location?.coords.latitude,
       longitude: location?.coords.longitude,
@@ -65,7 +69,7 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
       <View style={{ rowGap: 20, paddingBottom: 50 }}>
         <Button onPress={setCurrentLocation} variant="default" title="Allow" />
         <TouchableOpacity
-          onPress={() => handleNext()}
+          onPress={() => handleSkip()}
           className="bg-white w-full py-4 px-2 flex-row flex justify-center items-center rounded-lg"
         >
           <Text className={"text-dark text-center text-[20px] font-medium"}>

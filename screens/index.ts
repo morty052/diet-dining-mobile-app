@@ -17,3 +17,4 @@ export * from "./search-screen";
 export * from "./location-permission-screen";
 export * from "./meal-breakdown";
 export * from "./login-screen";
+export * from "./address-finder";

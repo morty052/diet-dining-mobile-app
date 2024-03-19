@@ -244,34 +244,35 @@ export const FoodScreen = ({ navigation, route }: any) => {
             name={name as string}
             price={price as number}
           />
-          {!loading && (
-            <View>
-              <HorizontalRule marginTop={10} marginBottom={20} />
-              <ExtraSelectionsGrid />
-              <HorizontalRule marginTop={10} marginBottom={20} />
-              <FrequentlyBought />
-            </View>
-          )}
+          {/* {!loading && (
+          )} */}
+          <View>
+            <HorizontalRule marginTop={10} marginBottom={20} />
+            <ExtraSelectionsGrid />
+            <HorizontalRule marginTop={10} marginBottom={20} />
+            <FrequentlyBought />
+          </View>
         </View>
       </ScrollView>
-      <Text>View Cart</Text>
-      <BuyButton
-        isInCart={isInCart}
-        price={
-          itemQuantity > 1
-            ? ((price && itemQuantity * price) as number)
-            : (price as number)
-        }
-        itemQuantity={itemQuantity}
-        setItemQuantity={setItemQuantity}
-        buyItem={() => {
-          addToCart({
-            ...(product as TcartItem),
-            quantity: itemQuantity,
-          });
-          navigation.goBack();
-        }}
-      />
+      {!loading && (
+        <BuyButton
+          isInCart={isInCart}
+          price={
+            itemQuantity > 1
+              ? ((price && itemQuantity * price) as number)
+              : (price as number)
+          }
+          itemQuantity={itemQuantity}
+          setItemQuantity={setItemQuantity}
+          buyItem={() => {
+            addToCart({
+              ...(product as TcartItem),
+              quantity: itemQuantity,
+            });
+            navigation.goBack();
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };

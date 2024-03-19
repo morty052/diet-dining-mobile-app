@@ -20,6 +20,33 @@ export const get_stores = async () => {
   }
 };
 
+export const get_stores_around_user = async ({
+  latitude,
+  longitude,
+}: {
+  latitude: string;
+  longitude: string;
+}) => {
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      "get_stores_around_user",
+      {
+        body: {
+          latitude,
+          longitude,
+        },
+      }
+    );
+    if (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const get_single_store = async (store_id: string) => {
   try {
     const { data } = await supabase.functions.invoke("get_single_store", {

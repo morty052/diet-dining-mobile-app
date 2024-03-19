@@ -24,7 +24,7 @@ const LikeButton = ({
     try {
       setNewLike(true);
       const user_id = await getValueFor("user_id");
-      const url = `http://localhost:3000/user/like?user_id=${user_id}&item_id=${item_id}`;
+      const url = `https://diet-dining-server.onrender.com/user/like?user_id=${user_id}&item_id=${item_id}`;
       const res = await fetch(url);
       const data = await res.json();
       console.log(data);
@@ -57,5 +57,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 20,
+    paddingTop: 4,
   },
 });

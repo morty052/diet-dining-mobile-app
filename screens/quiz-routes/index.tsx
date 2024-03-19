@@ -90,6 +90,10 @@ const budgetAnswers = [
     title: "$100  and above",
     name: "VEGETARIAN",
   },
+  {
+    title: "Prefer not to say",
+    name: "NOT",
+  },
 ];
 
 const QuestionItem = ({
@@ -323,10 +327,24 @@ const GettingPlanReadyScreen = () => {
         style={{ width: 300, height: 300, alignSelf: "center" }}
       />
       <View className="px-2 space-y-2">
-        <Text className="text-center text-dark  text-4xl font-semibold">
+        <Text
+          style={{
+            fontFamily: SEMI_BOLD,
+            textAlign: "center",
+            fontSize: 36,
+            color: Colors.dark,
+          }}
+        >
           Getting plan ready
         </Text>
-        <Text className="text-center text-dark text-[15px]  font-medium">
+        <Text
+          style={{
+            textAlign: "center",
+            color: Colors.dark,
+            fontSize: 15,
+            fontFamily: SEMI_BOLD,
+          }}
+        >
           Give us a second to make sure we get the perfect diet plan for you.
         </Text>
       </View>
@@ -349,11 +367,11 @@ const DietBudget = ({ navigation }: { navigation: any }) => {
     if (!gettingDietPlan) {
       return;
     }
-    const timer = setTimeout(() => {
-      setPlan("plan");
-      setGettingDietPlan(false);
-      navigation.navigate("Diet");
-    }, 8000);
+    // const timer = setTimeout(() => {
+    //   setPlan("plan");
+    //   setGettingDietPlan(false);
+    //   navigation.navigate("Diet");
+    // }, 8000);
 
     // return () => {
     //   clearTimeout(timer);
@@ -436,12 +454,13 @@ const DietConfirmationScreen = ({ navigation }: { navigation: any }) => {
     }
     const timer = setTimeout(() => {
       setGettingDietPlan(false);
+      setPlan("plan");
       navigation.navigate("Diet");
     }, 8000);
 
-    // return () => {
-    //   clearTimeout(timer);
-    // };
+    return () => {
+      clearTimeout(timer);
+    };
   }, [gettingDietPlan]);
 
   const NextButton = ({
@@ -505,6 +524,7 @@ export const QuizRoutes = (props: Props) => {
         />
         <Stack.Screen
           name="DietConfirmationScreen"
+          options={{ headerShown: false }}
           component={DietConfirmationScreen}
         />
       </Stack.Navigator>

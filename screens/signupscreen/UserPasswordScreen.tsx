@@ -5,7 +5,8 @@ import { SEMI_BOLD } from "../../constants/fontNames";
 import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { getValueFor, save } from "../../lib/secure-store";
+import { getValueFor } from "../../lib/secure-store";
+import { setItem } from "../../utils/storage";
 
 type Props = {};
 
@@ -79,10 +80,10 @@ const UserPasswordScreen = ({ navigation, route }: any) => {
       // };
       // const res = await fetch(url, options);
       // const { _id } = await res.json();
-      // await save("user_id", _id);
-      await save("ONBOARDED", "TRUE");
+      // await setItem("user_id", _id);
+      setItem("firstname", firstName);
+      setItem("ONBOARDED", "TRUE");
       navigation.navigate("LocationPermission");
-      // await save("user_id", _id);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }

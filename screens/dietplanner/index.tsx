@@ -1,32 +1,29 @@
 import {
   View,
   Text,
-  ImageBackground,
-  FlatList,
   Image,
   Pressable,
   useWindowDimensions,
-  TouchableOpacity,
   ScrollView,
+  Dimensions,
+  ImageBackground,
 } from "react-native";
 import React from "react";
-import { Screen } from "../../components";
-import circle from "../../assets/circle.png";
-import { StatusBar } from "expo-status-bar";
-import { Feather } from "@expo/vector-icons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useState, useMemo } from "react";
 import { useQuizStore } from "../../store/quizStore";
-import { salads, seaFood } from "../../constants/menu";
 import { useNavigation } from "@react-navigation/native";
-import { ceaser_salad, chicken_salad } from "../../assets/dishes";
+import { ceaser_salad } from "../../assets/dishes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../../components/ui";
 import Colors from "../../constants/colors";
-import DietPlanCard from "../../components/cards/DietPlanCard";
 import { SEMI_BOLD } from "../../constants/fontNames";
 import { seafoods_emoji } from "../../assets/foodcategories";
 import { DietBrowser } from "./components/DietBrowser";
+import DietTracker from "./components/DietTracker";
+import { mockMealData } from "../../constants/restaurants";
+import { Ionicons } from "@expo/vector-icons";
+import { keto_bg } from "../../assets/diet-plan-images";
 
 type DietStackParamList = {
   DietHome: undefined;
@@ -76,13 +73,17 @@ const menu = [
 ];
 
 function DishPreviewCard({
-  title,
+  name,
   image,
   _id,
+  price,
+  description,
 }: {
-  title: string;
+  name: string;
   image: any;
   _id: string;
+  price: number;
+  description: string;
 }) {
   const navigation = useNavigation();
   return (
@@ -90,30 +91,63 @@ function DishPreviewCard({
       onPress={() =>
         // @ts-ignore
         navigation.navigate("FoodScreen", {
-          _id: _id,
-          title: title,
-          image: image,
+          _id,
+          name,
+          image,
+          price,
+          description,
         })
       }
-      className="flex-1  mr-4 w-[90vw]"
+      style={{
+        flex: 1,
+        marginRight: 16,
+        width: Dimensions.get("screen").width * 0.9,
+      }}
     >
-      <View className="relative">
+      <View style={{ position: "relative" }}>
         <Image
-          source={{ uri: image }}
-          className="w-full  h-56 rounded-xl     object-cover"
+          style={{ width: "100%", height: 224, borderRadius: 12 }}
+          // source={{ uri: image }}
+          source={ceaser_salad}
+          resizeMode="cover"
         />
-        <View className="absolute top-2 right-4">
-          <Feather name="heart" size={24} color="black" />
-        </View>
-        <View className="absolute rounded-xl top-0 bottom-0 left-0 right-0 bg-black/20 "></View>
+        <View
+          style={{
+            position: "absolute",
+            borderRadius: 12,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0 0 0 / 0.2)",
+          }}
+        ></View>
       </View>
-      <View className="py-2 flex flex-row items-center justify-between">
-        <View className="flex">
-          <Text className="text-xl font-medium">{title}</Text>
-          <Text className="text-lg">$15.00</Text>
+      <View
+        style={{
+          paddingVertical: 8,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <View style={{ gap: 3 }}>
+          <Text style={{ fontSize: 18, fontFamily: SEMI_BOLD }}>{name}</Text>
+          <Text style={{ fontSize: 16 }}>${price}</Text>
         </View>
-        <View className=" border px-4 w-28 inline-flex items-center py-1 rounded-3xl border-dark">
-          <Text className="text-sm font-medium">Order</Text>
+        <View
+          style={{
+            borderWidth: 1,
+            paddingHorizontal: 16,
+            width: 112,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 4,
+            borderRadius: 24,
+            borderColor: Colors.dark,
+          }}
+        >
+          <Text style={{ fontSize: 14, fontFamily: SEMI_BOLD }}>Order</Text>
         </View>
       </View>
     </Pressable>
@@ -277,105 +311,12 @@ const DietHomePage = ({ navigation }: { navigation: any }) => {
   );
 };
 
-const Planner = ({ today }: { today: string }) => {
-  const { width, height } = useWindowDimensions();
-
-  const half = height / 2.5;
-
-  const TrackerVisual = () => {
-    return (
-      <View style={{ height: half }} className="bg-dark relative">
-        <View className="flex flex-row justify-center items-center space-x-8 py-6">
-          <View className="flex items-center">
-            <Text className="text-lg font-bold text-white">0</Text>
-            <Text className="text-lg font-bold text-white">Eaten</Text>
-          </View>
-          <View className=" w-52 h-52 rounded-full border-[8px] flex items-center justify-center border-gray-300/10">
-            <Text className="text-5xl text-white font-bold">2540</Text>
-            <Text className="text-white">KCAL LEFT</Text>
-          </View>
-          <View className="flex items-center">
-            <Text className="text-lg font-bold text-white">0</Text>
-            <Text className="text-lg font-bold text-white">Goal</Text>
-          </View>
-        </View>
-        <Text className="text-center text-lg text-white">Hide stats</Text>
-        <View className="absolute -bottom-8 left-0 z-10 right-0 px-6">
-          <View className="bg-white rounded-lg p-4  flex-row justify-between w-full">
-            <View className="flex items-center space-y-2">
-              <Text className="">Carbs</Text>
-              <Text>0/318g</Text>
-            </View>
-            <View className="flex items-center space-y-2">
-              <Text className="">Protein</Text>
-              <Text>0/127g</Text>
-            </View>
-            <View className="flex items-center space-y-2">
-              <Text className="">Fat</Text>
-              <Text>0/85g</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
-  const DaySwitcher = () => {
-    return (
-      <View className=" flex-row items-center pt-12 px-4  w-full">
-        <Feather name="chevron-left" size={20} />
-        <View className="flex-1 flex-row justify-center  items-center space-x-2">
-          <Feather name="calendar" size={20} />
-          <Text className="text-lg">{today}</Text>
-        </View>
-        <Feather name="chevron-right" size={20} />
-      </View>
-    );
-  };
-
-  const RecommendedMealCard = ({
-    time,
-    image,
-  }: {
-    time: string;
-    image: any;
-  }) => {
-    return (
-      <View className="bg-white my-2 border p-4 flex-row justify-between items-center rounded-lg">
-        <Image resizeMode="contain" className=" h-16 w-16" source={image} />
-        <View className="flex-1 px-4">
-          <Text className="text-xl font-medium test-dark">{time}</Text>
-          <Text>recommended: 635-889 kcal</Text>
-        </View>
-        <Feather name="plus-circle" size={30} />
-      </View>
-    );
-  };
-
-  const RecommendedMealsGrid = () => {
-    return (
-      <View className="p-4 ">
-        <RecommendedMealCard image={ceaser_salad} time="Breakfast" />
-        <RecommendedMealCard image={"parfait"} time="Lunch" />
-        <RecommendedMealCard image={chicken_salad} time="Dinner" />
-      </View>
-    );
-  };
-
-  return (
-    <View className="h-screen">
-      <TrackerVisual />
-      <DaySwitcher />
-      <RecommendedMealsGrid />
-    </View>
-  );
-};
-
 const DietSuggestions = ({ today }: { today: string }) => {
+  const navigate = useNavigation();
   const DateHeader = () => {
     return (
       <View className="px-2 border-b border-gray-300 py-2.5 w-full space-y-2 ">
-        <Text className="text-center text-lg">{today}</Text>
+        <Text className="text-center text-lg">Keto Diet</Text>
         <Text className="text-center text-2xl text-dark font-medium">
           Day 1 of 7
         </Text>
@@ -383,9 +324,132 @@ const DietSuggestions = ({ today }: { today: string }) => {
     );
   };
 
+  const ActivePlan = () => {
+    return (
+      <Pressable
+        style={{
+          height: 100,
+          borderRadius: 10,
+          position: "relative",
+        }}
+        // @ts-ignore
+        onPress={() => navigate.navigate("DietBrowser")}
+      >
+        <Image
+          resizeMode="cover"
+          source={keto_bg}
+          style={{
+            width: "100%",
+            height: "100%",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            borderRadius: 10,
+          }}
+        />
+        {/* TITLE */}
+        <Text
+          style={{
+            zIndex: 10,
+            color: "white",
+            fontFamily: SEMI_BOLD,
+            fontSize: 17,
+            marginLeft: 10,
+            marginTop: 10,
+          }}
+        >
+          KETO
+        </Text>
+
+        {/* BUTTON */}
+        <View
+          style={{
+            position: "absolute",
+            right: 10,
+            bottom: 10,
+            zIndex: 10,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 5,
+          }}
+        >
+          <Text style={{ color: "white" }}>View More</Text>
+          <Ionicons color={"white"} name="arrow-forward" />
+        </View>
+        {/* OVERLAY */}
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "black",
+            borderRadius: 10,
+            opacity: 0.4,
+            height: 100,
+          }}
+        ></View>
+      </Pressable>
+    );
+  };
+
+  const suggestions = Array.from([12345].map(() => mockMealData));
+
   return (
     <>
       <DateHeader />
+      <View
+        style={{
+          paddingHorizontal: 10,
+          paddingVertical: 20,
+          gap: 20,
+          paddingBottom: 60,
+        }}
+      >
+        <ActivePlan />
+        <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>BreakFast</Text>
+        <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+          {suggestions.map((item, index) => (
+            <DishPreviewCard
+              price={item.price}
+              image={item.image}
+              _id={item._id}
+              key={index}
+              name={item.name}
+              description={item.description}
+            />
+          ))}
+        </ScrollView>
+        <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>Lunch</Text>
+        <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+          {suggestions.map((item, index) => (
+            <DishPreviewCard
+              image={item.image}
+              price={item.price}
+              _id={item._id}
+              key={index}
+              name={item.name}
+              description={item.description}
+            />
+          ))}
+        </ScrollView>
+        <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>Dinner</Text>
+        <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+          {suggestions.map((item, index) => (
+            <DishPreviewCard
+              price={item.price}
+              image={item.image}
+              _id={item._id}
+              key={index}
+              name={item.name}
+              description={item.description}
+            />
+          ))}
+        </ScrollView>
+      </View>
     </>
   );
 };
@@ -403,15 +467,9 @@ const DailyDiet = ({ navigation }: { navigation: any }) => {
     });
   }, [todayRaw]);
 
-  const isViewingToday = useMemo(() => {
-    if (activeTab == "TODAY") {
-      return true;
-    }
-  }, [activeTab]);
-
   const tabs = {
     TODAY: <DietSuggestions today={today} />,
-    TRACKER: <Planner today={today} />,
+    TRACKER: <DietTracker today={today} />,
   };
 
   return (
@@ -471,7 +529,7 @@ export const DietPlanner = ({ navigation }: any) => {
           name="DailyDiet"
           component={DailyDiet}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           options={{
             headerLeft: () => (
               <Text onPress={() => navigation.navigate("DietHome")}>Back</Text>
@@ -481,7 +539,7 @@ export const DietPlanner = ({ navigation }: any) => {
           }}
           name="DietBrowser"
           component={DietBrowser}
-        />
+        /> */}
       </Stack.Navigator>
     </>
   );

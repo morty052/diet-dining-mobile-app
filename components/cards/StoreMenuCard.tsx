@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
+import Animated from "react-native-reanimated";
 
 type Props = {};
 
@@ -43,8 +44,8 @@ export function StoreMenuCard({
       </View>
       <View className="w-32 h-32 border border-black/10 rounded-lg">
         <Image
-          resizeMode="contain"
-          className="w-full h-full"
+          resizeMode="cover"
+          className="w-full h-full rounded-lg"
           source={{ uri: image }}
         />
       </View>

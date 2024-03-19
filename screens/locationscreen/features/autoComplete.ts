@@ -38,9 +38,9 @@ export async function autoComplete(
       address: item.placePrediction.structuredFormat.mainText.text,
       placeId: item.placePrediction.placeId,
     }));
-    // console.log(
-    //   data.suggestions[0].placePrediction.structuredFormat.mainText.text
-    // );
+    console.log(
+      data.suggestions[0].placePrediction.structuredFormat.mainText.text
+    );
 
     return suggestions;
   } catch (error) {

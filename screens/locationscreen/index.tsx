@@ -20,12 +20,13 @@ import { Button } from "../../components/ui";
 import { LocationObject } from "expo-location";
 import * as Location from "expo-location";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { getValueFor, save } from "../../lib/secure-store";
+import { getValueFor } from "../../lib/secure-store";
 import { useNavigation } from "@react-navigation/native";
 import Map from "./components/Map";
 import { reverseGeocodeAddress } from "./features/reverseGeocodeAddress";
 import AutoCompleteInput from "./components/AutoCompleteInput";
 import { useLocationStore } from "../../store/locationStore";
+import { getItem, setItem } from "../../utils/storage";
 
 type Props = {};
 
@@ -45,7 +46,7 @@ const BackButton = () => {
   );
 };
 
-const ManualAddressFinderScreen = ({ navigation }: any) => {
+const AddressFinderScreen = ({ navigation }: any) => {
   const [location, setLocation] = React.useState<LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = React.useState("");
 
@@ -60,8 +61,8 @@ const ManualAddressFinderScreen = ({ navigation }: any) => {
     setLocation(location);
     const { coords } = location;
 
-    await save("latitude", `${coords.latitude}`);
-    await save("longitude", `${coords.longitude}`);
+    setItem("latitude", `${coords.latitude}`);
+    setItem("longitude", `${coords.longitude}`);
 
     await reverseGeocodeAddress({
       latitude: `${coords.latitude}`,
@@ -69,12 +70,6 @@ const ManualAddressFinderScreen = ({ navigation }: any) => {
     });
 
     navigation.navigate("MainLocationScreen");
-    // mapRef.current?.animateToRegion({
-    //   latitude: location.coords.latitude,
-    //   longitude: location.coords.longitude,
-    //   latitudeDelta: 0.0922,
-    //   longitudeDelta: 0.0421,
-    // });
   }
 
   return (
@@ -168,21 +163,29 @@ export const LocationScreen = ({ navigation }: any) => {
       return;
     }
     const getCoords = async () => {
-      const latitude = await getValueFor("latitude");
-      const longitude = await getValueFor("longitude");
+      const latitude = getItem("latitude");
+      const longitude = getItem("longitude");
 
-      const address = await getValueFor("DELIVERY_ADDRESS");
+      const address = getItem("DELIVERY_ADDRESS");
 
       // const addy = await reverseGeocodeAddress({
       //   latitude: latitude as string,
       //   longitude: longitude as string,
       // });
 
-      setAddy(address);
+      if (address) {
+        setAddy(address as string);
+      } else {
+        const addy = await reverseGeocodeAddress({
+          latitude: latitude as string,
+          longitude: longitude as string,
+        });
+        setAddy(addy);
+      }
 
       setCoords({
-        latitude,
-        longitude,
+        latitude: `${latitude}`,
+        longitude: `${longitude}`,
       });
     };
 
@@ -199,11 +202,10 @@ export const LocationScreen = ({ navigation }: any) => {
 
   async function handleConfirmLocation() {
     setLoading(true);
-    await save("DELIVERY_ADDRESS", addy);
-    await setHeader();
-    await save("ONBOARDED", "TRUE");
+    setItem("DELIVERY_ADDRESS", addy as string);
+    setItem("ONBOARDED", "TRUE");
+    setHeader();
     setLoading(false);
-    console.log(newCoords);
     navigation.navigate("App");
   }
 
@@ -274,62 +276,6 @@ export const LocationScreen = ({ navigation }: any) => {
     </View>
   );
 };
-
-// export const LocationScreen = ({ route, navigation }: any) => {
-//   const { latitude, longitude } = route.params ?? {};
-
-//   const [coords, setCoords] = React.useState<{
-//     latitude: string | boolean;
-//     longitude: string | boolean;
-//   } | null>(null);
-
-//   React.useEffect(() => {
-//     const getCoords = async () => {
-//       const latitude = await getValueFor("latitude");
-//       const longitude = await getValueFor("longitude");
-
-//       console.log(latitude, longitude);
-
-//       setCoords({
-//         latitude,
-//         longitude,
-//       });
-//     };
-
-//     getCoords();
-//   }, []);
-
-//   if (!coords) {
-//     return null;
-//   }
-
-//   return (
-//     // <Stack.Navigator initialRouteName={"MainLocationScreen"}>
-//     //   {/* <Stack.Screen
-//     //     options={{
-//     //       headerBackVisible: true,
-//     //       headerShadowVisible: false,
-//     //       title: "Delivery Location",
-//     //       headerLeft: () => (
-//     //         <Text onPress={() => navigation.goBack()}>Back</Text>
-//     //       ),
-//     //     }}
-//     //     name="ManualAddressFinder"
-//     //     component={ManualAddressFinderScreen}
-//     //   /> */}
-//     //   <Stack.Screen
-//     //     options={{
-//     //       headerTransparent: true,
-//     //       headerTitle: "",
-//     //       headerLeft: () => <BackButton />,
-//     //     }}
-//     //     name="MainLocationScreen"
-//     //     component={MainLocationScreen}
-//     //   />
-//     // </Stack.Navigator>
-//     // <MainLocationScreen />
-//   );
-// };
 
 const styles = StyleSheet.create({
   container: {

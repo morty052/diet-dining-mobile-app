@@ -13,6 +13,7 @@ import {
   salads_emoji,
   seafoods_emoji,
   soups_emoji,
+  chinese_emoji,
 } from "../../../assets/foodcategories";
 
 type TmenuItem = {
@@ -35,7 +36,7 @@ const categories = [
   },
   {
     name: "Chinese",
-    image: soups_emoji,
+    image: chinese_emoji,
   },
   {
     name: "Soups",

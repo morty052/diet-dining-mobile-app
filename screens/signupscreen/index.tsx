@@ -20,7 +20,8 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import Foodbg from "../../assets/foodbg.png";
 import emailImage from "../../assets/emailimage.png";
 import { StatusBar } from "expo-status-bar";
-import { getValueFor, save } from "../../lib/secure-store";
+import { getValueFor } from "../../lib/secure-store";
+import { setItem } from "../../utils/storage";
 import Colors from "../../constants/colors";
 
 const Stack = createNativeStackNavigator();
@@ -39,7 +40,7 @@ const SignUpForm = ({
   const navigation = useNavigation();
 
   async function handleOldUser() {
-    // await save("ONBOARDED", "TRUE");
+    // await setItem("ONBOARDED", "TRUE");
     navigation.navigate("Login");
   }
 
@@ -299,19 +300,19 @@ const EmailVerificationScreen = ({ navigation, route }: any) => {
 
     try {
       console.log("code", code);
-      // const completeSignUp = await signUp.attemptEmailAddressVerification({
-      //   code,
-      // });
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code,
+      });
 
-      // const expo_push_token = await getValueFor("expo_push_token");
+      const expo_push_token = await getValueFor("expo_push_token");
 
       // const url = `https://91d6-102-216-10-2.ngrok-free.app/auth/signup?email=${emailAddress}&expo_push_token=${expo_push_token}`;
-      // const url =  `https://diet-dining-server.onrender.com/auth/signup?email=${emailAddress}`
+      const url = `https://diet-dining-server.onrender.com/auth/signup?email=${emailAddress}&expo_push_token=${expo_push_token}`;
 
-      // const res = await fetch(url);
-      // const { _id } = await res.json();
+      const res = await fetch(url);
+      const { _id } = await res.json();
 
-      // await save("user_id", _id);
+      await setItem("user_id", _id);
 
       // @ts-ignore
       navigation.navigate("UserDetails", {

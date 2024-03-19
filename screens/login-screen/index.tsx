@@ -1,13 +1,27 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SEMI_BOLD } from "../../constants/fontNames";
 import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { save } from "../../lib/secure-store";
+import { getItem, setItem } from "../../utils/storage";
+import { baseUrl } from "../../constants/baseUrl";
 
-type LoginResponseProps = { _id: string | null; status: "SUCCESS" | "ERROR" };
+type LoginResponseProps = {
+  _id: string | null;
+  user_firstname: string | null;
+  status: "SUCCESS" | "ERROR";
+};
 
 const BackButton = () => {
   const navigation = useNavigation();
@@ -28,7 +42,13 @@ const BackButton = () => {
   );
 };
 
-const NextButton = ({ handlePress }: { handlePress: () => void }) => {
+const NextButton = ({
+  handlePress,
+  loading,
+}: {
+  handlePress: () => void;
+  loading: boolean;
+}) => {
   return (
     <Pressable
       onPress={handlePress}
@@ -37,11 +57,16 @@ const NextButton = ({ handlePress }: { handlePress: () => void }) => {
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 10,
+        width: 100,
+        alignItems: "center",
       }}
     >
-      <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD, color: "white" }}>
-        Next
-      </Text>
+      {!loading && (
+        <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD, color: "white" }}>
+          Next
+        </Text>
+      )}
+      {loading && <ActivityIndicator color={"white"} size={20} />}
     </Pressable>
   );
 };
@@ -51,23 +76,31 @@ const LoginScreen = ({ navigation, route }: any) => {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState(false);
   const [hidePassword, setHidePassword] = React.useState(true);
+  const [loading, setloading] = React.useState(false);
+
+  const passwordRef = React.useRef<TextInput>(null);
 
   async function handlePress() {
     if (!email || !password) {
       return;
     }
-
+    setloading(true);
     try {
       const cleanEmail = email.trim().toLowerCase();
-      const url = `http://localhost:3000/auth/signin?user_email=${cleanEmail}&user_password=${password}`;
+      const expo_push_token = getItem("expo_push_token");
+      // const url = `https://diet-dining-server.onrender.com/auth/signin?user_email=${cleanEmail}&user_password=${password}&expo_push_token=${expo_push_token}`;
+      const url = `${baseUrl}/auth/signin?user_email=${cleanEmail}&user_password=${password}&expo_push_token=${expo_push_token}`;
 
       const res = await fetch(url);
       const data: LoginResponseProps = await res.json();
 
-      const { _id, status } = data;
+      const { _id, status, user_firstname } = data;
 
+      // TODO: SAVE USERS FIRSTNAME HERE
       if (status === "SUCCESS") {
-        await save("user_id", _id);
+        setItem("user_id", _id as string);
+        setItem("firstname", user_firstname as string);
+        setloading(false);
         navigation.navigate("LocationPermission");
       }
 
@@ -77,6 +110,7 @@ const LoginScreen = ({ navigation, route }: any) => {
       }
     } catch (error) {
       console.error(error);
+      setloading(false);
       setError(true);
     }
 
@@ -88,7 +122,10 @@ const LoginScreen = ({ navigation, route }: any) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
         <View style={styles.innerContainer}>
           <Text style={styles.mainText}>Welcome back.</Text>
           <Text style={styles.subtitle}>
@@ -107,13 +144,15 @@ const LoginScreen = ({ navigation, route }: any) => {
               placeholder="Email"
               style={styles.input}
             />
-            <View
+            <Pressable
+              onPress={() => passwordRef.current?.focus()}
               style={[
                 { flexDirection: "row", alignItems: "center" },
                 styles.input,
               ]}
             >
               <TextInput
+                ref={passwordRef}
                 value={password}
                 secureTextEntry={hidePassword}
                 autoCapitalize="none"
@@ -132,7 +171,7 @@ const LoginScreen = ({ navigation, route }: any) => {
                 size={18}
                 onPress={() => setHidePassword(!hidePassword)}
               />
-            </View>
+            </Pressable>
             {error && (
               <Text style={{ textAlign: "center", color: Colors.danger }}>
                 Invalid email or password
@@ -150,10 +189,10 @@ const LoginScreen = ({ navigation, route }: any) => {
             }}
           >
             <BackButton />
-            <NextButton handlePress={handlePress} />
+            <NextButton loading={loading} handlePress={handlePress} />
           </View>
         </SafeAreaView>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

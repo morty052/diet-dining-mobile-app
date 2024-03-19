@@ -350,7 +350,7 @@ function CheckOutItem({
   item,
   handleRemoveItem,
 }: {
-  item: TcartItem;
+  item: any;
   handleRemoveItem: () => void;
 }) {
   return (
@@ -374,7 +374,9 @@ function CheckOutItem({
         </Text>
       </View>
       <View className="flex flex-row items-center">
-        <Text className="font-medium text-dark">${item.item_price}</Text>
+        <Text className="font-medium text-dark">
+          ${item.item_price * item.item_quantity}
+        </Text>
         <TouchableOpacity
           onPress={handleRemoveItem}
           className="ml-4 bg-red-500/10 rounded-full h-8 w-8  justify-center items-center"
@@ -387,14 +389,15 @@ function CheckOutItem({
 }
 
 function CheckOutGrid({ store_name }: { store_name: string }) {
-  const { removeItemFromCart, getVendor, cartItems } = useCartStore();
+  const { removeItemFromCart, getVendor, cartItems, vendors } = useCartStore();
 
   const navigation = useNavigation();
 
   const vendorItems = useMemo(() => {
     const vendor = getVendor(store_name);
-    console.log(vendor);
+
     const items = vendor?.vendorItems;
+    console.info(items);
     return items;
   }, [cartItems]);
 
@@ -402,7 +405,7 @@ function CheckOutGrid({ store_name }: { store_name: string }) {
     if (!vendorItems) {
       navigation.goBack();
     }
-  }, [cartItems]);
+  }, [cartItems, vendors]);
 
   return (
     <View className="border-t px-3 py-4 border-black/10">
@@ -411,9 +414,9 @@ function CheckOutGrid({ store_name }: { store_name: string }) {
           <>
             <Text className="text-lg font-bold text-dark">Items</Text>
             <TouchableOpacity>
-              <Text className="text-[14px] font-medium text-red-500">
+              {/* <Text className="text-[14px] font-medium text-red-500">
                 Clear all
-              </Text>
+              </Text> */}
             </TouchableOpacity>
           </>
         )}
@@ -442,10 +445,21 @@ function HorizontalRule(params: type) {
 function NoteToStoreModal({
   writingNote,
   setWritingNote,
+  store_name,
 }: {
   writingNote: boolean;
   setWritingNote: (b: boolean) => void;
+  store_name: string;
 }) {
+  const [orderNote, setOrderNote] = useState("");
+  const { addNoteToOrder } = useCartStore();
+
+  function handleAddNotePress() {
+    addNoteToOrder({ store_name, order_note: orderNote });
+    setOrderNote("");
+    setWritingNote(false);
+  }
+
   return (
     <Modal transparent animationType="slide" visible={writingNote}>
       <Pressable
@@ -466,13 +480,19 @@ function NoteToStoreModal({
 
           <TextInput
             // autoFocus
+
+            value={orderNote}
+            onChangeText={(text) => setOrderNote(text)}
             style={{ textAlignVertical: "top" }}
             inputMode="text"
             multiline
             placeholder="Please hold the onions"
             className=" border px-2 bg-gray-200/30 py-2 rounded-lg h-40 mt-6"
           />
-          <Pressable className="rounded-3xl px-6 py-3 bg-primary  my-8 flex items-center">
+          <Pressable
+            onPress={() => handleAddNotePress()}
+            className="rounded-3xl px-6 py-3 bg-primary  my-8 flex items-center"
+          >
             <Text className="text-white font-medium">Add Note</Text>
           </Pressable>
         </KeyboardAvoidingView>
@@ -497,6 +517,7 @@ function ExtraInteractionButtons({
   return (
     <View className="flex flex-row justify-between items-center pt-4 px-3 ">
       <NoteToStoreModal
+        store_name={store_name}
         setWritingNote={setWritingNote}
         writingNote={writingNote}
       />
@@ -509,6 +530,7 @@ function ExtraInteractionButtons({
           Note to store
         </Text>
       </TouchableOpacity>
+      {/* ADD MORE ITEMS */}
       <TouchableOpacity
         onPress={() =>
           // @ts-ignore
@@ -536,8 +558,6 @@ export function CheckoutScreen({ route, navigation }) {
 
   const { store_name, store_id } = route.params;
 
-  console.info(store_name);
-
   const { getVendor } = useCartStore();
 
   // const activeVendor = useMemo(
@@ -547,12 +567,13 @@ export function CheckoutScreen({ route, navigation }) {
 
   const activeVendor = useMemo(() => {
     const vendor = getVendor(store_name);
-    console.log(vendor);
 
     return vendor;
   }, [cartItems]);
 
   const { vendorItems, vendorTotal, vendorItemsCount } = activeVendor ?? {};
+
+  console.info(vendorTotal);
 
   useEffect(() => {
     if (loading) {

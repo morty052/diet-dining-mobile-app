@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  Pressable,
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +13,7 @@ import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import HorizontalRule from "../../components/ui/HorizontalRule";
 import { SEMI_BOLD } from "../../constants/fontNames";
+import { deleteKey } from "../../lib/secure-store";
 
 type Props = {};
 
@@ -70,11 +72,15 @@ const AccountQuickLinkCard = ({ name, icon }: { name: string; icon: any }) => {
 export const AccountScreen = (props: Props) => {
   return (
     <ScrollView style={styles.container}>
+      {/* HEADER */}
       <View style={styles.accountPageheader}>
         <Text style={styles.userFullName}>Patrick Star</Text>
-        <View style={styles.userIconContainer}>
+        <Pressable
+          onPress={async () => await deleteKey("ONBOARDED")}
+          style={styles.userIconContainer}
+        >
           <Ionicons color={"white"} size={25} name="person-outline" />
-        </View>
+        </Pressable>
       </View>
       <View
         style={{

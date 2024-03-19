@@ -1,22 +1,27 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { SEMI_BOLD } from "../../../constants/fontNames";
 
+// TODO ADD DISTANCE AS PROPS
+// TODO ADD STORE TAGS PROPS
 export function StoreTags({
   store_name,
   store_id,
   store_address,
+  store_tags,
 }: {
   store_name: string;
   store_id: string;
   store_address: any;
+  store_tags: string[];
 }) {
   const navigation = useNavigation();
   return (
     <View className="pt-3 px-2 ">
       <View className="flex flex-row items-center justify-between pb-2">
         <View className="flex-1 pr-4">
-          <Text className={styles.store_name_text}>{store_name}</Text>
+          <Text style={styles.store_name_text}>{store_name}</Text>
         </View>
         <TouchableOpacity
           onPress={() =>
@@ -40,12 +45,16 @@ export function StoreTags({
         </TouchableOpacity>
       </View>
 
-      <View className={styles.tags_container}>
-        <View className="flex flex-row ">
-          <Text className={styles.tag_text}> Western -</Text>
-          <Text className={styles.tag_text}> Sandwiches -</Text>
-          <Text className={styles.tag_text}> Wraps -</Text>
-          <Text className={styles.tag_text}> Beef</Text>
+      <View>
+        <View style={styles.tags_container}>
+          {store_tags?.map((tag, index) => {
+            return (
+              <Text key={index} style={styles.tag_text}>
+                {" "}
+                {tag} {index != store_tags.length - 1 && " -"}
+              </Text>
+            );
+          })}
         </View>
 
         {/* RATINGS*/}
@@ -58,28 +67,41 @@ export function StoreTags({
       </View>
 
       {/* DISTANCE AND OPEN STATUS */}
-      <View className={styles.more_info_container}>
+      <View
+        className={
+          "border border-black/10 flex flex-row justify-between px-6 py-2.5 mt-4 rounded-lg"
+        }
+      >
         <View className="flex-1  items-start">
-          <Text className={styles.more_info_text}>5.9km</Text>
-          <Text className={styles.more_info_subtitle}>Distance</Text>
+          <Text style={styles.more_info_text}>5.9km</Text>
+          <Text style={styles.more_info_subtitle}>Distance</Text>
         </View>
         <View className="w-[1px] bg-black"></View>
         <View className="flex-1 items-end">
-          <Text className={styles.more_info_text}>Opened</Text>
-          <Text className={styles.more_info_subtitle}>Closes at 9:00 PM</Text>
+          <Text style={styles.more_info_text}>Opened</Text>
+          <Text style={styles.more_info_subtitle}>Closes at 9:00 PM</Text>
         </View>
       </View>
     </View>
   );
 }
 
-const styles = {
-  container: "py-4 px-2 flex-1 ",
-  store_name_text: "font-semibold  text-[25px]",
-  tags_container: "flex-1",
-  tag_text: "font-medium ",
-  more_info_container:
-    "border border-black/10 flex flex-row justify-between px-6 py-2.5 mt-4 rounded-lg",
-  more_info_text: "text-center font-medium text-[14px]",
-  more_info_subtitle: "text-center font-medium ",
-};
+const styles = StyleSheet.create({
+  container: {},
+  store_name_text: {
+    fontFamily: SEMI_BOLD,
+    fontSize: 24,
+  },
+  tags_container: {
+    flexDirection: "row",
+  },
+  tag_text: {},
+  more_info_container: {},
+  more_info_text: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  more_info_subtitle: {
+    textAlign: "center",
+  },
+});

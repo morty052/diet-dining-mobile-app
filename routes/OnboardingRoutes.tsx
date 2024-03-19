@@ -6,6 +6,7 @@ import {
   SignUpScreen,
   LocationPermissionScreen,
   LocationScreen,
+  AddressFinderScreen,
 } from "../screens";
 import StoreInfo from "../screens/restaurantscreen/components/StoreInfo";
 import UserDetails from "../screens/signupscreen/UserDetails";
@@ -56,7 +57,10 @@ const OnboardingRoutes = () => {
         name="LocationConfirmation"
         component={LocationScreen}
       />
-      <Stack.Screen name="DeliveryAddressScreen" component={LocationScreen} />
+      <Stack.Screen
+        name="DeliveryAddressScreen"
+        component={AddressFinderScreen}
+      />
     </Stack.Navigator>
   );
 };

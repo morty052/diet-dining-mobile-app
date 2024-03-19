@@ -8,6 +8,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Image,
+  FlatList,
+  Pressable,
 } from "react-native";
 import React, { useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -28,6 +31,8 @@ import TstoreProps from "../../types/Store";
 import { Ivendor, useCartStore } from "../../store/cartStore";
 import BuyButton from "../foodscreen/components/BuyButton";
 import Basketbutton from "./components/BasketButton";
+import HorizontalRule from "../../components/ui/HorizontalRule";
+import { SEMI_BOLD } from "../../constants/fontNames";
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
 
@@ -93,18 +98,122 @@ const Header = ({
   );
 };
 
+const VendorsChoiceGrid = ({
+  store,
+  data,
+}: {
+  store: TstoreProps;
+  data: any;
+}) => {
+  const VendorsChoiceCard = ({
+    image,
+    name,
+    price,
+    _id,
+    description,
+  }: {
+    image: string;
+    name: string;
+    price: number;
+    _id: string;
+    description: string;
+  }) => {
+    const navigation = useNavigation();
+    return (
+      <Pressable
+        onPress={() =>
+          // @ts-ignore
+          navigation.navigate("FoodScreen", {
+            image,
+            name,
+            price,
+            _id,
+            description,
+          })
+        }
+        style={{ gap: 10, marginRight: 20 }}
+      >
+        <View
+          style={{
+            width: 300,
+            height: 180,
+            borderRadius: 10,
+            position: "relative",
+          }}
+        >
+          <Image
+            resizeMode="cover"
+            style={{ width: "100%", height: "100%", borderRadius: 10 }}
+            source={{ uri: image }}
+          />
+          {/* OVERLAY */}
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 0,
+              backgroundColor: "black",
+              borderRadius: 10,
+              opacity: 0.1,
+            }}
+          ></View>
+        </View>
+        {/* INFO */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 5,
+          }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "600" }}>
+            {name.length < 25 ? name : `${name.slice(0, 25)}...`}
+          </Text>
+          <Text style={{ fontSize: 18, fontWeight: "600" }}>${price}</Text>
+        </View>
+      </Pressable>
+    );
+  };
+
+  return (
+    <View style={{ paddingHorizontal: 10, paddingVertical: 20, gap: 10 }}>
+      <Text style={{ fontSize: 16, fontFamily: SEMI_BOLD }}>
+        Vendor's Choice
+      </Text>
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={data}
+        renderItem={({ item }) => (
+          <VendorsChoiceCard
+            _id={item._id}
+            description={item.description}
+            price={item.price}
+            name={item.name}
+            image={item.image}
+          />
+        )}
+      />
+    </View>
+  );
+};
+
 const RestaurantScreen = ({ navigation, route }: any) => {
   const { store_id, store_name } = route.params;
   const [isViewable, setisViewable] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
   const [store, setStore] = useState<null | TstoreProps>(null);
+  const [vendorsChoice, setVendorsChoice] = useState(null);
 
   const { getVendor, cartItems } = useCartStore();
 
-  const activeVendor: Ivendor | null = useMemo(() => {
+  const activeVendor: Ivendor | undefined = useMemo(() => {
     const vendor = getVendor(store_name);
-    console.log(vendor);
+
     return vendor;
   }, [store_name, cartItems]);
 
@@ -138,6 +247,7 @@ const RestaurantScreen = ({ navigation, route }: any) => {
 
         const data = await get_single_store(store_id);
         setStore(data[0]);
+        setVendorsChoice(data[0].menu[0].products);
         setLoading(false);
         return data[0];
       };
@@ -222,11 +332,18 @@ const RestaurantScreen = ({ navigation, route }: any) => {
         />
         <View className={` bg-white`}>
           <StoreTags
+            store_tags={store?.store_tags as string[]}
             store_address={store?.store_address}
             store_id={store_id}
             store_name={store_name}
           />
-          <View className="mt-4 ">
+          {/* <HorizontalRule marginTop={20} />
+          <VendorsChoiceGrid
+            data={vendorsChoice}
+            store={store as TstoreProps}
+          />
+          <HorizontalRule /> */}
+          <View>
             <StoreMenuSectionList data={store?.menu} />
           </View>
         </View>

@@ -3,11 +3,13 @@ import React from "react";
 import { EmptyState, ErrorState, Loader } from "../../components";
 import { getValueFor } from "../../lib/secure-store";
 import { useQuery } from "@tanstack/react-query";
-import { SEMI_BOLD } from "../../constants/fontNames";
+import { MEDIUM, REGULAR, SEMI_BOLD } from "../../constants/fontNames";
 import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HorizontalRule from "../../components/ui/HorizontalRule";
+import { useRefreshOnFocus } from "../../hooks/useRefreshOnFocus";
+import { Skeleton } from "moti/skeleton";
 type Props = {};
 
 type OrderCardProps = {
@@ -20,33 +22,42 @@ const OrderCard = ({ order }: { order: OrderCardProps }) => {
   return (
     <View
       style={{
-        borderRadius: 5,
-        borderWidth: 1,
-        paddingVertical: 15,
-        paddingHorizontal: 10,
+        borderRadius: 20,
+        paddingVertical: 20,
+        paddingHorizontal: 15,
         gap: 5,
-        borderColor: Colors.primary,
-        backgroundColor: Colors.gray,
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        // borderColor: Colors.primary,
+        backgroundColor: "white",
       }}
     >
-      <Text
-        style={{
-          fontSize: 24,
-          fontFamily: SEMI_BOLD,
-          color: Colors.dark,
-        }}
-      >
-        {order.status.pending ? "Confirming your order " : "Completed"}
-      </Text>
-      <Text
-        style={{
-          fontFamily: SEMI_BOLD,
-          fontSize: 17,
-          color: Colors.dark,
-        }}
-      >
-        {order.vendor.store_name}
-      </Text>
+      <View>
+        <Text
+          style={{
+            fontSize: 15,
+            fontFamily: SEMI_BOLD,
+            color: Colors.dark,
+          }}
+        >
+          {order.status.pending ? "Confirming your order " : "Completed"}
+        </Text>
+        <Text
+          style={{
+            fontFamily: SEMI_BOLD,
+            fontSize: 18,
+            color: Colors.dark,
+          }}
+        >
+          {order.vendor.store_name}
+        </Text>
+      </View>
       {/* ICONS */}
       <View
         style={{
@@ -57,74 +68,60 @@ const OrderCard = ({ order }: { order: OrderCardProps }) => {
           position: "relative",
         }}
       >
-        <View
-          style={{
-            backgroundColor: "rgba(229 231 235)",
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 50,
-          }}
-        >
-          <Ionicons size={30} name="fast-food-outline" />
-        </View>
-        <View
-          style={{
-            backgroundColor: "rgba(229 231 235)",
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 50,
-          }}
-        >
-          <Ionicons size={30} name="storefront-outline" />
-        </View>
-        <View
-          style={{
-            backgroundColor: "rgba(229 231 235)",
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 50,
-          }}
-        >
-          <Ionicons size={34} name="car-outline" />
-        </View>
-        <View
-          style={{
-            backgroundColor: "rgba(229 231 235)",
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 50,
-          }}
-        >
-          <Ionicons size={30} name="home-outline" />
-        </View>
-        <View
-          style={{
-            position: "absolute",
-            left: 4,
-            right: 4,
-            zIndex: -4,
-            backgroundColor: Colors.gray,
-            height: 4,
-          }}
-        ></View>
+        <Ionicons color={Colors.primary} size={25} name="fast-food" />
+        <Skeleton
+          height={4}
+          radius={20}
+          width={40}
+          colorMode="light"
+          colors={["#E5E5E5", Colors.primary]}
+          // style={{
+          //   backgroundColor: Colors.primary,
+          //   height: 4,
+          //   width: 40,
+          //   borderRadius: 20,
+          // }}
+        ></Skeleton>
+        <Ionicons size={25} name="storefront-outline" />
+        <Skeleton
+          height={4}
+          radius={20}
+          width={40}
+          colorMode="light"
+          colors={["#E5E5E5", Colors.dark]}
+          // style={{
+          //   backgroundColor: Colors.primary,
+          //   height: 4,
+          //   width: 40,
+          //   borderRadius: 20,
+          // }}
+        ></Skeleton>
+        <Ionicons size={28} name="car-outline" />
+        <Skeleton
+          height={4}
+          radius={20}
+          width={40}
+          colorMode="light"
+          colors={["#E5E5E5", Colors.dark]}
+          // style={{
+          //   backgroundColor: Colors.primary,
+          //   height: 4,
+          //   width: 40,
+          //   borderRadius: 20,
+          // }}
+        ></Skeleton>
+        <Ionicons size={25} name="home-outline" />
       </View>
     </View>
   );
 };
 
-export const OrdersPage = ({}) => {
+export const OrdersPage = () => {
   const getUserOrders = async () => {
     const user_id = await getValueFor("user_id");
+    console.log(user_id);
     const res = await fetch(
-      `http://localhost:3000/orders/get-user-orders?user_id=${user_id}`
+      `https://diet-dining-server.onrender.com/orders/get-user-orders?user_id=${user_id}`
     );
     const orders: OrderCardProps[] = await res.json();
 
@@ -133,10 +130,12 @@ export const OrdersPage = ({}) => {
     return { pendingOrders, orders, completedOrders };
   };
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["orders"],
     queryFn: getUserOrders,
   });
+
+  useRefreshOnFocus(refetch);
 
   if (isLoading) {
     return <Loader />;
@@ -202,7 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     marginVertical: 10,
   },
-  progressText: { fontFamily: SEMI_BOLD, fontSize: 20, marginBottom: 10 },
+  progressText: { fontFamily: MEDIUM, fontSize: 20, marginBottom: 10 },
   ordersContainer: { paddingHorizontal: 10, paddingVertical: 20, gap: 15 },
   iconsWrapper: {},
   iconContainer: {},

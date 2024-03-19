@@ -19,6 +19,7 @@ import {
   soups_emoji,
 } from "../../assets/foodcategories";
 import { useNavigation } from "@react-navigation/native";
+import Colors from "../../constants/colors";
 type Props = {};
 
 const categories = [
@@ -224,15 +225,17 @@ export const SearchBar = () => {
 
   return (
     <View className=" pb-4 flex flex-row items-center">
-      <Pressable
-        onPress={() => navigate.navigate("Search")}
-        className=" rounded-2xl flex flex-1 flex-row items-center border border-gray-300 bg-white py-2   px-4 "
-      >
+      <Pressable className=" rounded-2xl flex flex-1 flex-row items-center border border-gray-300 bg-white py-2   px-4 ">
+        {/* @ts-ignore */}
         <TouchableOpacity onPress={() => navigate.navigate("Search")}>
-          <Ionicons name={"search"} size={24} color="black" />
+          <Ionicons name={"search"} size={20} color={Colors.dark} />
         </TouchableOpacity>
+
         <Pressable
-          onPress={() => navigate.navigate("Search")}
+          onPress={() => {
+            // @ts-ignore
+            navigate.navigate("Search");
+          }}
           className=" bg-transparent flex-1   placeholder:text-left text-[18px]  border-r border-gray-300 mx-2  "
         >
           <Text>Search Diet Dining</Text>

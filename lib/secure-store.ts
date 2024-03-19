@@ -12,7 +12,6 @@ async function getValueFor(key: string): Promise<string | boolean> {
   if (result) {
     return result;
   } else {
-    console.warn("Key not found", key);
     return false;
   }
 }

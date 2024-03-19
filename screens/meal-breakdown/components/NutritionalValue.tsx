@@ -19,20 +19,38 @@ const NutritionalGrid = () => {
   function NutritionBox({
     amount,
     nutrient,
+    color,
   }: {
     amount: string;
     nutrient: string;
+    color: string;
   }) {
     return (
       <View
-        style={{ width: boxWidth }}
-        className="border-2 border-primary items-center flex p-2 "
+        style={{
+          width: boxWidth,
+          backgroundColor: color,
+          // borderWidth: 2,
+          // borderColor: "rgb(243 244 246)",
+          alignItems: "center",
+          padding: 8,
+          borderRadius: 10,
+        }}
       >
         <View className="gap-1">
-          <Text className="text-[18px] font-medium text-dark text-center">
+          <Text
+            style={{
+              fontSize: 18,
+              color: "white",
+              textAlign: "center",
+              fontFamily: SEMI_BOLD,
+            }}
+          >
             {amount}
           </Text>
-          <Text style={{ textAlign: "center" }}>{nutrient}</Text>
+          <Text style={{ textAlign: "center", color: "white" }}>
+            {nutrient}
+          </Text>
         </View>
       </View>
     );
@@ -44,17 +62,18 @@ const NutritionalGrid = () => {
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "center",
+        gap: 4,
       }}
     >
-      <NutritionBox amount="446" nutrient="calories" />
-      <NutritionBox amount="148" nutrient="fat" />
-      <NutritionBox amount="46" nutrient="saturates" />
-      <NutritionBox amount="160" nutrient="carbs" />
-      <NutritionBox amount="10" nutrient="sugars" />
-      <NutritionBox amount="28" nutrient="fibre" />
-      <NutritionBox amount="390" nutrient="protein" />
-      <NutritionBox amount="11" nutrient="salt" />
-      <NutritionBox amount="146" nutrient="kcal" />
+      <NutritionBox color="purple" amount="446" nutrient="calories" />
+      <NutritionBox color="orange" amount="148" nutrient="fat" />
+      <NutritionBox color="steelblue" amount="46" nutrient="saturates" />
+      <NutritionBox color="darkgreen" amount="160" nutrient="carbs" />
+      <NutritionBox color="silver" amount="10" nutrient="sugars" />
+      <NutritionBox color="brown" amount="28" nutrient="fibre" />
+      <NutritionBox color="fuchsia" amount="390" nutrient="protein" />
+      <NutritionBox color="gold" amount="146" nutrient="kcal" />
+      <NutritionBox color="gray" amount="11" nutrient="salt" />
     </View>
   );
 };

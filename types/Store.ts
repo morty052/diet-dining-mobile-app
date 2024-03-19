@@ -4,9 +4,10 @@ type TstoreProps = {
   store_description: string;
   store_logo: string;
   store_image: string;
-  store_menu: string;
+  menu: any;
   store_rating: number;
   distance?: number;
+  store_tags: string[];
   _id: string;
 };
 export default TstoreProps;

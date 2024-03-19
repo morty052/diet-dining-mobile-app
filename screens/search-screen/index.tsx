@@ -26,6 +26,7 @@ import { TcartItem } from "../../contexts/CartContext";
 import Colors from "../../constants/colors";
 import LikeButton from "../../components/interaction-buttons/LikeButton";
 import { SEMI_BOLD } from "../../constants/fontNames";
+import { useSearchStore } from "../../store/searchStore";
 
 const categories = [
   // {
@@ -252,6 +253,7 @@ type TsearchItem = {
   category: string;
   total?: number;
   image?: ImageSourcePropType;
+  description: string;
   vendor: {
     store_name: string;
     store_image: string;
@@ -266,8 +268,10 @@ export const SearchScreen = ({ navigation, route }: any) => {
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const [searchArray, setSearchArray] = useState<null | Ivendor[]>(null);
-  const [products, setProducts] = useState<null | TsearchItem[]>(null);
+  // const [products, setProducts] = useState<null | TsearchItem[]>(null);
   const [activeCategory, setactiveCategory] = useState<null | string>(category);
+
+  const { products, stores } = useSearchStore();
 
   const fetchStoresAndProducts = async () => {
     // const res = await fetch(
@@ -296,14 +300,10 @@ export const SearchScreen = ({ navigation, route }: any) => {
     return stores;
   };
 
-  const {
-    data: stores,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["searcharray"],
-    queryFn: fetchStoresAndProducts,
-  });
+  // const { data, isLoading, isError } = useQuery({
+  //   queryKey: ["searcharray"],
+  //   queryFn: fetchStoresAndProducts,
+  // });
 
   // useEffect(() => {
   //   if (!catory) {
@@ -312,14 +312,14 @@ export const SearchScreen = ({ navigation, route }: any) => {
   // }, [])
 
   const queryResults = useMemo(() => {
-    // * RETURN NULL IF FETCHING IS ACTIVE OR USER NOT TYPING OR SEARCH ARRAY IS EMOTY
-    if (!searchArray || isLoading || !query) {
+    // * RETURN NULL IF FETCHING IS ACTIVE OR USER NOT TYPING OR SEARCH ARRAY IS EMPTY
+    if (!query) {
       return null;
     }
 
     // * RETURN NULL IF USER IS TYPING BUT NO STORES MATCH SEARCH QUERY
     if (
-      !searchArray.filter((item) =>
+      !stores.filter((item) =>
         item.store_name.toLowerCase().includes(query.toLowerCase())
       )
     ) {
@@ -327,13 +327,13 @@ export const SearchScreen = ({ navigation, route }: any) => {
     }
 
     // * FINNALY RETURN RESULTS OF QUERY IF STORE ARRAY EXISTS AND USER IS TYPING AND THERE ARE RESULTS
-    return searchArray.filter((item) =>
+    return stores.filter((item) =>
       item.store_name.toLowerCase().includes(query.toLowerCase())
     );
   }, [query]);
 
   const productsQueryResults = useMemo(() => {
-    if (!products || isLoading || !query) {
+    if (!query) {
       return null;
     }
 
@@ -351,12 +351,16 @@ export const SearchScreen = ({ navigation, route }: any) => {
   }, [query]);
 
   const categoryQueryResults = useMemo(() => {
-    return products?.filter((item) =>
-      item.category.toLowerCase().includes(category.toLowerCase())
-    );
+    if (!category) {
+      return null;
+    }
 
-    // * ADDED ISLOADING TO DEPENDENCIES BECAUSE PRODUCTS IS NULL AT FIRST
-  }, [category, isLoading]);
+    return products?.filter((item) =>
+      item?.category.toLowerCase().includes(category?.toLowerCase())
+    );
+  }, [category]);
+
+  console.info(category);
 
   return (
     <SafeAreaView className="flex-1">
@@ -367,13 +371,13 @@ export const SearchScreen = ({ navigation, route }: any) => {
         className="px-2 flex-1"
       >
         {/* SEARCHBAR */}
-        <View className=" rounded-2xl flex flex-row items-center border border-gray-300 bg-gray-300/40 pt-2   px-4 ">
+        <View className=" rounded-2xl flex flex-row items-center border border-gray-300 bg-white py-2   px-4 ">
           <TouchableOpacity
             onPress={() => {
               navigation.goBack();
             }}
           >
-            <Ionicons name={"arrow-back"} size={24} color="black" />
+            <Ionicons name={"arrow-back"} size={20} color="black" />
           </TouchableOpacity>
           <TextInput
             autoFocus
@@ -381,7 +385,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
             value={query}
             onChangeText={(text) => setQuery(text)}
             placeholder="Food, drinks, etc..."
-            className=" bg-transparent flex-1   placeholder:text-left text-[18px]   border-gray-300 mx-2  "
+            className=" bg-transparent flex-1   placeholder:text-left text-[16px]   border-gray-300 mx-2  "
           />
           {query && (
             <TouchableOpacity onPress={() => setQuery("")}>
@@ -389,7 +393,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
             </TouchableOpacity>
           )}
         </View>
-        <ScrollView keyboardDismissMode="on-drag" className=" flex-1 px-2  ">
+        <ScrollView keyboardDismissMode="on-drag" className="  px-2  ">
           {/*  */}
 
           {/* CATEGORIES */}
@@ -473,9 +477,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
                 </View>
 
                 {/* LIKE BUTTON */}
-                <Pressable>
-                  <Ionicons size={28} name="heart-outline" />
-                </Pressable>
+                <LikeButton item_id={item._id} background />
               </Pressable>
             ))}
           </View>
@@ -494,6 +496,10 @@ export const SearchScreen = ({ navigation, route }: any) => {
                   // @ts-ignore
                   navigation.navigate("FoodScreen", {
                     _id: item._id,
+                    image: item.image,
+                    name: item.name,
+                    price: item.price,
+                    description: item.description,
                   })
                 }
                 style={{
@@ -526,7 +532,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
                 </View>
 
                 {/* LIKE BUTTON */}
-                <LikeButton background />
+                <LikeButton item_id={item._id} background />
               </Pressable>
             ))}
           </View>
@@ -555,6 +561,10 @@ export const SearchScreen = ({ navigation, route }: any) => {
                     // @ts-ignore
                     navigation.navigate("FoodScreen", {
                       _id: item._id,
+                      image: item.image,
+                      name: item.name,
+                      price: item.price,
+                      description: item.description,
                     })
                   }
                   style={{

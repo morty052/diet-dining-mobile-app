@@ -11,12 +11,19 @@ interface ICart {
   getCartTotal: () => number | undefined;
   decreaseItemQuantity: (_id: string) => void;
   increaseItemQuantity: (_id: string) => void;
-  getVendor: (store_name: string) => Ivendor | null;
+  getVendor: (store_name: string) => Ivendor | undefined;
   removeItemFromCart: (
     _id: string,
     store_name: string,
     item_quantity: number
   ) => void;
+  addNoteToOrder: ({
+    store_name,
+    order_note,
+  }: {
+    store_name: string;
+    order_note: string;
+  }) => void;
   handleCheckout: (store_name: string) => void;
   total?: number;
 }
@@ -34,6 +41,7 @@ export interface Ivendor {
     item_name: string;
     item_price: number;
     item_id: string;
+    item_quantity: number;
   }[];
 }
 
@@ -75,7 +83,7 @@ const checkCartForVendor = (store_name: string, vendors: Ivendor[]) => {
 //   });
 // };
 
-const increaseItemQuantity = (_id: string, state: ICart) => {
+const increaseItemQuantity = (_id: string, quantity: number, state: ICart) => {
   const itemToUpdate = state.cartItems.find((item) => item._id == _id);
 
   const { vendor, price } = itemToUpdate ?? {};
@@ -91,36 +99,46 @@ const increaseItemQuantity = (_id: string, state: ICart) => {
       return {
         ...vendorsItemsToIncrease,
         vendorTotal: price
-          ? vendorsItemsToIncrease.vendorTotal + price
+          ? vendorsItemsToIncrease.vendorTotal + price * quantity
           : vendorsItemsToIncrease,
-        vendorItemsCount: vendorsItemsToIncrease.vendorItemsCount + 1,
+        vendorItemsCount: vendorsItemsToIncrease.vendorItemsCount + quantity,
+        vendorItems: vendor.vendorItems.map((item) => {
+          if (item.item_id == _id) {
+            return {
+              ...item,
+              item_quantity: item.item_quantity + quantity,
+            };
+          }
+
+          return item;
+        }),
       };
     }
 
     return vendor;
   });
 
-  const updatedCartItems = state.cartItems
-    .map((item: TcartItem) => {
-      if (item._id == _id) {
-        const { quantity, price } = item;
-        return {
-          ...item,
-          quantity: quantity + 1,
-        };
-      }
-      return item;
-    })
-    .map((item: TcartItem) => {
-      if (item._id == _id) {
-        const { price, quantity } = item;
-        return {
-          ...item,
-          total: price * quantity,
-        };
-      }
-      return item;
-    });
+  const updatedCartItems = state.cartItems.map((item: TcartItem) => {
+    if (item._id == _id) {
+      const { price } = item;
+      return {
+        ...item,
+        quantity: item.quantity + quantity,
+        total: item.price * quantity + item.quantity,
+      };
+    }
+    return item;
+  });
+  // .map((item: TcartItem) => {
+  //   if (item._id == _id) {
+  //     const { price, quantity } = item;
+  //     return {
+  //       ...item,
+  //       total: price * quantity,
+  //     };
+  //   }
+  //   return item;
+  // });
   return {
     updatedCartItems,
     updatedVendors,
@@ -145,9 +163,9 @@ const increaseVendorItemQuantity = (
     if (vendor.store_name == vendorsItemsToIncrease?.store_name) {
       return {
         ...vendorsItemsToIncrease,
-        // * INCREASE TOTAL PRICE OF ITEMS FOR TARGET VENDOR
+        // * INCREASE TOTAL PRICE OF ITEMS FOR TARGET VENDOR BY ADDING PRICE OF ITEM MULTIPLIED BY QUANTITY
         vendorTotal: price
-          ? vendorsItemsToIncrease.vendorTotal + price
+          ? vendorsItemsToIncrease.vendorTotal + price * quantity
           : vendorsItemsToIncrease.vendorTotal,
         // * INCREASE TOTAL ITEMS COUNT FOR TAGERT VENDOR BY ADDING QUANITY OF NEW ITEM
         vendorItemsCount: vendorsItemsToIncrease.vendorItemsCount + quantity,
@@ -359,13 +377,6 @@ const addToCart = (item: TcartItem, state: ICart) => {
         cartItems: [...state.cartItems, newItem],
       };
     }
-    Toast.show("Added to cart.", {
-      duration: Toast.durations.LONG,
-      position: Toast.positions.BOTTOM,
-      backgroundColor: "#90C466",
-      textColor: "#ffffff",
-      opacity: 1,
-    });
 
     if (vendorExists) {
       const { updatedVendors } = increaseVendorItemQuantity(
@@ -386,6 +397,7 @@ const addToCart = (item: TcartItem, state: ICart) => {
   } else if (isAlreadyInCart) {
     const { updatedCartItems, updatedVendors } = increaseItemQuantity(
       _id,
+      quantity,
       state
     );
 
@@ -398,6 +410,14 @@ const addToCart = (item: TcartItem, state: ICart) => {
       };
     }
 
+    Toast.show("Added to cart.", {
+      duration: Toast.durations.LONG,
+      position: Toast.positions.BOTTOM,
+      backgroundColor: "#90C466",
+      textColor: "#ffffff",
+      opacity: 1,
+    });
+
     return {
       ...state,
       itemsCount: state.itemsCount + 1,
@@ -407,13 +427,6 @@ const addToCart = (item: TcartItem, state: ICart) => {
   }
 
   return state;
-};
-
-const getVendor = (store_name: string, vendors: Ivendor[]) => {
-  const activeVendor = vendors.find(
-    (vendor) => vendor.store_name == store_name
-  );
-  return activeVendor;
 };
 
 const handleCheckout = async (store_name: string, vendors: Ivendor[]) => {
@@ -458,7 +471,26 @@ export const useCartStore = create<ICart>((set, state) => ({
       (vendor) => vendor.store_name == store_name
     );
 
-    return activeVendor;
+    return activeVendor as Ivendor | undefined;
+  },
+  addNoteToOrder: ({ store_name, order_note }) => {
+    const vendorToUpdate = state().vendors.find(
+      (vendor) => vendor.store_name == store_name
+    );
+
+    const updatedVendors = state().vendors.map((vendor) => {
+      if (vendor.store_name == store_name) {
+        return {
+          ...vendor,
+          vendorNote: order_note,
+        };
+      }
+      return vendor;
+    });
+
+    set((state) => ({
+      vendors: updatedVendors,
+    }));
   },
   handleCheckout: (store_name) => {
     handleCheckout(store_name, state().vendors);
@@ -480,6 +512,7 @@ export const useCartStore = create<ICart>((set, state) => ({
       (item) => item.vendor.store_name != store_name
     );
 
+    // * UPDATE CART STATE
     set((state) => ({
       cartItems: updatedCartItems,
       vendors: updatedVendors,
