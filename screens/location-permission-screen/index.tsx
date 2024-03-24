@@ -1,6 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { getValueFor } from "../../lib/secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/colors";
@@ -13,8 +12,10 @@ import { setItem } from "../../utils/storage";
 export const LocationPermissionScreen = ({ navigation }: any) => {
   const [location, setLocation] = React.useState<LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   async function setCurrentLocation() {
+    setLoading(true);
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       setErrorMsg("Permission to access location was denied");
@@ -37,6 +38,8 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
 
     //  * SAVE USER ONBOARDING
     setItem("ONBOARDED", "TRUE");
+
+    setLoading(false);
 
     // * PASS LATITUDE AND LONGITUDE TO LOCATION CONFIRMATION SCREEN
     navigation.navigate("LocationConfirmation", {
@@ -67,7 +70,12 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
         </Text>
       </View>
       <View style={{ rowGap: 20, paddingBottom: 50 }}>
-        <Button onPress={setCurrentLocation} variant="default" title="Allow" />
+        <Button
+          loading={loading}
+          onPress={setCurrentLocation}
+          variant="primary"
+          title="Allow"
+        />
         <TouchableOpacity
           onPress={() => handleSkip()}
           className="bg-white w-full py-4 px-2 flex-row flex justify-center items-center rounded-lg"

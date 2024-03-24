@@ -20,7 +20,6 @@ import { Button } from "../../components/ui";
 import { LocationObject } from "expo-location";
 import * as Location from "expo-location";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { getValueFor } from "../../lib/secure-store";
 import { useNavigation } from "@react-navigation/native";
 import Map from "./components/Map";
 import { reverseGeocodeAddress } from "./features/reverseGeocodeAddress";

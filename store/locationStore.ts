@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getValueFor } from "../lib/secure-store";
+import { getItem } from "../utils/storage";
 
 interface IlocationStore {
   delivery_address: string | boolean;
@@ -10,7 +10,7 @@ export const useLocationStore = create<IlocationStore>((set, state) => {
   return {
     delivery_address: "",
     setHeader: async () => {
-      const delivery_address = await getValueFor("DELIVERY_ADDRESS");
+      const delivery_address = getItem("DELIVERY_ADDRESS");
       console.info("settingHeader", delivery_address);
       set({
         delivery_address,

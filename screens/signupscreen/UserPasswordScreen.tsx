@@ -1,12 +1,19 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SEMI_BOLD } from "../../constants/fontNames";
 import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { getValueFor } from "../../lib/secure-store";
-import { setItem } from "../../utils/storage";
+import { getItem, setItem } from "../../utils/storage";
+import { baseUrl } from "../../constants/baseUrl";
 
 type Props = {};
 
@@ -29,7 +36,13 @@ const BackButton = () => {
   );
 };
 
-const NextButton = ({ handlePress }: { handlePress: () => void }) => {
+const NextButton = ({
+  handlePress,
+  loading,
+}: {
+  handlePress: () => void;
+  loading?: boolean;
+}) => {
   return (
     <Pressable
       onPress={handlePress}
@@ -40,9 +53,12 @@ const NextButton = ({ handlePress }: { handlePress: () => void }) => {
         borderRadius: 10,
       }}
     >
-      <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD, color: "white" }}>
-        Next
-      </Text>
+      {!loading && (
+        <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD, color: "white" }}>
+          Next
+        </Text>
+      )}
+      {loading && <ActivityIndicator size={20} color="white" />}
     </Pressable>
   );
 };
@@ -50,42 +66,31 @@ const NextButton = ({ handlePress }: { handlePress: () => void }) => {
 const UserPasswordScreen = ({ navigation, route }: any) => {
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   const { firstName, lastName, email } = route.params;
 
   async function handlePress() {
+    setLoading(true);
     if (!password || !confirmPassword) {
       return;
     }
 
     try {
-      const expo_push_token = await getValueFor("expo_push_token");
+      const expo_push_token = getItem("expo_push_token");
 
-      // const url = `https://e48d-102-216-10-2.ngrok-free.app/auth/signup?email=${email}&expo_push_token=${expo_push_token}`;
-      // const url = `https://diet-dining-server.onrender.com/auth/signup?email=${emailAddress}`;
-      // const url = `http://localhost:3000/auth/signup?email=${email}`;
-      // const details = {
-      //   firstname: firstName,
-      //   lastname: lastName,
-      //   email,
-      //   password,
-      //   expo_push_token,
-      // };
-      // const options = {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(details),
-      // };
-      // const res = await fetch(url, options);
-      // const { _id } = await res.json();
-      // await setItem("user_id", _id);
+      const url = `${baseUrl}/auth/signup?email=${email}&expo_push_token=${expo_push_token}&password=${password}&firstname=${firstName}&lastname=${lastName}`;
+      const res = await fetch(url);
+      const { _id } = await res.json();
+      setItem("user_id", _id);
       setItem("firstname", firstName);
       setItem("ONBOARDED", "TRUE");
       navigation.navigate("LocationPermission");
+      setLoading(false);
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error(err);
+
+      setLoading(false);
     }
   }
 
@@ -100,6 +105,10 @@ const UserPasswordScreen = ({ navigation, route }: any) => {
           </Text>
           <View style={styles.inputsContainer}>
             <TextInput
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoFocus
               value={password}
               onChangeText={(text) => setPassword(text)}
               placeholderTextColor={Colors.dark}
@@ -107,6 +116,9 @@ const UserPasswordScreen = ({ navigation, route }: any) => {
               style={styles.input}
             />
             <TextInput
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
               value={confirmPassword}
               onChangeText={(text) => setConfirmPassword(text)}
               placeholderTextColor={Colors.dark}
@@ -125,7 +137,15 @@ const UserPasswordScreen = ({ navigation, route }: any) => {
             }}
           >
             <BackButton />
-            <NextButton handlePress={handlePress} />
+            <NextButton
+              loading={loading}
+              handlePress={() => {
+                if (loading) {
+                  return;
+                }
+                handlePress();
+              }}
+            />
           </View>
         </SafeAreaView>
       </View>

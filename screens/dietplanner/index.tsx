@@ -107,8 +107,8 @@ function DishPreviewCard({
       <View style={{ position: "relative" }}>
         <Image
           style={{ width: "100%", height: 224, borderRadius: 12 }}
-          // source={{ uri: image }}
-          source={ceaser_salad}
+          source={{ uri: image }}
+          // source={ceaser_salad}
           resizeMode="cover"
         />
         <View
@@ -311,7 +311,7 @@ const DietHomePage = ({ navigation }: { navigation: any }) => {
   );
 };
 
-const DietSuggestions = ({ today }: { today: string }) => {
+const DietmockMealData = ({ today }: { today: string }) => {
   const navigate = useNavigation();
   const DateHeader = () => {
     return (
@@ -396,8 +396,6 @@ const DietSuggestions = ({ today }: { today: string }) => {
     );
   };
 
-  const suggestions = Array.from([12345].map(() => mockMealData));
-
   return (
     <>
       <DateHeader />
@@ -412,7 +410,7 @@ const DietSuggestions = ({ today }: { today: string }) => {
         <ActivePlan />
         <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>BreakFast</Text>
         <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-          {suggestions.map((item, index) => (
+          {mockMealData.slice(0, 3).map((item, index) => (
             <DishPreviewCard
               price={item.price}
               image={item.image}
@@ -425,7 +423,7 @@ const DietSuggestions = ({ today }: { today: string }) => {
         </ScrollView>
         <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>Lunch</Text>
         <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-          {suggestions.map((item, index) => (
+          {mockMealData.slice(4, 7).map((item, index) => (
             <DishPreviewCard
               image={item.image}
               price={item.price}
@@ -438,7 +436,7 @@ const DietSuggestions = ({ today }: { today: string }) => {
         </ScrollView>
         <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>Dinner</Text>
         <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-          {suggestions.map((item, index) => (
+          {mockMealData.slice(8, 11).map((item, index) => (
             <DishPreviewCard
               price={item.price}
               image={item.image}
@@ -468,7 +466,7 @@ const DailyDiet = ({ navigation }: { navigation: any }) => {
   }, [todayRaw]);
 
   const tabs = {
-    TODAY: <DietSuggestions today={today} />,
+    TODAY: <DietmockMealData today={today} />,
     TRACKER: <DietTracker today={today} />,
   };
 

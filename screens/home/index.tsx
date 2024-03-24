@@ -1,34 +1,23 @@
-import { ScrollView, View, Text } from "react-native";
+import { ScrollView, View, Text, Image } from "react-native";
 import { RestaurantsGrid, ErrorState, Loader } from "../../components";
 import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { get_stores, get_stores_around_user } from "../../lib/supabase";
-import { getValueFor } from "../../lib/secure-store";
 import { MenuItemsGrid } from "./menuitemsgrid";
 import { useSearchStore } from "../../store/searchStore";
 import { useEffect } from "react";
+import { getItem } from "../../utils/storage";
+import { ceaser_salad } from "../../assets/dishes";
+import { baseUrl } from "../../constants/baseUrl";
 
 export const Home = ({}) => {
-  // const fetchStores = async () => {
-  //   // const data = await get_stores();
-  //   const latitude = await getValueFor("latitude");
-  //   const longitude = await getValueFor("longitude");
-  //   // const res = await fetch(
-  //   //   `http://localhost:3000/stores/get-stores-around?latitude=${latitude}&longitude=${longitude}`
-  //   // );
-  //   const res = await fetch(
-  //     `https://diet-dining-server.onrender.com/stores/get-stores-around?latitude=${latitude}&longitude=${longitude}`
-  //   );
-  //   const data = await res.json();
-  //   return data;
-  // };
   const fetchStores = async () => {
-    const latitude = await getValueFor("latitude");
-    const longitude = await getValueFor("longitude");
-    const data = await get_stores_around_user({
-      latitude: latitude as string,
-      longitude: longitude as string,
-    });
+    const latitude = getItem("latitude");
+    const longitude = getItem("longitude");
+    const res = await fetch(
+      `${baseUrl}/stores/get-stores-around?latitude=${latitude}&longitude=${longitude}`
+    );
+    const data = await res.json();
     if (!data) {
       return [];
     }
@@ -63,6 +52,23 @@ export const Home = ({}) => {
             <View>
               <RestaurantsGrid stores={stores} title="Nearby Stores" />
               <RestaurantsGrid stores={stores} title="Top Picks For You" />
+              {/* <View style={{ gap: 20, paddingVertical: 20 }}>
+                <Text>Spotlight</Text>
+                <View
+                  style={{
+                    height: 100,
+                    borderWidth: 1,
+                    width: 100,
+                    borderRadius: 100,
+                  }}
+                >
+                  <Image
+                    resizeMode="contain"
+                    style={{ height: "100%", width: "100%" }}
+                    source={ceaser_salad}
+                  />
+                </View>
+              </View> */}
               <RestaurantsGrid stores={stores} title="New in your Area" />
             </View>
           )}

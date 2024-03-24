@@ -45,20 +45,15 @@ const NextButton = ({ handlePress }: { handlePress: () => void }) => {
   );
 };
 
-const UserDetails = ({ navigation, route }: any) => {
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-
-  const { email } = route.params;
+const UserEmail = ({ navigation }: any) => {
+  const [email, setEmail] = React.useState("");
 
   function handlePress() {
-    if (!firstName || !lastName) {
+    if (!email) {
       return;
     }
 
-    navigation.navigate("PasswordScreen", {
-      firstName,
-      lastName,
+    navigation.navigate("UserDetails", {
       email,
     });
   }
@@ -67,24 +62,18 @@ const UserDetails = ({ navigation, route }: any) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <View style={styles.container}>
         <View style={styles.innerContainer}>
-          <Text style={styles.mainText}>What's your name?</Text>
-          <Text style={styles.subtitle}>
-            Let us know how we can address you.
-          </Text>
+          <Text style={styles.mainText}>What's your email address</Text>
+          <Text style={styles.subtitle}>Please enter your email below.</Text>
           <View style={styles.inputsContainer}>
             <TextInput
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
               autoFocus
-              value={firstName}
-              onChangeText={(text) => setFirstName(text)}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
               placeholderTextColor={Colors.dark}
-              placeholder="First Name"
-              style={styles.input}
-            />
-            <TextInput
-              value={lastName}
-              onChangeText={(text) => setLastName(text)}
-              placeholderTextColor={Colors.dark}
-              placeholder="Last Name"
+              placeholder="name@example.com"
               style={styles.input}
             />
           </View>
@@ -107,7 +96,7 @@ const UserDetails = ({ navigation, route }: any) => {
   );
 };
 
-export default UserDetails;
+export default UserEmail;
 
 const styles = StyleSheet.create({
   container: {

@@ -5,7 +5,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useCartStore } from "../../store/cartStore";
 import { SearchBar } from "../searchbar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { deleteKey } from "../../lib/secure-store";
 import { useLocationStore } from "../../store/locationStore";
 
 const Badge = ({ count }: { count: number }) => {
@@ -70,7 +69,7 @@ export const Header = () => {
             onPress={() =>
               // deleteKey("ONBOARDED")
               // @ts-ignore
-              navigation.navigate("Account")
+              navigation.navigate("Test")
             }
           >
             <Ionicons name="person-outline" size={22} color="black" />

@@ -165,7 +165,7 @@ export const OnboardingScreenItem = (props: TOnboardingScreenProps) => {
         >
           <LottieView
             resizeMode="cover"
-            style={{ width: width * 0.9, height: width }}
+            style={{ width, height: width }}
             autoPlay
             source={lottie}
           />
@@ -214,8 +214,8 @@ export const OnboardingScreen = () => {
       <OnboardingScreenItem
         setActivePage={setonboardingIndex}
         activePage={onboardingIndex}
-        width={width * 0.8}
-        height={width}
+        width={300}
+        height={300}
         lottie={healthyFoodLottie}
         description="Get set up with a  fully tracked diet plan in a few clicks"
         title="Professional Diet Plans"

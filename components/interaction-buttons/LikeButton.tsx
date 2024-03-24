@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { getValueFor } from "../../lib/secure-store";
 import Colors from "../../constants/colors";
+import { getItem } from "../../utils/storage";
 type Props = {};
 
 const LikeButton = ({
@@ -23,7 +23,7 @@ const LikeButton = ({
 
     try {
       setNewLike(true);
-      const user_id = await getValueFor("user_id");
+      const user_id = await getItem("user_id");
       const url = `https://diet-dining-server.onrender.com/user/like?user_id=${user_id}&item_id=${item_id}`;
       const res = await fetch(url);
       const data = await res.json();

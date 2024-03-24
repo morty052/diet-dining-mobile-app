@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { getValueFor } from "../lib/secure-store";
 
 interface IsearchStore {
   fetchStoresAndProducts: () => void;

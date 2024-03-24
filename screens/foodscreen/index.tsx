@@ -254,25 +254,28 @@ export const FoodScreen = ({ navigation, route }: any) => {
           </View>
         </View>
       </ScrollView>
-      {!loading && (
-        <BuyButton
-          isInCart={isInCart}
-          price={
-            itemQuantity > 1
-              ? ((price && itemQuantity * price) as number)
-              : (price as number)
+
+      <BuyButton
+        loading={loading}
+        isInCart={isInCart}
+        price={
+          itemQuantity > 1
+            ? ((price && itemQuantity * price) as number)
+            : (price as number)
+        }
+        itemQuantity={itemQuantity}
+        setItemQuantity={setItemQuantity}
+        buyItem={() => {
+          if (loading) {
+            return;
           }
-          itemQuantity={itemQuantity}
-          setItemQuantity={setItemQuantity}
-          buyItem={() => {
-            addToCart({
-              ...(product as TcartItem),
-              quantity: itemQuantity,
-            });
-            navigation.goBack();
-          }}
-        />
-      )}
+          addToCart({
+            ...(product as TcartItem),
+            quantity: itemQuantity,
+          });
+          navigation.goBack();
+        }}
+      />
     </SafeAreaView>
   );
 };

@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, Platform, ScrollView } from "react-native";
 import React from "react";
 import { EmptyState, ErrorState, Loader } from "../../components";
-import { getValueFor } from "../../lib/secure-store";
 import { useQuery } from "@tanstack/react-query";
 import { MEDIUM, REGULAR, SEMI_BOLD } from "../../constants/fontNames";
 import Colors from "../../constants/colors";
@@ -10,6 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HorizontalRule from "../../components/ui/HorizontalRule";
 import { useRefreshOnFocus } from "../../hooks/useRefreshOnFocus";
 import { Skeleton } from "moti/skeleton";
+import { getItem } from "../../utils/storage";
+import { baseUrl } from "../../constants/baseUrl";
 type Props = {};
 
 type OrderCardProps = {
@@ -118,10 +119,10 @@ const OrderCard = ({ order }: { order: OrderCardProps }) => {
 
 export const OrdersPage = () => {
   const getUserOrders = async () => {
-    const user_id = await getValueFor("user_id");
+    const user_id = getItem("user_id");
     console.log(user_id);
     const res = await fetch(
-      `https://diet-dining-server.onrender.com/orders/get-user-orders?user_id=${user_id}`
+      `${baseUrl}/orders/get-user-orders?user_id=${user_id}`
     );
     const orders: OrderCardProps[] = await res.json();
 

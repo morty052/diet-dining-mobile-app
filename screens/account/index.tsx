@@ -13,7 +13,7 @@ import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import HorizontalRule from "../../components/ui/HorizontalRule";
 import { SEMI_BOLD } from "../../constants/fontNames";
-import { deleteKey } from "../../lib/secure-store";
+import { getItem, removeItem } from "../../utils/storage";
 
 type Props = {};
 
@@ -70,13 +70,14 @@ const AccountQuickLinkCard = ({ name, icon }: { name: string; icon: any }) => {
 };
 
 export const AccountScreen = (props: Props) => {
+  const firstname = getItem("firstname");
   return (
     <ScrollView style={styles.container}>
       {/* HEADER */}
       <View style={styles.accountPageheader}>
-        <Text style={styles.userFullName}>Patrick Star</Text>
+        <Text style={styles.userFullName}>{firstname}</Text>
         <Pressable
-          onPress={async () => await deleteKey("ONBOARDED")}
+          onPress={async () => removeItem("ONBOARDED")}
           style={styles.userIconContainer}
         >
           <Ionicons color={"white"} size={25} name="person-outline" />
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   userFullName: {
-    fontSize: 35,
+    fontSize: 30,
     color: Colors.dark,
     fontWeight: "700",
     fontFamily: SEMI_BOLD,

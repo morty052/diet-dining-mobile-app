@@ -12,6 +12,7 @@ import StoreInfo from "../screens/restaurantscreen/components/StoreInfo";
 import UserDetails from "../screens/signupscreen/UserDetails";
 import UserPasswordScreen from "../screens/signupscreen/UserPasswordScreen";
 import LoginScreen from "../screens/login-screen";
+import UserEmail from "../screens/signupscreen/UserEmail";
 type OnboardingRoutesList = {
   SplashScreen: undefined;
   Onboarding: undefined;
@@ -24,6 +25,7 @@ type OnboardingRoutesList = {
   };
   DeliveryAddressScreen?: undefined;
   UserDetails: undefined;
+  UserEmail: undefined;
   PasswordScreen: {
     firstName: string;
     lastName: string;
@@ -40,6 +42,7 @@ const OnboardingRoutes = () => {
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="UserDetails" component={UserDetails} />
+      <Stack.Screen name="UserEmail" component={UserEmail} />
       <Stack.Screen name="PasswordScreen" component={UserPasswordScreen} />
       <Stack.Screen
         name="LocationPermission"

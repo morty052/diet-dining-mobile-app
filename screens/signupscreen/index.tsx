@@ -10,19 +10,17 @@ import {
   Platform,
 } from "react-native";
 import React from "react";
-import { Button } from "../../components";
-import { googleLogo } from "../../assets";
 import { useNavigation } from "@react-navigation/native";
 import { useSignUp } from "@clerk/clerk-expo";
 import { Feather } from "@expo/vector-icons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Animated, { SlideInDown } from "react-native-reanimated";
-import Foodbg from "../../assets/foodbg.png";
+import Foodbg from "../../assets/bgimage.jpeg";
 import emailImage from "../../assets/emailimage.png";
-import { StatusBar } from "expo-status-bar";
-import { getValueFor } from "../../lib/secure-store";
-import { setItem } from "../../utils/storage";
+import { getItem, setItem } from "../../utils/storage";
 import Colors from "../../constants/colors";
+import { baseUrl } from "../../constants/baseUrl";
+import { MEDIUM, SEMI_BOLD } from "../../constants/fontNames";
+import { Ionicons } from "@expo/vector-icons";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,79 +39,120 @@ const SignUpForm = ({
 
   async function handleOldUser() {
     // await setItem("ONBOARDED", "TRUE");
+    // @ts-ignore
     navigation.navigate("Login");
   }
 
   return (
-    <Animated.View
-      entering={SlideInDown.duration(900)}
-      style={{ backgroundColor: "white" }}
+    // <View style={{ backgroundColor: "white" }}>
+    //   <View className="flex bg-white pb-6   rounded-t-2xl pt-2 px-4">
+    //     <Text className="text-center text-lg font-medium text-dark">
+    //       Get Started with Diet dining
+    //     </Text>
+    //     <Text className="text-center  font-medium text-dark">
+    //       Lets's get started with your email
+    //     </Text>
+
+    //     <View>
+    //       <TextInput
+    //         autoCapitalize="none"
+    //         value={emailAddress}
+    //         onChangeText={(email) => setEmailAddress(email)}
+    //         placeholder="Email"
+    //         className="border border-gray-400 text-center rounded-lg p-2"
+    //       />
+
+    //       <Button
+    //         textStyle="text-white"
+    //         // onPress={() => navigation.navigate("App")}
+    //         onPress={handlePress}
+    //         style="bg-dark w-full text-white mt-4"
+    //         title="Sign Up"
+    //       />
+
+    //       <Text
+    //         onPress={() => handleOldUser()}
+    //         style={{ color: Colors.link }}
+    //         className="text-center mt-2  font-medium "
+    //       >
+    //         i already have an account
+    //       </Text>
+    //     </View>
+
+    //     <View className="flex mb-4 flex-row justify-center items-center">
+    //       <View className="border border-gray-300 flex-1"></View>
+    //       <Text className="text-center   mx-2">Or with</Text>
+    //       <View className="border border-gray-300 flex-1"></View>
+    //     </View>
+
+    //     <View>
+    //       <View className="font-medium flex-row items-center text-center border-gray-300 border rounded-2xl p-2 ">
+    //         <Image className="h-6 w-6" source={googleLogo} />
+    //         <View className="flex-1  pr-6">
+    //           <Text className="text-[15px] font-medium text-center">
+    //             Google
+    //           </Text>
+    //         </View>
+    //       </View>
+    //     </View>
+
+    //     <Pressable onPress={() => navigation.navigate("App")} className=" mt-1">
+    //       <Text className="text-center text-sm text-gray-500">
+    //         By continuing, you agree to our Terms of Service
+    //       </Text>
+    //       <Text className="text-center text-sm text-gray-500">
+    //         Privacy Policy and cookie policy
+    //       </Text>
+    //     </Pressable>
+    //   </View>
+    // </View>
+    <View
+      style={{
+        backgroundColor: "white",
+        height: 200,
+        justifyContent: "center",
+        paddingHorizontal: 20,
+        gap: 15,
+      }}
     >
-      <Animated.View className="flex bg-white pb-6   rounded-t-2xl pt-2 px-4">
-        <Text className="text-center text-lg font-medium text-dark">
-          Welcome
+      <Text
+        style={{
+          fontSize: 20,
+          fontFamily: MEDIUM,
+          color: Colors.dark,
+          // textAlign: "center",
+        }}
+      >
+        Get Started with Diet dining
+      </Text>
+
+      <Pressable
+        style={{
+          backgroundColor: Colors.primary,
+          height: 65,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 10,
+          flexDirection: "row",
+          paddingHorizontal: 20,
+        }}
+        // @ts-ignore
+        onPress={() => navigation.navigate("UserEmail")}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+            fontFamily: SEMI_BOLD,
+            color: "white",
+            flex: 1,
+            textAlign: "center",
+          }}
+        >
+          Continue
         </Text>
-        <Text className="text-center  font-medium text-dark">
-          Lets's get started with your email
-        </Text>
-
-        {/* BUTTON AND INPUT */}
-        <View className="py-4">
-          <TextInput
-            autoCapitalize="none"
-            value={emailAddress}
-            onChangeText={(email) => setEmailAddress(email)}
-            placeholder="Email"
-            className="border border-gray-400 text-center rounded-lg p-2"
-          />
-
-          <Button
-            textStyle="text-white"
-            // onPress={() => navigation.navigate("App")}
-            onPress={handlePress}
-            style="bg-dark w-full text-white mt-4"
-            title="Sign Up"
-          />
-
-          <Text
-            onPress={() => handleOldUser()}
-            style={{ color: Colors.link }}
-            className="text-center mt-2  font-medium "
-          >
-            i already have an account
-          </Text>
-        </View>
-
-        {/* DIVIDER */}
-        <View className="flex mb-4 flex-row justify-center items-center">
-          <View className="border border-gray-300 flex-1"></View>
-          <Text className="text-center   mx-2">Or with</Text>
-          <View className="border border-gray-300 flex-1"></View>
-        </View>
-
-        {/* GOOGLE BUTTON */}
-        <View>
-          <View className="font-medium flex-row items-center text-center border-gray-300 border rounded-2xl p-2 ">
-            <Image className="h-6 w-6" source={googleLogo} />
-            <View className="flex-1  pr-6">
-              <Text className="text-[15px] font-medium text-center">
-                Google
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* TERMS */}
-        <Pressable onPress={() => navigation.navigate("App")} className=" mt-1">
-          <Text className="text-center text-sm text-gray-500">
-            By continuing, you agree to our Terms of Service
-          </Text>
-          <Text className="text-center text-sm text-gray-500">
-            Privacy Policy and cookie policy
-          </Text>
-        </Pressable>
-      </Animated.View>
-    </Animated.View>
+        <Ionicons name="arrow-forward" size={25} color="white" />
+      </Pressable>
+    </View>
   );
 };
 
@@ -139,18 +178,18 @@ const MainSignUpScreen = () => {
   const navigation = useNavigation();
 
   const onSignUpPress = async () => {
-    // if (!isLoaded) {
-    //   return;
-    // }
+    if (!isLoaded) {
+      return;
+    }
 
     try {
       const emailAddress = email.trim();
 
-      // await signUp.create({
-      //   emailAddress,
-      // });
+      await signUp.create({
+        emailAddress,
+      });
       //* send the email.
-      // await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       // @ts-ignore
       navigation.navigate("EmailVerificationScreen", {
         emailAddress,
@@ -177,16 +216,48 @@ const MainSignUpScreen = () => {
           backgroundColor: "rgba(0 0 0 / 0.4)",
         }}
       ></View>
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <SignUpForm
-          handlePress={onSignUpPress}
-          emailAddress={email}
-          setEmailAddress={setEmail}
-        />
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingView> */}
+      <SignUpForm
+        handlePress={onSignUpPress}
+        emailAddress={email}
+        setEmailAddress={setEmail}
+      />
       {/* <StatusBar hidden={true} /> */}
+      <View
+        style={{
+          position: "absolute",
+          top: 100,
+          // backgroundColor: "rgba(0 0 0 / 0.4)",
+          width: "100%",
+          paddingHorizontal: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            fontSize: 60,
+            fontFamily: SEMI_BOLD,
+            lineHeight: 60,
+            letterSpacing: 2,
+          }}
+        >
+          Diet
+        </Text>
+        <Text
+          style={{
+            color: Colors.primary,
+            fontSize: 60,
+            lineHeight: 60,
+            fontFamily: SEMI_BOLD,
+            letterSpacing: 2,
+          }}
+        >
+          Dining
+        </Text>
+      </View>
     </ImageBackground>
   );
 };
@@ -294,9 +365,9 @@ const EmailVerificationScreen = ({ navigation, route }: any) => {
   const { isLoaded, signUp, setActive } = useSignUp();
 
   const onPressVerify = async (code: string) => {
-    // if (!isLoaded || !emailAddress) {
-    //   return;
-    // }
+    if (!isLoaded) {
+      return;
+    }
 
     try {
       console.log("code", code);
@@ -304,15 +375,15 @@ const EmailVerificationScreen = ({ navigation, route }: any) => {
         code,
       });
 
-      const expo_push_token = await getValueFor("expo_push_token");
+      const expo_push_token = getItem("expo_push_token");
 
       // const url = `https://91d6-102-216-10-2.ngrok-free.app/auth/signup?email=${emailAddress}&expo_push_token=${expo_push_token}`;
-      const url = `https://diet-dining-server.onrender.com/auth/signup?email=${emailAddress}&expo_push_token=${expo_push_token}`;
+      const url = `${baseUrl}/auth/signup?email=${emailAddress}&expo_push_token=${expo_push_token}`;
 
       const res = await fetch(url);
       const { _id } = await res.json();
 
-      await setItem("user_id", _id);
+      setItem("user_id", _id);
 
       // @ts-ignore
       navigation.navigate("UserDetails", {

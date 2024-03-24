@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text } from "react-native";
+import { TouchableOpacity, View, Text, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -75,12 +75,14 @@ const BuyButton = ({
   setItemQuantity,
   price,
   isInCart,
+  loading,
 }: {
   buyItem: () => void;
   itemQuantity: number;
   setItemQuantity: any;
   price: number;
   isInCart: boolean;
+  loading: boolean;
 }) => {
   return (
     <SafeAreaView
@@ -116,9 +118,12 @@ const BuyButton = ({
           }}
           onPress={buyItem}
         >
-          <Text className=" text-white text-[20px] font-medium">
-            {` Add ${itemQuantity} to Cart - $${Math.round(price)}`}
-          </Text>
+          {!loading && (
+            <Text className=" text-white text-[20px] font-medium">
+              {` Add ${itemQuantity} to Cart - $${Math.round(price)}`}
+            </Text>
+          )}
+          {loading && <ActivityIndicator color={"white"} size={20} />}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

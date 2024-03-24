@@ -292,26 +292,196 @@ export const mockRestaurantData = [
   },
 ];
 
-export const mockMealData = {
-  description:
-    "Delicious Salad for your delight made with white meat, lettuce, tomatoes and onion rings dressing .",
-  _rev: "bwjmyF8qb3kmUEGeGH26WR",
-  name: "Farm cherry cake",
-  _updatedAt: "2024-03-09T14:26:13Z",
-  image:
-    "https://cdn.sanity.io/images/xnrrhmkl/production/1690887a5672fa326f1ae5c07f9118b1f4751e20-1380x920.jpg",
-  vendor: {
+export const mockMealData = [
+  {
+    vendor: {
+      store_name: "Lean Baker",
+    },
+    name: "Mixed Fruits delight",
+    _id: "18ab1a6f-c975-4593-ac3f-132390b6f6f0",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/1afdd7454251eadbb81570eff85d0522d21ab2a7-740x1109.jpg",
+    price: 27,
+    category: "Desserts",
+    description:
+      "Delicious Salad for your delight made with white meat, lettuce, tomatoes and onion rings dressing .",
     store_name: "Lean Baker",
-    _id: "5e210e6e-89c0-49f6-b544-bf4b8f427a54",
-    store_logo:
-      "https://cdn.sanity.io/images/xnrrhmkl/production/56a77bd89bbcda5a5e17912959937ecb82363320-900x860.jpg",
   },
-  _type: "products",
-  category: "Desserts",
-  price: 10,
-  _createdAt: "2024-03-09T14:24:02Z",
-  _id: "c138d1e8-e1f8-47ce-b76c-f980696db475",
-};
+
+  {
+    name: "Oyster soup",
+    _id: "293273a7-14b7-47ee-bc30-84d977c4c619",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/69809eb63d02c14d38de1c0b27d0b09f4c094c42-1380x920.jpg",
+    price: 90,
+    category: "Soups",
+    description: "Oysters  with a sprinkle of rosemary and curry",
+    vendor: {
+      store_name: "Krabby Patty's",
+    },
+    store_name: "Krabby Patty's",
+  },
+  {
+    description:
+      "Delicious Salad for your delight made with white meat, lettuce, tomatoes and onion rings dressing .",
+    vendor: {
+      store_name: "Papa Johns",
+    },
+    name: "Boiled potato salad",
+    _id: "31ae0337-5a9f-4f39-b46d-9c256a989450",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/7ef8bbfe91395bf9c960930ecd381bfa93592687-1060x764.jpg",
+    price: 37.68,
+    category: "Salads",
+    store_name: "Papa Johns",
+  },
+  {
+    name: "Cream and veggies",
+    _id: "379e2d63-97c2-4753-b6bc-4a937e6df8a9",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/74ee7bec310873e5ca522c9c2dbba66929bbb3ea-826x826.jpg",
+    price: 35,
+    category: "Desserts",
+    description:
+      "Delicious Salad for your delight made with white meat, lettuce, tomatoes and onion rings dressing .",
+    vendor: {
+      store_name: "Lean Baker",
+    },
+    store_name: "Lean Baker",
+  },
+  {
+    vendor: {
+      store_name: "Papa Johns",
+    },
+    name: "Olive Salad",
+    _id: "3ee9f488-a516-47c5-b9a1-d2624c7ab2de",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/a15d27d70c30f6ad01ee350c7356f93597cae004-3854x2876.jpg",
+    price: 27.75,
+    category: "Salads",
+    description: "delicious salad  for your delight from papa johns cafe",
+    store_name: "Papa Johns",
+  },
+  {
+    _id: "4086d219-a720-4fbc-ac90-641b6b5b2df8",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/84c31951de0c735d4d67b5cc029c73a55c42ba3e-1380x920.jpg",
+    price: 90,
+    category: "Soups",
+    description: "Green healthy pea soup",
+    vendor: {
+      store_name: "Krabby Patty's",
+    },
+    name: "Green Pea soup",
+    store_name: "Krabby Patty's",
+  },
+  {
+    name: "Borsch soup",
+    _id: "49ec5a01-c695-4b06-8081-166db7448d67",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/e5b0fba15ca9299713b04baa135c1f9d681fbc03-1380x920.jpg",
+    price: 58,
+    category: "Soups",
+    description: "Oysters  with a sprinkle of rosemary and curry",
+    vendor: {
+      store_name: "Krabby Patty's",
+    },
+    store_name: "Krabby Patty's",
+  },
+  {
+    name: "Salmon and lemons",
+    _id: "67ad412a-3ced-43e3-9e48-9e920416701b",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/3b4e20de1606e883c37d6419600e19734f4971cd-826x826.jpg",
+    price: 50,
+    category: "Sea Food",
+    description: "dbbddbd",
+    vendor: {
+      store_name: "Krabby Patty's",
+    },
+    store_name: "Krabby Patty's",
+  },
+  {
+    name: "Fresh salmon salad",
+    _id: "6a58c6eb-22b7-4d40-aace-e3c901538928",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/6a7e66163943fec6a27438e08bfcd9f3edd48c8e-1380x920.jpg",
+    price: 50,
+    category: "Sea Food",
+    description: "dbbddbd",
+    vendor: {
+      store_name: "Krabby Patty's",
+    },
+    store_name: "Krabby Patty's",
+  },
+  {
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/5914f210e1b262a2eaeab696d13f6f95d8b36749-1380x920.jpg",
+    price: 299,
+    category: "Chinese",
+    description: "yip yip",
+    vendor: {
+      store_name: "Papa Johns",
+    },
+    name: "Takoyaki Ball",
+    _id: "9819b0d3-96bb-478d-a7b7-6c0794f2cdab",
+    store_name: "Papa Johns",
+  },
+  {
+    name: "Pad Thai",
+    _id: "bf3d4ac6-f030-42ba-bc26-f68f843e988a",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/df780bbc5c4f8c152ba37f6a6d20e0ed3e9e096a-826x826.jpg",
+    price: 70,
+    category: "Thai",
+    description: "dbbddbd",
+    vendor: {
+      store_name: "Papa Johns",
+    },
+    store_name: "Papa Johns",
+  },
+  {
+    _id: "c138d1e8-e1f8-47ce-b76c-f980696db475",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/1690887a5672fa326f1ae5c07f9118b1f4751e20-1380x920.jpg",
+    price: 10,
+    category: "Desserts",
+    description:
+      "Delicious Salad for your delight made with white meat, lettuce, tomatoes and onion rings dressing .",
+    vendor: {
+      store_name: "Lean Baker",
+    },
+    name: "Farm cherry cake",
+    store_name: "Lean Baker",
+  },
+  {
+    name: "Ceaser Salad",
+    _id: "cb491002-10ef-4854-a7cd-7c8513843d01",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/4c19fd308e5e1da0e68acbde81b9a3cb6e329a3e-900x720.png",
+    price: 37.68,
+    category: "Salads",
+    description:
+      "Delicious Salad for your delight made with white meat, lettuce, tomatoes and onion rings dressing .",
+    vendor: {
+      store_name: "Papa Johns",
+    },
+    store_name: "Papa Johns",
+  },
+  {
+    name: "Thai Salad",
+    _id: "eab9b250-b262-4aeb-a5ff-5e10829b3b89",
+    image:
+      "https://cdn.sanity.io/images/xnrrhmkl/production/1655de8e4243dbb5c1bd78bf7dc4c1796fba1d7f-6000x4000.jpg",
+    price: 54.29,
+    category: "Salads",
+    description: "delicious Thai Salad for your delight from papa johns cafe",
+    vendor: {
+      store_name: "Papa Johns",
+    },
+    store_name: "Papa Johns",
+  },
+];
 
 const mockStoreData = {
   store_rating: 4.7,

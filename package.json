@@ -10,7 +10,11 @@
     "install-ios": "eas build:run -p ios",
     "install-android": "eas build:run -p ios",
     "build-ios": "eas build --profile development-simulator --platform ios",
-    "build-android": "eas build --profile development --platform android"
+    "build-android": "eas build --profile development --platform android",
+    "preview-android": "eas build --profile preview --platform android",
+    "preview-ios": "eas build --profile preview --platform ios",
+    "preview-ios-simulator": " eas build -p ios --profile ios-preview",
+    "add-ios-device": "eas device:create"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^0.20.1",
@@ -46,7 +50,10 @@
     "react-native-screens": "~3.29.0",
     "react-native-svg": "13.9.0",
     "socket.io-client": "^4.7.4",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "expo-auth-session": "~5.4.0",
+    "expo-crypto": "~12.8.1",
+    "expo-web-browser": "~12.8.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

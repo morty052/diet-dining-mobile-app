@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { TcartItem } from "../contexts/CartContext";
 import Toast from "react-native-root-toast";
-import { getValueFor } from "../lib/secure-store";
+import { getItem } from "../utils/storage";
+import { baseUrl } from "../constants/baseUrl";
 
 interface ICart {
   vendors: Ivendor[] | [];
@@ -432,18 +433,23 @@ const addToCart = (item: TcartItem, state: ICart) => {
 const handleCheckout = async (store_name: string, vendors: Ivendor[]) => {
   const vendor = vendors.find((vendor) => vendor.store_name == store_name);
 
-  const user_id = await getValueFor("user_id");
+  try {
+    const user_push_token = getItem("expo_push_token");
+    const user_id = getItem("user_id");
 
-  const url = "http://localhost:3000/orders/create";
-  // const url = "https://e48d-102-216-10-2.ngrok-free.app/orders/create";
+    const url = `${baseUrl}/orders/create`;
+    // const url = "https://e48d-102-216-10-2.ngrok-free.app/orders/create";
 
-  await fetch(url, {
-    method: "POST",
-    body: JSON.stringify({ vendor, user_id }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+    await fetch(url, {
+      method: "POST",
+      body: JSON.stringify({ vendor, user_id, user_push_token }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export const useCartStore = create<ICart>((set, state) => ({
