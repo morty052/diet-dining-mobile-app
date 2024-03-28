@@ -279,7 +279,7 @@ const AppStack = ({ ONBOARDED }: { ONBOARDED: boolean }) => {
       />
       <Stack.Screen
         options={{
-          headerShown: true,
+          headerShown: false,
           headerTitle: "",
           headerBackTitleVisible: false,
           headerTransparent: true,

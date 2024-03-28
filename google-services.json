@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "888603760362",
-    "project_id": "diet-dining-mobile",
-    "storage_bucket": "diet-dining-mobile.appspot.com"
+    "project_number": "4734430008",
+    "project_id": "diet-dining-mobile-6bdb5",
+    "storage_bucket": "diet-dining-mobile-6bdb5.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:888603760362:android:ced7ee4ccc4f05dc8a2993",
+        "mobilesdk_app_id": "1:4734430008:android:c0698d4f34635701b1efcd",
         "android_client_info": {
           "package_name": "com.abdulojehumen.dietdining"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAcoXz_BZrNHOusRubJYXEzTq3ngz_saB0"
+          "current_key": "AIzaSyBUdYUet_Nr4hvUTqImNHkdOHXYDU0KhcA"
         }
       ],
       "services": {
