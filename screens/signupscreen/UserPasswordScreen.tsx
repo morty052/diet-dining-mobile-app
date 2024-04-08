@@ -1,5 +1,7 @@
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -96,7 +98,10 @@ const UserPasswordScreen = ({ navigation, route }: any) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
         <View style={styles.innerContainer}>
           <Text style={styles.mainText}>Create password</Text>
           <Text style={styles.subtitle}>
@@ -148,7 +153,7 @@ const UserPasswordScreen = ({ navigation, route }: any) => {
             />
           </View>
         </SafeAreaView>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

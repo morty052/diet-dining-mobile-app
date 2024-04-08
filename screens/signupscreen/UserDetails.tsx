@@ -1,4 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SEMI_BOLD } from "../../constants/fontNames";
@@ -65,7 +73,10 @@ const UserDetails = ({ navigation, route }: any) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
         <View style={styles.innerContainer}>
           <Text style={styles.mainText}>What's your name?</Text>
           <Text style={styles.subtitle}>
@@ -102,7 +113,7 @@ const UserDetails = ({ navigation, route }: any) => {
             <NextButton handlePress={handlePress} />
           </View>
         </SafeAreaView>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

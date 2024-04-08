@@ -433,16 +433,28 @@ const addToCart = (item: TcartItem, state: ICart) => {
 const handleCheckout = async (store_name: string, vendors: Ivendor[]) => {
   const vendor = vendors.find((vendor) => vendor.store_name == store_name);
 
+  const latitude = getItem("latitude");
+  const longitude = getItem("longitude");
+  const user_location = {
+    lat: Number(latitude),
+    lng: Number(longitude),
+  };
+
+  const delivery_address = getItem("DELIVERY_ADDRESS");
+
   try {
     const user_push_token = getItem("expo_push_token");
     const user_id = getItem("user_id");
-
     const url = `${baseUrl}/orders/create`;
-    // const url = "https://e48d-102-216-10-2.ngrok-free.app/orders/create";
-
     await fetch(url, {
       method: "POST",
-      body: JSON.stringify({ vendor, user_id, user_push_token }),
+      body: JSON.stringify({
+        vendor,
+        user_id,
+        user_push_token,
+        user_location,
+        delivery_address,
+      }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -498,6 +510,21 @@ export const useCartStore = create<ICart>((set, state) => ({
       vendors: updatedVendors,
     }));
   },
+  removeItemFromCart: (item_id, store_name, item_quantity) => {
+    const { updatedCartItems, updatedVendors } = removeItemFromCart({
+      item_id,
+      store_name,
+      state: state(),
+      item_quantity,
+    });
+
+    set((state) => ({
+      cartItems: updatedCartItems,
+      // * SUBTRACT ITEMS QUANTITY FROM STATES ITEMS COUNT
+      itemsCount: state.itemsCount - item_quantity,
+      vendors: updatedVendors as Ivendor[],
+    }));
+  },
   handleCheckout: (store_name) => {
     handleCheckout(store_name, state().vendors);
 
@@ -526,21 +553,6 @@ export const useCartStore = create<ICart>((set, state) => ({
       itemsCount: vendorItemsCount && state.itemsCount - vendorItemsCount,
       //* SUBTRACT VENDOR TOTAL FROM TOTAL ITEMS TOTAL
       total: vendorTotal && state.total && state.total - vendorTotal,
-    }));
-  },
-  removeItemFromCart: (item_id, store_name, item_quantity) => {
-    const { updatedCartItems, updatedVendors } = removeItemFromCart({
-      item_id,
-      store_name,
-      state: state(),
-      item_quantity,
-    });
-
-    set((state) => ({
-      cartItems: updatedCartItems,
-      // * SUBTRACT ITEMS QUANTITY FROM STATES ITEMS COUNT
-      itemsCount: state.itemsCount - item_quantity,
-      vendors: updatedVendors as Ivendor[],
     }));
   },
 }));

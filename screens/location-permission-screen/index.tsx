@@ -39,6 +39,9 @@ export const LocationPermissionScreen = ({ navigation }: any) => {
     //  * SAVE USER ONBOARDING
     setItem("ONBOARDED", "TRUE");
 
+    // * SAVE DELIVERY ADDRESS
+    setItem("DELIVERY_ADDRESS", delivery_address);
+
     setLoading(false);
 
     // * PASS LATITUDE AND LONGITUDE TO LOCATION CONFIRMATION SCREEN

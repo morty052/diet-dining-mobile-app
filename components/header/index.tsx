@@ -69,7 +69,9 @@ export const Header = () => {
             onPress={() =>
               // deleteKey("ONBOARDED")
               // @ts-ignore
-              navigation.navigate("Test")
+              navigation.navigate("Account", {
+                startingIndex: 1,
+              })
             }
           >
             <Ionicons name="person-outline" size={22} color="black" />

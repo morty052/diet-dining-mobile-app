@@ -7,12 +7,16 @@ import {
   Pressable,
 } from "react-native";
 import React, { Dispatch, SetStateAction } from "react";
-import Colors from "../constants/colors";
+import Colors from "../../constants/colors";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput } from "react-native-gesture-handler";
-import { keto_bg, paleo_bg, wholefoods_bg } from "../assets/diet-plan-images";
+import {
+  keto_bg,
+  paleo_bg,
+  wholefoods_bg,
+} from "../../assets/diet-plan-images";
 import Animated, {
   useSharedValue,
   withTiming,
@@ -24,9 +28,9 @@ import Animated, {
   SlideInRight,
 } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
-import { MEDIUM, SEMI_BOLD } from "../constants/fontNames";
+import { MEDIUM, SEMI_BOLD } from "../../constants/fontNames";
 import { LinearGradient } from "expo-linear-gradient";
-import { ProductProps } from "../types/ProductProps";
+import { ProductProps } from "../../types/ProductProps";
 
 type StoryProps = {
   media: "IMAGE" | "TEXT" | "VIDEO";
@@ -100,15 +104,27 @@ const storiesArray: StoryProps[] = [
       },
     },
   },
-  // {
-  //   type: "IMAGE",
-  //   image: keto_bg,
-  //   text: {
-  //     header: "vv",
-  //     subtitle: "",
-  //     body: "",
-  //   },
-  // },
+  {
+    media: "IMAGE",
+    type: "FULL_SCREEN",
+    image: keto_bg,
+    text: {
+      header: "Lean meats treats",
+      body: "Calling all canivores, try our lean meat treats today.",
+      subtitle: "not for the faint hearted",
+    },
+    product: {
+      name: "Muffin",
+      _id: "10",
+      image: "dkdk",
+      price: 20,
+      description: "",
+      vendor: {
+        store_name: "papa johns",
+        store_image: "vsvsv",
+      },
+    },
+  },
 ];
 
 const merchantStory: MerchantStoryProps = {
@@ -701,35 +717,15 @@ function MediumScreenReel({
 
 const MerchantReelComponent = ({
   merchantStory,
+  startingIndex,
 }: {
   merchantStory: MerchantStoryProps;
+  startingIndex: number;
 }) => {
   const [stories, setStories] = React.useState<StoryProps[]>(
     merchantStory.reel
   );
-  const [activeStoryIndex, setActiveStoryIndex] = React.useState(0);
-
-  // const ReelTypes = React.useMemo(
-  //   () => ({
-  //     FULL_SCREEN: (
-  //       <FullScreenReel
-  //         activeStoryIndex={activeStoryIndex}
-  //         setActiveStoryIndex={setActiveStoryIndex}
-  //         stories={stories}
-  //         setStories={setStories}
-  //       />
-  //     ),
-  //     HALF_SCREEN: (
-  //       <MediumScreenReel
-  //         activeStoryIndex={activeStoryIndex}
-  //         setActiveStoryIndex={setActiveStoryIndex}
-  //         stories={stories}
-  //         setStories={setStories}
-  //       />
-  //     ),
-  //   }),
-  //   []
-  // );
+  const [activeStoryIndex, setActiveStoryIndex] = React.useState(startingIndex);
 
   const IS_FULL_SCREEN = React.useMemo(() => {
     if (stories[activeStoryIndex].type == "HALF_SCREEN") {
@@ -761,14 +757,19 @@ const MerchantReelComponent = ({
   );
 };
 
-const TestScreen = () => {
+export const MerchantStoryScreen = ({ route }: any) => {
+  const { startingIndex } = route.params ?? {};
+  console.info({ startingStoryAt: startingIndex });
   const [stories, setStories] = React.useState<StoryProps[]>(
     merchantStory.reel
   );
-  const [activeStoryIndex, setActiveStoryIndex] = React.useState(0);
-  return <MerchantReelComponent merchantStory={merchantStory} />;
+  const [activeStoryIndex, setActiveStoryIndex] = React.useState(startingIndex);
+  return (
+    <MerchantReelComponent
+      startingIndex={startingIndex}
+      merchantStory={merchantStory}
+    />
+  );
 };
-
-export default TestScreen;
 
 const styles = StyleSheet.create({});

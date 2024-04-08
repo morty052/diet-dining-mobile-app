@@ -24,6 +24,7 @@ import LottieView from "lottie-react-native";
 import Colors from "../../constants/colors";
 import { IOS } from "../../utils/Platform";
 import { TcartItem } from "../../contexts/CartContext";
+import { getItem } from "../../utils/storage";
 
 const Header = () => {
   const navigation = useNavigation();
@@ -75,7 +76,13 @@ const CheckoutButton = ({
         </Text>
       </View> */}
       <TouchableOpacity
-        onPress={cartIsEmpty ? () => navigate.navigate("Home") : handleCheckout}
+        onPress={() => {
+          if (cartIsEmpty) {
+            // @ts-ignore
+            navigate.navigate("Home");
+          }
+          handleCheckout();
+        }}
         className=" inline-flex border py-4 rounded-lg bg-dark px-4 justify-center items-center"
       >
         <Text className=" text-white text-xl font-medium">
@@ -101,7 +108,10 @@ function CheckOutCompleteScreen() {
       <View className="px-2 pt-4 ">
         <Pressable
           className=" flex flex-row justify-between items-center"
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => {
+            // @ts-ignore
+            navigation.navigate("Home");
+          }}
         >
           {/* <View className="border h-8 w-8 rounded-full flex justify-center items-center">
           </View> */}
@@ -174,6 +184,8 @@ function CheckoutLoading() {
 }
 
 function DeliveryDetails() {
+  const delivery_address = getItem("DELIVERY_ADDRESS");
+
   return (
     <View className="  px-3">
       <Text className="text-[19px] font-bold text-dark">Delivery Details</Text>
@@ -183,7 +195,7 @@ function DeliveryDetails() {
         <View className="flex-1 flex-row items-center justify-between border-b border-gray-400 pb-3 ml-4">
           <View>
             <Text className=" text-[14px] font-medium text-dark">Address</Text>
-            <Text className=" font-medium text-dark">200 West 74th st</Text>
+            <Text className=" font-medium text-dark">{delivery_address}</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
         </View>
@@ -227,6 +239,7 @@ function DeliveryDetails() {
 }
 
 function ContactInformation() {
+  const firstname = getItem("firstname");
   return (
     <View className="px-3">
       <Text className="text-[19px] font-bold text-dark">
@@ -240,7 +253,7 @@ function ContactInformation() {
             <Ionicons name="person-circle-outline" size={24} />
           </View>
           <View className="flex-1 ml-2">
-            <Text className="font-medium">Patrick Star</Text>
+            <Text className="font-medium">{firstname}</Text>
             <Text className="font-medium">+1 234 567 8910</Text>
           </View>
         </View>
@@ -436,7 +449,7 @@ function CheckOutGrid({ store_name }: { store_name: string }) {
   );
 }
 
-function HorizontalRule(params: type) {
+function HorizontalRule() {
   return (
     <View className="border-y h-4 bg-gray-200/20 border-black/10 my-8"></View>
   );
@@ -550,7 +563,7 @@ function ExtraInteractionButtons({
   );
 }
 
-export function CheckoutScreen({ route, navigation }) {
+export function CheckoutScreen({ route, navigation }: any) {
   const { cartItems, handleCheckout, vendors } = useCartStore();
   const [checkoutComplete, setcheckoutComplete] = useState(false);
   const [writingNote, setwritingNote] = useState(false);

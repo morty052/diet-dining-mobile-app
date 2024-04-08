@@ -98,52 +98,33 @@ const Header = ({
   );
 };
 
-const VendorsChoiceGrid = ({
+const MerchantStoryGrid = ({
   store,
   data,
 }: {
   store: TstoreProps;
   data: any;
 }) => {
-  const VendorsChoiceCard = ({
-    image,
-    name,
-    price,
-    _id,
-    description,
-  }: {
-    image: string;
-    name: string;
-    price: number;
-    _id: string;
-    description: string;
-  }) => {
+  const StoryCard = ({ image, index }: { image: string; index: number }) => {
     const navigation = useNavigation();
     return (
       <Pressable
         onPress={() =>
           // @ts-ignore
-          navigation.navigate("FoodScreen", {
-            image,
-            name,
-            price,
-            _id,
-            description,
+          navigation.navigate("MerchantStory", {
+            startingIndex: index,
           })
         }
         style={{ gap: 10, marginRight: 20 }}
       >
         <View
           style={{
-            width: 300,
-            height: 180,
-            borderRadius: 10,
             position: "relative",
           }}
         >
           <Image
             resizeMode="cover"
-            style={{ width: "100%", height: "100%", borderRadius: 10 }}
+            style={{ width: 80, height: 80, borderRadius: 80 }}
             source={{ uri: image }}
           />
           {/* OVERLAY */}
@@ -155,46 +136,24 @@ const VendorsChoiceGrid = ({
               bottom: 0,
               top: 0,
               backgroundColor: "black",
-              borderRadius: 10,
+              borderRadius: 80,
               opacity: 0.1,
             }}
           ></View>
-        </View>
-        {/* INFO */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            paddingHorizontal: 5,
-          }}
-        >
-          <Text style={{ fontSize: 16, fontWeight: "600" }}>
-            {name.length < 25 ? name : `${name.slice(0, 25)}...`}
-          </Text>
-          <Text style={{ fontSize: 18, fontWeight: "600" }}>${price}</Text>
         </View>
       </Pressable>
     );
   };
 
   return (
-    <View style={{ paddingHorizontal: 10, paddingVertical: 20, gap: 10 }}>
-      <Text style={{ fontSize: 16, fontFamily: SEMI_BOLD }}>
-        Vendor's Choice
-      </Text>
+    <View style={{ paddingHorizontal: 10, paddingTop: 10, gap: 10 }}>
+      <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>Stories</Text>
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
         data={data}
-        renderItem={({ item }) => (
-          <VendorsChoiceCard
-            _id={item._id}
-            description={item.description}
-            price={item.price}
-            name={item.name}
-            image={item.image}
-          />
+        renderItem={({ item, index }) => (
+          <StoryCard index={index} image={item.image} />
         )}
       />
     </View>
@@ -274,17 +233,8 @@ const RestaurantScreen = ({ navigation, route }: any) => {
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (e.nativeEvent.contentOffset.y > 200) {
       setisViewable(true);
-      // navigation.setOptions({
-      //   headerStyle: { backgroundColor: "white" },
-      //   headerTitle: store_name,
-      // });
     } else if (e.nativeEvent.contentOffset.y < 200) {
       setisViewable(false);
-      // navigation.setOptions({
-      //   header: undefined,
-      //   headerStyle: { backgroundColor: "transparent" },
-      //   headerTitle: "",
-      // });
     }
   };
 
@@ -337,12 +287,12 @@ const RestaurantScreen = ({ navigation, route }: any) => {
             store_id={store_id}
             store_name={store_name}
           />
-          {/* <HorizontalRule marginTop={20} />
-          <VendorsChoiceGrid
+          <HorizontalRule marginTop={20} />
+          <MerchantStoryGrid
             data={vendorsChoice}
             store={store as TstoreProps}
           />
-          <HorizontalRule /> */}
+          <HorizontalRule marginTop={20} />
           <View>
             <StoreMenuSectionList data={store?.menu} />
           </View>

@@ -1,7 +1,15 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { SEMI_BOLD } from "../../constants/fontNames";
+import { MEDIUM, SEMI_BOLD } from "../../constants/fontNames";
 import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -60,7 +68,10 @@ const UserEmail = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
         <View style={styles.innerContainer}>
           <Text style={styles.mainText}>What's your email address</Text>
           <Text style={styles.subtitle}>Please enter your email below.</Text>
@@ -77,6 +88,12 @@ const UserEmail = ({ navigation }: any) => {
               style={styles.input}
             />
           </View>
+          <Text
+            onPress={() => navigation.navigate("Login")}
+            style={styles.link}
+          >
+            I already have an account.
+          </Text>
         </View>
         <SafeAreaView>
           <View
@@ -91,7 +108,7 @@ const UserEmail = ({ navigation }: any) => {
             <NextButton handlePress={handlePress} />
           </View>
         </SafeAreaView>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -116,6 +133,13 @@ const styles = StyleSheet.create({
   subtitle: {
     marginTop: 10,
     fontSize: 16,
+  },
+  link: {
+    marginTop: 10,
+    fontSize: 16,
+    fontFamily: MEDIUM,
+    color: Colors.link,
+    textAlign: "center",
   },
   inputsContainer: {
     gap: 20,

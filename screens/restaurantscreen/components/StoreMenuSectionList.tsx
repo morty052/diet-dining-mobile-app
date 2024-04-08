@@ -54,7 +54,7 @@ const StoreMenuSectionList = ({ data }: any) => {
           </Text>
         </View>
       )}
-      SectionSeparatorComponent={() => <HorizontalRule />}
+      renderSectionFooter={() => <HorizontalRule />}
     />
   );
 };

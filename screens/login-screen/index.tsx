@@ -96,7 +96,6 @@ const LoginScreen = ({ navigation, route }: any) => {
 
       const { _id, status, user_firstname } = data;
 
-      // TODO: SAVE USERS FIRSTNAME HERE
       if (status === "SUCCESS") {
         setItem("user_id", _id as string);
         setItem("firstname", user_firstname as string);

@@ -26,6 +26,7 @@ import { reverseGeocodeAddress } from "./features/reverseGeocodeAddress";
 import AutoCompleteInput from "./components/AutoCompleteInput";
 import { useLocationStore } from "../../store/locationStore";
 import { getItem, setItem } from "../../utils/storage";
+import { updateDeliveryAddress } from "../../utils/updateDeliveryAddress";
 
 type Props = {};
 
@@ -200,12 +201,22 @@ export const LocationScreen = ({ navigation }: any) => {
   }, [newCoords]);
 
   async function handleConfirmLocation() {
-    setLoading(true);
-    setItem("DELIVERY_ADDRESS", addy as string);
-    setItem("ONBOARDED", "TRUE");
-    setHeader();
-    setLoading(false);
-    navigation.navigate("App");
+    try {
+      setLoading(true);
+      setItem("DELIVERY_ADDRESS", addy as string);
+      setItem("ONBOARDED", "TRUE");
+      setHeader();
+      const user_id = getItem("user_id");
+      await updateDeliveryAddress({
+        delivery_address: addy as string,
+        user_id: user_id as string,
+      });
+      setLoading(false);
+      navigation.navigate("App");
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
   }
 
   const moveMap = async (e: any) => {

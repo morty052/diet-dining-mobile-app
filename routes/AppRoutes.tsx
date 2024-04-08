@@ -12,6 +12,7 @@ import {
   SearchScreen,
   AccountScreen,
   MealBreakDownScreen,
+  MerchantStoryScreen,
 } from "../screens";
 import OnboardingRoutes from "./OnboardingRoutes";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -39,7 +40,7 @@ type RootTabsParamList = {
 
 const Tab = createBottomTabNavigator<RootTabsParamList>();
 
-export function AppTabsNavigator({ navigation }) {
+export function AppTabsNavigator({ navigation }: any) {
   const { itemsCount } = useCartStore();
 
   return (
@@ -180,6 +181,7 @@ export type RootStackParamList = {
   };
   Account: undefined;
   DietBrowser: undefined;
+  MerchantStory: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -286,6 +288,16 @@ const AppStack = ({ ONBOARDED }: { ONBOARDED: boolean }) => {
         }}
         name="Test"
         component={TestScreen}
+      />
+      <Stack.Screen
+        options={{
+          headerShown: false,
+          headerTitle: "",
+          headerBackTitleVisible: false,
+          headerTransparent: true,
+        }}
+        name="MerchantStory"
+        component={MerchantStoryScreen}
       />
     </Stack.Navigator>
   );
