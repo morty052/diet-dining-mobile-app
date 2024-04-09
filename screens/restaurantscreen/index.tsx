@@ -99,13 +99,21 @@ const Header = ({
 };
 
 const MerchantStoryGrid = ({
-  store,
+  store_name,
   data,
 }: {
-  store: TstoreProps;
+  store_name: string;
   data: any;
 }) => {
-  const StoryCard = ({ image, index }: { image: string; index: number }) => {
+  const StoryCard = ({
+    image,
+    index,
+    store_name,
+  }: {
+    image: string;
+    index: number;
+    store_name: string;
+  }) => {
     const navigation = useNavigation();
     return (
       <Pressable
@@ -113,9 +121,9 @@ const MerchantStoryGrid = ({
           // @ts-ignore
           navigation.navigate("MerchantStory", {
             startingIndex: index,
+            store_name,
           })
         }
-        style={{ gap: 10, marginRight: 20 }}
       >
         <View
           style={{
@@ -148,14 +156,20 @@ const MerchantStoryGrid = ({
   return (
     <View style={{ paddingHorizontal: 10, paddingTop: 10, gap: 10 }}>
       <Text style={{ fontSize: 20, fontFamily: SEMI_BOLD }}>Stories</Text>
-      <FlatList
-        horizontal
+      <ScrollView
+        contentContainerStyle={{ gap: 10, flex: 1 }}
         showsHorizontalScrollIndicator={false}
-        data={data}
-        renderItem={({ item, index }) => (
-          <StoryCard index={index} image={item.image} />
-        )}
-      />
+        horizontal
+      >
+        {data?.map((item: any, index: number) => (
+          <StoryCard
+            store_name={store_name}
+            key={index}
+            index={index}
+            image={item.image}
+          />
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -288,10 +302,7 @@ const RestaurantScreen = ({ navigation, route }: any) => {
             store_name={store_name}
           />
           <HorizontalRule marginTop={20} />
-          <MerchantStoryGrid
-            data={vendorsChoice}
-            store={store as TstoreProps}
-          />
+          <MerchantStoryGrid data={vendorsChoice} store_name={store_name} />
           <HorizontalRule marginTop={20} />
           <View>
             <StoreMenuSectionList data={store?.menu} />

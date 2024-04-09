@@ -5,6 +5,7 @@ import {
   View,
   Image,
   Pressable,
+  Dimensions,
 } from "react-native";
 import React, { Dispatch, SetStateAction } from "react";
 import Colors from "../../constants/colors";
@@ -31,6 +32,7 @@ import { useNavigation } from "@react-navigation/native";
 import { MEDIUM, SEMI_BOLD } from "../../constants/fontNames";
 import { LinearGradient } from "expo-linear-gradient";
 import { ProductProps } from "../../types/ProductProps";
+import { usePhoneScreen } from "../../hooks/useScreen";
 
 type StoryProps = {
   media: "IMAGE" | "TEXT" | "VIDEO";
@@ -328,10 +330,18 @@ function StoryHeader({
   );
 }
 
+// TODO FIX ORDER BUTTON DISTANCE FROM BOTTOM LOGIC
 function StoryOrderButton({ product }: { product: ProductProps }) {
+  const { isTallScreen } = usePhoneScreen();
+
   return (
     <View
-      style={{ position: "absolute", bottom: 50, width: "100%", zIndex: 5 }}
+      style={{
+        position: "absolute",
+        bottom: isTallScreen ? 50 : 10,
+        width: "100%",
+        zIndex: 5,
+      }}
     >
       <View
         style={{
@@ -424,7 +434,30 @@ function StoryControlButtons({
   );
 }
 
-function StoryImageRenderer({ activeStory }: { activeStory: StoryProps }) {
+function StoryImageRenderer({
+  activeStory,
+  type,
+}: {
+  activeStory: StoryProps;
+  type?: "FULL_SCREEN" | "HALF_SCREEN";
+}) {
+  if (type == "HALF_SCREEN") {
+    return (
+      <Image
+        //  @ts-ignore
+        source={activeStory?.image}
+        resizeMode="cover"
+        style={{
+          width: "98%",
+          height: "60%",
+          backgroundColor: "black",
+          borderRadius: 10,
+          alignSelf: "center",
+        }}
+      ></Image>
+    );
+  }
+
   return (
     <Image
       //  @ts-ignore
@@ -432,7 +465,6 @@ function StoryImageRenderer({ activeStory }: { activeStory: StoryProps }) {
       resizeMode="cover"
       style={{
         width: "100%",
-        height: 500,
         flex: 1,
         backgroundColor: "black",
         // borderTopLeftRadius: 10,
@@ -611,12 +643,12 @@ function StoryTextRenderer({
 
 function FullScreenReel({
   stories,
-  setStories,
+  store_name,
   activeStoryIndex,
   setActiveStoryIndex,
 }: {
   stories: StoryProps[];
-  setStories: (story: StoryProps[]) => void;
+  store_name: string;
   activeStoryIndex: number;
   setActiveStoryIndex: Dispatch<SetStateAction<number>>;
 }) {
@@ -632,7 +664,7 @@ function FullScreenReel({
       <View style={{ flex: 1, position: "relative", zIndex: 2 }}>
         <StoryHeader
           created_at={merchantStory.created_at}
-          vendor_name={merchantStory.vendor_name}
+          vendor_name={store_name}
           setActiveStoryIndex={setActiveStoryIndex}
           activeStory={stories[activeStoryIndex]}
           activeStoryIndex={activeStoryIndex}
@@ -657,12 +689,12 @@ function FullScreenReel({
 
 function MediumScreenReel({
   stories,
-  setStories,
+  store_name,
   activeStoryIndex,
   setActiveStoryIndex,
 }: {
   stories: StoryProps[];
-  setStories: (story: StoryProps[]) => void;
+  store_name: string;
   activeStoryIndex: number;
   setActiveStoryIndex: Dispatch<SetStateAction<number>>;
 }) {
@@ -677,7 +709,7 @@ function MediumScreenReel({
       <View style={{ flex: 1, position: "relative", zIndex: 2 }}>
         <StoryHeader
           created_at={merchantStory.created_at}
-          vendor_name={merchantStory.vendor_name}
+          vendor_name={store_name}
           setActiveStoryIndex={setActiveStoryIndex}
           activeStory={stories[activeStoryIndex]}
           activeStoryIndex={activeStoryIndex}
@@ -686,14 +718,16 @@ function MediumScreenReel({
         <View
           style={{
             width: "100%",
-            height: 500,
             paddingTop: 70,
             position: "relative",
             gap: 30,
-            // backgroundColor: "red",
+            flex: 1,
           }}
         >
-          <StoryImageRenderer activeStory={stories[activeStoryIndex]} />
+          <StoryImageRenderer
+            type="HALF_SCREEN"
+            activeStory={stories[activeStoryIndex]}
+          />
           <StoryTextRenderer
             type="HALF_SCREEN"
             text={stories[activeStoryIndex].text}
@@ -718,9 +752,11 @@ function MediumScreenReel({
 const MerchantReelComponent = ({
   merchantStory,
   startingIndex,
+  store_name,
 }: {
   merchantStory: MerchantStoryProps;
   startingIndex: number;
+  store_name: string;
 }) => {
   const [stories, setStories] = React.useState<StoryProps[]>(
     merchantStory.reel
@@ -742,7 +778,7 @@ const MerchantReelComponent = ({
           activeStoryIndex={activeStoryIndex}
           setActiveStoryIndex={setActiveStoryIndex}
           stories={stories}
-          setStories={setStories}
+          store_name={store_name}
         />
       )}
       {IS_FULL_SCREEN && (
@@ -750,7 +786,7 @@ const MerchantReelComponent = ({
           activeStoryIndex={activeStoryIndex}
           setActiveStoryIndex={setActiveStoryIndex}
           stories={stories}
-          setStories={setStories}
+          store_name={store_name}
         />
       )}
     </>
@@ -758,14 +794,10 @@ const MerchantReelComponent = ({
 };
 
 export const MerchantStoryScreen = ({ route }: any) => {
-  const { startingIndex } = route.params ?? {};
-  console.info({ startingStoryAt: startingIndex });
-  const [stories, setStories] = React.useState<StoryProps[]>(
-    merchantStory.reel
-  );
-  const [activeStoryIndex, setActiveStoryIndex] = React.useState(startingIndex);
+  const { startingIndex, store_name } = route.params ?? {};
   return (
     <MerchantReelComponent
+      store_name={store_name}
       startingIndex={startingIndex}
       merchantStory={merchantStory}
     />

@@ -272,44 +272,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
   const [activeCategory, setactiveCategory] = useState<null | string>(category);
 
   const { products, stores } = useSearchStore();
-
-  const fetchStoresAndProducts = async () => {
-    // const res = await fetch(
-    //   "https://ea0e-102-216-10-2.ngrok-free.app/stores/search-stores"
-    // );
-    // const res = await fetch("http://localhost:3000/stores/search-stores");
-    const res = await fetch(
-      "https://diet-dining-server.onrender.com/stores/search-stores"
-    );
-
-    const stores = await res.json();
-
-    const productsRes = await fetch(
-      "https://diet-dining-server.onrender.com/stores/search-products"
-      // "http://localhost:3000/stores/search-products"
-      // "https://ea0e-102-216-10-2.ngrok-free.app/stores/search-products"
-    );
-
-    const productData = await productsRes.json();
-
-    setProducts(productData);
-
-    //
-    setSearchArray(stores);
-
-    return stores;
-  };
-
-  // const { data, isLoading, isError } = useQuery({
-  //   queryKey: ["searcharray"],
-  //   queryFn: fetchStoresAndProducts,
-  // });
-
-  // useEffect(() => {
-  //   if (!catory) {
-
-  //   }
-  // }, [])
+  console.log(products);
 
   const queryResults = useMemo(() => {
     // * RETURN NULL IF FETCHING IS ACTIVE OR USER NOT TYPING OR SEARCH ARRAY IS EMPTY
@@ -320,7 +283,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
     // * RETURN NULL IF USER IS TYPING BUT NO STORES MATCH SEARCH QUERY
     if (
       !stores.filter((item) =>
-        item.store_name.toLowerCase().includes(query.toLowerCase())
+        item?.store_name?.toLowerCase().includes(query.toLowerCase())
       )
     ) {
       return null;
@@ -328,7 +291,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
 
     // * FINNALY RETURN RESULTS OF QUERY IF STORE ARRAY EXISTS AND USER IS TYPING AND THERE ARE RESULTS
     return stores.filter((item) =>
-      item.store_name.toLowerCase().includes(query.toLowerCase())
+      item?.store_name?.toLowerCase().includes(query.toLowerCase())
     );
   }, [query]);
 
@@ -346,7 +309,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
     }
 
     return products?.filter((item) =>
-      item.name.toLowerCase().includes(query.toLowerCase())
+      item?.name?.toLowerCase().includes(query.toLowerCase())
     );
   }, [query]);
 
@@ -356,17 +319,15 @@ export const SearchScreen = ({ navigation, route }: any) => {
     }
 
     return products?.filter((item) =>
-      item?.category.toLowerCase().includes(category?.toLowerCase())
+      item?.category?.toLowerCase().includes(category?.toLowerCase())
     );
   }, [category]);
-
-  console.info(category);
 
   return (
     <SafeAreaView className="flex-1">
       <View
         style={{
-          paddingTop: IOS ? 0 : 20,
+          paddingTop: IOS ? 20 : 20,
         }}
         className="px-2 flex-1"
       >

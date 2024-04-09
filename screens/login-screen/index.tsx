@@ -132,6 +132,7 @@ const LoginScreen = ({ navigation, route }: any) => {
           </Text>
           <View style={styles.inputsContainer}>
             <TextInput
+              autoFocus
               value={email}
               onChangeText={(text) => {
                 if (error) {
@@ -178,19 +179,17 @@ const LoginScreen = ({ navigation, route }: any) => {
             )}
           </View>
         </View>
-        <SafeAreaView>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingBottom: 20,
-            }}
-          >
-            <BackButton />
-            <NextButton loading={loading} handlePress={handlePress} />
-          </View>
-        </SafeAreaView>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingBottom: 20,
+          }}
+        >
+          <BackButton />
+          <NextButton loading={loading} handlePress={handlePress} />
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -200,7 +199,8 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    paddingTop: 10,
+    paddingHorizontal: 10,
     backgroundColor: "white",
     flex: 1,
     justifyContent: "space-between",

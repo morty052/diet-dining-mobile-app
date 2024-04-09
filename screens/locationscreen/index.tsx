@@ -276,11 +276,13 @@ export const LocationScreen = ({ navigation }: any) => {
             bottom: "additive",
           }}
         >
-          <Button
-            onPress={() => handleConfirmLocation()}
-            variant="default"
-            title={!loading ? "Select Address" : "Confirming..."}
-          />
+          <View style={{ paddingBottom: 10 }}>
+            <Button
+              onPress={() => handleConfirmLocation()}
+              variant="default"
+              title={!loading ? "Select Address" : "Confirming..."}
+            />
+          </View>
         </SafeAreaView>
       </View>
     </View>

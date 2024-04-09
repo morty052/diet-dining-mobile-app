@@ -216,16 +216,11 @@ const MainSignUpScreen = () => {
           backgroundColor: "rgba(0 0 0 / 0.4)",
         }}
       ></View>
-      {/* <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-      </KeyboardAvoidingView> */}
       <SignUpForm
         handlePress={onSignUpPress}
         emailAddress={email}
         setEmailAddress={setEmail}
       />
-      {/* <StatusBar hidden={true} /> */}
       <View
         style={{
           position: "absolute",
