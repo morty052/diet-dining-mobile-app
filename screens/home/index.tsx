@@ -7,10 +7,14 @@ import { MenuItemsGrid } from "./menuitemsgrid";
 import { useSearchStore } from "../../store/searchStore";
 import { useEffect } from "react";
 import { getItem } from "../../utils/storage";
-import { ceaser_salad } from "../../assets/dishes";
 import { baseUrl } from "../../constants/baseUrl";
+import React from "react";
+import { ResultsGrid } from "./resultsgrid";
+import TstoreProps from "../../types/Store";
 
 export const Home = ({}) => {
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [results, setResults] = React.useState<TstoreProps[] | []>([]);
   const fetchStores = async () => {
     const latitude = getItem("latitude");
     const longitude = getItem("longitude");
@@ -36,6 +40,23 @@ export const Home = ({}) => {
   const { fetchStoresAndProducts } = useSearchStore();
 
   useEffect(() => {
+    async function getSearchResults(searchQuery: string) {
+      const res = await fetch(`${baseUrl}/stores/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ searchQuery }),
+      });
+      const data = await res.json();
+      setResults(data);
+      console.log(data);
+    }
+    if (!searchQuery) return;
+    getSearchResults(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
     fetchStoresAndProducts();
   }, []);
 
@@ -47,32 +68,25 @@ export const Home = ({}) => {
     <ScrollView style={{ position: "relative", backgroundColor: "white" }}>
       <View style={{ flex: 1, paddingHorizontal: 10 }}>
         <View>
-          <MenuItemsGrid />
-          {!isLoading && stores && stores?.length > 0 && (
-            <View>
-              <RestaurantsGrid stores={stores} title="Nearby Stores" />
-              <RestaurantsGrid stores={stores} title="Top Picks For You" />
-              {/* <View style={{ gap: 20, paddingVertical: 20 }}>
-                <Text>Spotlight</Text>
-                <View
-                  style={{
-                    height: 100,
-                    borderWidth: 1,
-                    width: 100,
-                    borderRadius: 100,
-                  }}
-                >
-                  <Image
-                    resizeMode="contain"
-                    style={{ height: "100%", width: "100%" }}
-                    source={ceaser_salad}
-                  />
-                </View>
-              </View> */}
-              <RestaurantsGrid stores={stores} title="New in your Area" />
-            </View>
-          )}
+          <MenuItemsGrid query={searchQuery} setQuery={setSearchQuery} />
+          {!isLoading &&
+            stores &&
+            stores?.length > 0 &&
+            results?.length < 1 && (
+              <View style={{ gap: 10 }}>
+                <RestaurantsGrid stores={stores} title="Nearby Stores" />
+                <RestaurantsGrid stores={stores} title="Top Picks For You" />
+                <RestaurantsGrid stores={stores} title="New in your Area" />
+              </View>
+            )}
 
+          {results?.length > 0 && (
+            <ResultsGrid
+              setResults={setResults}
+              resultsCounts={results?.length}
+              results={results}
+            />
+          )}
           {!isLoading && stores && stores?.length == 0 && (
             <Text>Nothing found in your area</Text>
           )}

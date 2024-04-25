@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import HorizontalRule from "../../components/ui/HorizontalRule";
 import { SEMI_BOLD } from "../../constants/fontNames";
 import { getItem, removeItem } from "../../utils/storage";
+import * as Linking from "expo-linking";
 
 type Props = {};
 
@@ -21,13 +22,16 @@ const AccountSettingsItem = ({
   name,
   icon,
   subtitle,
+  onPress,
 }: {
   name: string;
   icon: any;
   subtitle: string;
+  onPress: () => void;
 }) => {
   return (
-    <View
+    <Pressable
+      onPress={onPress}
       style={{
         flexDirection: "row",
         columnGap: 10,
@@ -44,7 +48,7 @@ const AccountSettingsItem = ({
         <Text style={{ fontWeight: "normal", fontSize: 14 }}>{subtitle}</Text>
       </View>
       <Ionicons color={Colors.dark} size={25} name={"chevron-forward"} />
-    </View>
+    </Pressable>
   );
 };
 
@@ -71,6 +75,9 @@ const AccountQuickLinkCard = ({ name, icon }: { name: string; icon: any }) => {
 
 export const AccountScreen = (props: Props) => {
   const firstname = getItem("firstname");
+  async function openLink(link: string) {
+    await Linking.openURL(link);
+  }
   return (
     <ScrollView style={styles.container}>
       {/* HEADER */}
@@ -98,34 +105,46 @@ export const AccountScreen = (props: Props) => {
       <HorizontalRule />
       <View style={styles.accountSettingsContainer}>
         <AccountSettingsItem
+          onPress={() => openLink("tel:+123456789")}
           subtitle="Get in touch with us"
           name="Help"
           icon={"help-circle-outline"}
         />
         <AccountSettingsItem
+          onPress={() => openLink("mailto:support@expo.dev")}
           subtitle="Manage your diet plan settings"
           name="Diet Plan"
           icon={"gift-outline"}
         />
         <AccountSettingsItem
+          onPress={() => console.log("https://merchants.dietdining.org")}
           subtitle="Manage rewards grapes "
           name="Rewards"
           icon={"gift-outline"}
         />
         <AccountSettingsItem
+          onPress={() => console.log("https://merchants.dietdining.org")}
           subtitle="Manage privacy settings"
           name="Privacy"
           icon={"eye"}
         />
         <AccountSettingsItem
+          onPress={() => openLink("https://merchants.dietdining.org")}
           subtitle="Manage notifications and related settings"
-          name="Notifications"
-          icon={"notifications-outline"}
+          name="Become a partner restaurant"
+          icon={"storefront-outline"}
         />
         <AccountSettingsItem
+          onPress={() => openLink("https://drivers.dietdining.org")}
           subtitle="Read about diet dining and who we are"
-          name="About"
-          icon={"information"}
+          name="Become a driver"
+          icon={"car-outline"}
+        />
+        <AccountSettingsItem
+          onPress={() => openLink("mailto:info@dietdining.org")}
+          subtitle="Get in touch with us about sponsorship and enquiry"
+          name="Sponsorship and enquiry"
+          icon={"gift-outline"}
         />
       </View>
     </ScrollView>

@@ -4,6 +4,8 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Pressable,
+  ImageSourcePropType,
 } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -15,6 +17,8 @@ import {
   soups_emoji,
   chinese_emoji,
 } from "../../../assets/foodcategories";
+import { SEMI_BOLD } from "../../../constants/fontNames";
+import Colors from "../../../constants/colors";
 
 type TmenuItem = {
   image: string;
@@ -44,39 +48,82 @@ const categories = [
   },
 ];
 
-export function MenuItem({ image, name }: any) {
-  const navigationParams = {
-    category: name,
-  };
-  const navigation = useNavigation();
-
+export function MenuItem({
+  image,
+  name,
+  setQuery,
+  query,
+}: {
+  image: ImageSourcePropType;
+  name: string;
+  setQuery: (name: string) => void;
+  query: string;
+}) {
   return (
-    <TouchableOpacity
-      // @ts-ignore
-      onPress={() => navigation.navigate("Browse", navigationParams)}
-      className=" inline-flex pb-2 bg-white shadow   border border-gray-400  mr-4 px-4 rounded-lg   items-center"
+    <Pressable
+      style={[
+        styles.container,
+        {
+          backgroundColor: query === name ? "#90c466CC" : undefined,
+          borderColor: query === name ? "white" : "rgb(156 163 175)",
+        },
+      ]}
+      onPress={() => setQuery(name)}
     >
-      {/* <SvgComponent /> */}
-      <Image resizeMode="contain" className="w-20 h-20" source={image} />
-      <Text className="text-sm font-bold text-dark">{name}</Text>
-    </TouchableOpacity>
+      <Image resizeMode="contain" style={styles.image} source={image} />
+      <Text
+        style={[styles.text, { color: query === name ? "white" : Colors.dark }]}
+      >
+        {name}
+      </Text>
+    </Pressable>
   );
 }
 
-export function MenuItemsGrid() {
+export function MenuItemsGrid({
+  setQuery,
+  query,
+}: {
+  setQuery: any;
+  query: string;
+}) {
   return (
     <ScrollView
       contentContainerStyle={{
         paddingVertical: 15,
         paddingHorizontal: 5,
+        gap: 10,
       }}
       horizontal
     >
       {categories.map((item: TmenuItem, index: number) => (
-        <MenuItem image={item.image} name={item.name} key={index} />
+        <MenuItem
+          query={query}
+          setQuery={setQuery}
+          image={item.image as ImageSourcePropType}
+          name={item.name}
+          key={index}
+        />
       ))}
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    // inline-flex pb-2 bg-white    border border-gray-400  px-4 rounded-lg   items-center
+    alignItems: "center",
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    borderRadius: 10,
+  },
+  image: {
+    width: 80,
+    height: 80,
+  },
+  text: {
+    fontFamily: SEMI_BOLD,
+    fontSize: 14,
+  },
+});

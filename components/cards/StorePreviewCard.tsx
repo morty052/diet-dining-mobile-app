@@ -14,10 +14,11 @@ import TstoreProps from "../../types/Store";
 
 type Props = {
   store: TstoreProps;
+  fullWidth?: boolean;
 };
 
-export function StorePreviewCard({ store }: Props) {
-  const navigation = useNavigation();
+export function StorePreviewCard({ store, fullWidth }: Props) {
+  const navigation = useNavigation<any>();
 
   const { width: phoneWidth } = useWindowDimensions();
 
@@ -26,30 +27,23 @@ export function StorePreviewCard({ store }: Props) {
   return (
     <Pressable
       onPress={() =>
-        // @ts-ignore
         navigation.navigate("Restaurant", {
           store_name: store.store_name,
           store_id: store._id,
           store_image: store.store_image,
         })
       }
-      className="   mr-4    flex justify-between"
     >
       <View className=" relative ">
         <Image
           resizeMode="cover"
           style={{
-            width: cardWidth,
+            width: !fullWidth ? cardWidth : "100%",
             height: 200,
           }}
           className="rounded-lg"
           source={{ uri: store.store_image }}
         />
-        {/* LIKE BUTTON */}
-        {/* <View className="absolute right-2 top-2">
-          <Ionicons color={"white"} size={24} name="heart-outline" />
-          <Text className="text-white">340</Text>
-        </View> */}
         {/* OVERLAY */}
         <View className="absolute top-0 right-0 left-0 bottom-0 bg-black/10 rounded-lg "></View>
       </View>
@@ -74,4 +68,8 @@ export function StorePreviewCard({ store }: Props) {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+  },
+});
