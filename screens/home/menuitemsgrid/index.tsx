@@ -95,6 +95,7 @@ export function MenuItemsGrid({
         gap: 10,
       }}
       horizontal
+      showsHorizontalScrollIndicator={false}
     >
       {categories.map((item: TmenuItem, index: number) => (
         <MenuItem

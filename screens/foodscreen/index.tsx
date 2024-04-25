@@ -3,7 +3,6 @@ import { useNavigation } from "@react-navigation/native";
 import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
 import { useState, useMemo, useEffect } from "react";
 import { useCartStore } from "../../store/cartStore";
-import { TcartItem } from "../../contexts/CartContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/colors";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +16,7 @@ import FrequentlyBought from "./components/FrequentlyBought";
 import { get_single_product } from "../../lib/supabase";
 import { RestaurantSkeleton } from "../../components/ui/SkeletonBase";
 import BuyButton from "./components/BuyButton";
+import { TcartItem } from "../../types/TCartItem";
 
 export function useRefreshOnFocus<T>(refetch: () => Promise<T>) {
   const firstTimeRef = React.useRef(true);

@@ -22,7 +22,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { IOS } from "../../utils/Platform";
 import { useQuery } from "@tanstack/react-query";
 import { Ivendor } from "../../store/cartStore";
-import { TcartItem } from "../../contexts/CartContext";
 import Colors from "../../constants/colors";
 import LikeButton from "../../components/interaction-buttons/LikeButton";
 import { SEMI_BOLD } from "../../constants/fontNames";
@@ -111,7 +110,7 @@ const CategoryCard = ({
 }: {
   name: string;
   icon: any;
-  navigation: any;
+  navigation?: any;
 }) => {
   const width = Dimensions.get("screen").width;
   const cardWidth = width * 0.45;

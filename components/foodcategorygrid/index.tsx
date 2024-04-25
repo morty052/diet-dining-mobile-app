@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { DishPreviewCard } from "../dishpreviewcard";
-import { TcartItem } from "../../contexts/CartContext";
+import { TcartItem } from "../../types/TCartItem";
 
 export type TcategoryItem = {
   price: number;

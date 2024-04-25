@@ -23,7 +23,6 @@ import fryingPan from "../../assets/lottie/fryingpan.json";
 import LottieView from "lottie-react-native";
 import Colors from "../../constants/colors";
 import { IOS } from "../../utils/Platform";
-import { TcartItem } from "../../contexts/CartContext";
 import { getItem } from "../../utils/storage";
 
 const Header = () => {

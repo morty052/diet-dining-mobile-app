@@ -1,20 +1,13 @@
-import {
-  View,
-  Text,
-  Pressable,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useEffect, useMemo } from "react";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { EmptyState } from "../../components";
 import { Ivendor, useCartStore } from "../../store/cartStore";
-import { TcartItem } from "../../contexts/CartContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/colors";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { TcartItem } from "../../types/TCartItem";
 
 type Props = {};
 
@@ -26,7 +19,7 @@ const CheckoutButton = () => {
   const total = useMemo(() => getCartTotal(), [cartItems]);
   const cartIsEmpty = useMemo(() => cartItems.length == 0, [cartItems]);
 
-  const navigate = useNavigation();
+  const navigate = useNavigation<any>();
 
   return (
     <View className="absolute bg-white  bottom-0 left-0 right-0 pb-10 pt-6 space-y-5 border-gray-300 px-4 border-t">
@@ -50,22 +43,6 @@ const CheckoutButton = () => {
           {!cartIsEmpty ? "Checkout" : "Continue Shopping"}
         </Text>
       </TouchableOpacity>
-    </View>
-  );
-};
-
-const BackButtonheader = () => {
-  const navigation = useNavigation();
-  return (
-    <View className="px-1 pt-12 ">
-      <Pressable
-        className=" flex flex-row justify-between items-center"
-        onPress={() => navigation.goBack()}
-      >
-        {/* <View className="border h-8 w-8 rounded-full flex justify-center items-center">
-        </View> */}
-        <AntDesign size={20} color="black" name="arrowleft" />
-      </Pressable>
     </View>
   );
 };
@@ -143,10 +120,9 @@ const VendorCard = ({ vendor }: { vendor: Ivendor }) => {
   );
 };
 
-const InnerCart = ({ route, navigation }) => {
+const InnerCart = ({ route, navigation }: any) => {
   const { store_name } = route.params;
-  const { cartItems, decreaseItemQuantity, increaseItemQuantity } =
-    useCartStore();
+  const { cartItems, increaseItemQuantity } = useCartStore();
 
   useEffect(() => {
     navigation.setOptions({
@@ -166,7 +142,7 @@ const InnerCart = ({ route, navigation }) => {
         <View key={index}>
           <CheckOutItem
             handleIncreaseQuantity={() => increaseItemQuantity(item._id)}
-            handleReduceQuantity={() => decreaseItemQuantity(item._id)}
+            handleReduceQuantity={() => item._id}
             total={item.total as number}
             name={item.name}
             quantity={item.quantity}
@@ -199,9 +175,8 @@ function AllCartsGrid({ vendors }: { vendors: any }) {
   );
 }
 
-const AllCarts = ({ navigation }) => {
-  const { cartItems, decreaseItemQuantity, increaseItemQuantity, vendors } =
-    useCartStore();
+const AllCarts = ({ navigation }: any) => {
+  const { cartItems, vendors } = useCartStore();
 
   const emptyCart = useMemo(() => {
     if (cartItems.length < 1) {
@@ -237,8 +212,7 @@ const AllCarts = ({ navigation }) => {
 };
 
 export const Cart = (props: Props) => {
-  const { cartItems, decreaseItemQuantity, increaseItemQuantity, vendors } =
-    useCartStore();
+  const { cartItems } = useCartStore();
 
   const emptyCart = useMemo(() => {
     if (cartItems.length < 1) {

@@ -6,7 +6,7 @@ import {
   Text,
   Image,
 } from "react-native";
-import { TcartItem } from "../../contexts/CartContext";
+
 import { useNavigation } from "@react-navigation/native";
 import React, { useMemo, useState } from "react";
 import { Feather } from "@expo/vector-icons";
@@ -15,6 +15,7 @@ import Animated, {
   FadeInRight,
   FadeOutLeft,
 } from "react-native-reanimated";
+import { TcartItem } from "../../types/TCartItem";
 
 function AddToCartButton({
   addToCart,

@@ -15,6 +15,7 @@ import TstoreProps from "../../types/Store";
 export const Home = ({}) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [results, setResults] = React.useState<TstoreProps[] | []>([]);
+  const [fetchingResults, setFetchingResults] = React.useState(false);
   const fetchStores = async () => {
     const latitude = getItem("latitude");
     const longitude = getItem("longitude");
@@ -37,10 +38,9 @@ export const Home = ({}) => {
     queryFn: fetchStores,
   });
 
-  const { fetchStoresAndProducts } = useSearchStore();
-
   useEffect(() => {
     async function getSearchResults(searchQuery: string) {
+      setFetchingResults(true);
       const res = await fetch(`${baseUrl}/stores/search`, {
         method: "POST",
         headers: {
@@ -50,18 +50,18 @@ export const Home = ({}) => {
       });
       const data = await res.json();
       setResults(data);
-      console.log(data);
+      setFetchingResults(false);
     }
     if (!searchQuery) return;
     getSearchResults(searchQuery);
   }, [searchQuery]);
 
-  useEffect(() => {
-    fetchStoresAndProducts();
-  }, []);
-
   if (isError) {
     return <ErrorState />;
+  }
+
+  if (isLoading) {
+    return <Loader />;
   }
 
   return (
@@ -70,7 +70,7 @@ export const Home = ({}) => {
         <View>
           <MenuItemsGrid query={searchQuery} setQuery={setSearchQuery} />
           {!isLoading &&
-            stores &&
+            !fetchingResults &&
             stores?.length > 0 &&
             results?.length < 1 && (
               <View style={{ gap: 10 }}>
@@ -79,7 +79,12 @@ export const Home = ({}) => {
                 <RestaurantsGrid stores={stores} title="New in your Area" />
               </View>
             )}
-
+          {/* LOADING UI */}
+          {fetchingResults && (
+            <View className="flex-1 items-center justify-center">
+              <Loader />
+            </View>
+          )}
           {results?.length > 0 && (
             <ResultsGrid
               setResults={setResults}
@@ -87,10 +92,6 @@ export const Home = ({}) => {
               results={results}
             />
           )}
-          {!isLoading && stores && stores?.length == 0 && (
-            <Text>Nothing found in your area</Text>
-          )}
-          {isLoading && <Loader />}
         </View>
       </View>
       <StatusBar hidden={false} style="dark" />

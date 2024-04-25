@@ -1,8 +1,10 @@
 import { create } from "zustand";
-import { TcartItem } from "../contexts/CartContext";
 import Toast from "react-native-root-toast";
 import { getItem } from "../utils/storage";
 import { baseUrl } from "../constants/baseUrl";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { zustandStorage } from "../utils/storage";
+import { TcartItem } from "../types/TCartItem";
 
 interface ICart {
   vendors: Ivendor[] | [];
@@ -10,7 +12,6 @@ interface ICart {
   itemsCount: number;
   addToCart: (item: TcartItem) => void;
   getCartTotal: () => number | undefined;
-  decreaseItemQuantity: (_id: string) => void;
   increaseItemQuantity: (_id: string) => void;
   getVendor: (store_name: string) => Ivendor | undefined;
   removeItemFromCart: (
@@ -65,24 +66,6 @@ const checkCartForVendor = (store_name: string, vendors: Ivendor[]) => {
 
   return false;
 };
-
-// const increaseVendorItemsCount = (store_name: string, vendors: Ivendor[]) => {
-//   const vendorsItemsToIncrease = vendors.find(
-//     (vendor) => vendor.store_name == store_name
-//   );
-
-//   return vendors.map((vendor) => {
-//     if (vendor.store_name == vendorsItemsToIncrease?.store_name) {
-//       return {
-//         ...vendorsItemsToIncrease,
-//         vendorTotal: 0,
-//         vendorItemsCount: vendorsItemsToIncrease.vendorItemsCount + 1,
-//       };
-//     }
-
-//     return vendor;
-//   });
-// };
 
 const increaseItemQuantity = (_id: string, quantity: number, state: ICart) => {
   const itemToUpdate = state.cartItems.find((item) => item._id == _id);
@@ -238,7 +221,7 @@ const removeItemFromCart = ({
 
   // * FIND VENDOR THAT MATCHES @Param STORE_NAME,
   const vendorToUpdate = state.vendors.find(
-    (vendor) => vendor.store_name == store_name
+    (vendor: Ivendor) => vendor.store_name == store_name
   );
 
   //* DESCTRUCTURE VENDOR ITEMS COUNT FROM VENDOR
@@ -277,56 +260,18 @@ const removeItemFromCart = ({
   };
 };
 
-const decreaseItemQuantity = (_id: string, state: ICart) => {
-  // REDUCE QUANTITY VIA MAPPING ARRAY
-  const updatedCartItems = state.cartItems.map((item: TcartItem) => {
-    if (item._id == _id) {
-      const { quantity, price, total } = item;
-      return {
-        ...item,
-        quantity: quantity - 1,
-        total: total && total - price,
-      };
-    }
-    return item;
-  });
-
-  //   FIND UPDATED ITEM
-  const updatedItem: TcartItem | undefined = updatedCartItems.find(
-    (item: TcartItem) => item._id == _id
-  );
-
-  //   DESTRUCTURE QUANTITY FROM UPDATED ITEM IF IT EXISTS
-  const { quantity } = updatedItem ?? { quantity: 0 };
-
-  if (quantity > 0) {
-    return {
-      ...state,
-      itemsCount: state.itemsCount - 1,
-      cartItems: updatedCartItems,
-    };
-  } else if (quantity <= 0) {
-    const decreasedCartItems = removeItemFromCart(_id, state);
-    return {
-      ...state,
-      itemsCount: state.itemsCount - 1,
-      cartItems: decreasedCartItems,
-    };
-  }
-
-  return state;
-};
-
 const getCartTotalFromState = (cartItems: TcartItem[]) => {
   const cartPrices = cartItems.map((item: TcartItem) => item.total);
   const total = cartPrices.reduce(
+    // FIXME: ADD PROPER TYPING
+    // @ts-ignore
     (accumulator, currentvalue) => accumulator + currentvalue,
     0
   );
   return total;
 };
 
-const addToCart = (item: TcartItem, state: ICart) => {
+const addToCart = (item: TcartItem, state: any) => {
   //* DESTRUCTURE ITEM
   const { price, _id, name, quantity, image, vendor } = item;
 
@@ -464,95 +409,100 @@ const handleCheckout = async (store_name: string, vendors: Ivendor[]) => {
   }
 };
 
-export const useCartStore = create<ICart>((set, state) => ({
-  cartItems: [],
-  vendors: [],
-  itemsCount: 0,
-  total: 0,
-  addToCart: (item) => {
-    set((state) => addToCart(item, state));
-  },
-  // addToCart: (item) => addToCart(item, state()),
-  decreaseItemQuantity: (_id) => {
-    set((state) => decreaseItemQuantity(_id, state));
-  },
-  increaseItemQuantity: (_id) => {
-    set((state) => increaseItemQuantityFromState(_id, state));
-  },
-  getCartTotal: () => {
-    const { cartItems } = state();
-    const total = getCartTotalFromState(cartItems);
-    return total;
-  },
-  getVendor: (store_name) => {
-    const activeVendor = state().vendors.find(
-      (vendor) => vendor.store_name == store_name
-    );
+export const useCartStore = create(
+  persist<ICart>(
+    (set, state) => ({
+      cartItems: [],
+      vendors: [],
+      itemsCount: 0,
+      total: 0,
+      addToCart: (item) => {
+        set((state) => addToCart(item, state));
+      },
+      // addToCart: (item) => addToCart(item, state()),
+      increaseItemQuantity: (_id) => {
+        set((state) => increaseItemQuantityFromState(_id, state));
+      },
+      getCartTotal: () => {
+        const { cartItems } = state();
+        const total = getCartTotalFromState(cartItems);
+        return total;
+      },
+      getVendor: (store_name) => {
+        const activeVendor = state().vendors.find(
+          (vendor) => vendor.store_name == store_name
+        );
 
-    return activeVendor as Ivendor | undefined;
-  },
-  addNoteToOrder: ({ store_name, order_note }) => {
-    const vendorToUpdate = state().vendors.find(
-      (vendor) => vendor.store_name == store_name
-    );
+        return activeVendor as Ivendor | undefined;
+      },
+      addNoteToOrder: ({ store_name, order_note }) => {
+        const vendorToUpdate = state().vendors.find(
+          (vendor) => vendor.store_name == store_name
+        );
 
-    const updatedVendors = state().vendors.map((vendor) => {
-      if (vendor.store_name == store_name) {
-        return {
-          ...vendor,
-          vendorNote: order_note,
-        };
-      }
-      return vendor;
-    });
+        const updatedVendors = state().vendors.map((vendor) => {
+          if (vendor.store_name == store_name) {
+            return {
+              ...vendor,
+              vendorNote: order_note,
+            };
+          }
+          return vendor;
+        });
 
-    set((state) => ({
-      vendors: updatedVendors,
-    }));
-  },
-  removeItemFromCart: (item_id, store_name, item_quantity) => {
-    const { updatedCartItems, updatedVendors } = removeItemFromCart({
-      item_id,
-      store_name,
-      state: state(),
-      item_quantity,
-    });
+        set((state) => ({
+          vendors: updatedVendors,
+        }));
+      },
+      removeItemFromCart: (item_id, store_name, item_quantity) => {
+        const { updatedCartItems, updatedVendors } = removeItemFromCart({
+          item_id,
+          store_name,
+          state: state(),
+          item_quantity,
+        });
 
-    set((state) => ({
-      cartItems: updatedCartItems,
-      // * SUBTRACT ITEMS QUANTITY FROM STATES ITEMS COUNT
-      itemsCount: state.itemsCount - item_quantity,
-      vendors: updatedVendors as Ivendor[],
-    }));
-  },
-  handleCheckout: (store_name) => {
-    handleCheckout(store_name, state().vendors);
+        set((state) => ({
+          cartItems: updatedCartItems,
+          // * SUBTRACT ITEMS QUANTITY FROM STATES ITEMS COUNT
+          itemsCount: state.itemsCount - item_quantity,
+          vendors: updatedVendors as Ivendor[],
+        }));
+      },
+      handleCheckout: (store_name) => {
+        handleCheckout(store_name, state().vendors);
 
-    // * FILTER OUT VENDOR BEING CHECKED OUT FROM VENDORS ARRAY
-    const updatedVendors = state().vendors.filter(
-      (vendor) => vendor.store_name != store_name
-    );
+        // * FILTER OUT VENDOR BEING CHECKED OUT FROM VENDORS ARRAY
+        const updatedVendors = state().vendors.filter(
+          (vendor) => vendor.store_name != store_name
+        );
 
-    // * GET VENDOR BEING CHECKED OUT USING NAME
-    const checkedOutVendor = state().vendors.find(
-      (vendor) => vendor.store_name == store_name
-    );
+        // * GET VENDOR BEING CHECKED OUT USING NAME
+        const checkedOutVendor = state().vendors.find(
+          (vendor) => vendor.store_name == store_name
+        );
 
-    const { vendorItemsCount, vendorTotal } = checkedOutVendor ?? {};
+        const { vendorItemsCount, vendorTotal } = checkedOutVendor ?? {};
 
-    // * REMOVE ALL ITEMS FROM CART THAT BELONGS TO VENDOR
-    const updatedCartItems = state().cartItems.filter(
-      (item) => item.vendor.store_name != store_name
-    );
+        // * REMOVE ALL ITEMS FROM CART THAT BELONGS TO VENDOR
+        const updatedCartItems = state().cartItems.filter(
+          (item) => item.vendor.store_name != store_name
+        );
 
-    // * UPDATE CART STATE
-    set((state) => ({
-      cartItems: updatedCartItems,
-      vendors: updatedVendors,
-      //* SUBTRACT VENDOR ITEMS COUNT FROM TOTAL ITEMS COUNT
-      itemsCount: vendorItemsCount && state.itemsCount - vendorItemsCount,
-      //* SUBTRACT VENDOR TOTAL FROM TOTAL ITEMS TOTAL
-      total: vendorTotal && state.total && state.total - vendorTotal,
-    }));
-  },
-}));
+        // * UPDATE CART STATE
+        set((state) => ({
+          cartItems: updatedCartItems,
+          vendors: updatedVendors,
+          //* SUBTRACT VENDOR ITEMS COUNT FROM TOTAL ITEMS COUNT
+          itemsCount: vendorItemsCount && state.itemsCount - vendorItemsCount,
+          //* SUBTRACT VENDOR TOTAL FROM TOTAL ITEMS TOTAL
+          total: vendorTotal && state.total && state.total - vendorTotal,
+        }));
+      },
+    }),
+    {
+      name: "storage",
+      storage: createJSONStorage(() => zustandStorage),
+    }
+  )
+);
