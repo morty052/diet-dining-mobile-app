@@ -96,9 +96,22 @@ const LoginScreen = ({ navigation, route }: any) => {
 
       const { _id, status, user_firstname } = data;
 
+      // FIXME ADD USER DETAILS AS SINGLE OBJECT
       if (status === "SUCCESS") {
         setItem("user_id", _id as string);
         setItem("firstname", user_firstname as string);
+        setItem("user_email", cleanEmail);
+        setItem("user_password", password);
+
+        const user_details = {
+          user_id: _id as string,
+          user_email: cleanEmail,
+          user_password: password,
+          user_firstname,
+        };
+
+        setItem("user_details", JSON.stringify(user_details));
+
         setloading(false);
         navigation.navigate("LocationPermission");
       }

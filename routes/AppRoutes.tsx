@@ -245,7 +245,7 @@ const AppStack = ({ ONBOARDED }: { ONBOARDED: boolean }) => {
       <Stack.Screen
         options={{
           // headerTitle: "",
-          headerShown: true,
+          headerShown: false,
           headerBackTitleVisible: false,
           headerShadowVisible: false,
           headerTitleAlign: "center",

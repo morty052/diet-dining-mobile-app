@@ -21,6 +21,7 @@ import Colors from "../../constants/colors";
 import { baseUrl } from "../../constants/baseUrl";
 import { MEDIUM, SEMI_BOLD } from "../../constants/fontNames";
 import { Ionicons } from "@expo/vector-icons";
+import { Button } from "../../components/button";
 
 const Stack = createNativeStackNavigator();
 
@@ -85,7 +86,7 @@ const SignUpForm = ({
     //       <View className="border border-gray-300 flex-1"></View>
     //     </View>
 
-    //     <View>
+    //     {/* <View>
     //       <View className="font-medium flex-row items-center text-center border-gray-300 border rounded-2xl p-2 ">
     //         <Image className="h-6 w-6" source={googleLogo} />
     //         <View className="flex-1  pr-6">
@@ -94,7 +95,7 @@ const SignUpForm = ({
     //           </Text>
     //         </View>
     //       </View>
-    //     </View>
+    //     </View> */}
 
     //     <Pressable onPress={() => navigation.navigate("App")} className=" mt-1">
     //       <Text className="text-center text-sm text-gray-500">
@@ -109,10 +110,11 @@ const SignUpForm = ({
     <View
       style={{
         backgroundColor: "white",
-        height: 200,
         justifyContent: "center",
         paddingHorizontal: 20,
         gap: 15,
+        paddingBottom: 30,
+        paddingTop: 20,
       }}
     >
       <Text
@@ -257,6 +259,7 @@ const MainSignUpScreen = () => {
   );
 };
 
+// REFACTOR :CHANG STYLE
 const OTPInput = ({
   onPressVerify,
   code,
