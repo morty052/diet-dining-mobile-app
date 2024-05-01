@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,17 +14,72 @@ import Colors from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import HorizontalRule from "../../components/ui/HorizontalRule";
 import { SEMI_BOLD } from "../../constants/fontNames";
-import { getItem, removeItem } from "../../utils/storage";
+import { getItem, removeItem, setItem } from "../../utils/storage";
 import * as Linking from "expo-linking";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { TextInput } from "react-native-gesture-handler";
 import { useUserDetails } from "../../hooks/useUserDetails";
 import { baseUrl } from "../../constants/baseUrl";
+import Toast from "react-native-root-toast";
 
 const Stack = createNativeStackNavigator();
 
 type Props = {};
+
+async function UpdateUserEmail(user_email: string, user_id: string) {
+  const res = await fetch(`${baseUrl}/auth/update-email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id,
+      user_email,
+    }),
+  });
+  const data = await res.json();
+  return data;
+}
+
+async function UpdateUserName({
+  user_id,
+  user_firstname,
+  user_lastname,
+}: {
+  user_id: string;
+  user_firstname: string;
+  user_lastname: string;
+}) {
+  const res = await fetch(`${baseUrl}/user/update-name`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id,
+      user_firstname,
+      user_lastname,
+    }),
+  });
+  const data = await res.json();
+  return data;
+}
+
+async function UpdateUserPassword(user_password: string, user_id: string) {
+  const res = await fetch(`${baseUrl}/auth/update-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id,
+      user_password,
+    }),
+  });
+  const data = await res.json();
+  return data;
+}
 
 const AccountSettingsItem = ({
   name,
@@ -101,6 +157,7 @@ const AccountScreenHome = (props: Props) => {
             <Ionicons color={"white"} size={25} name="person-outline" />
           </Pressable>
         </View>
+        {/* CARDS */}
         <View
           style={{
             flexDirection: "row",
@@ -125,6 +182,12 @@ const AccountScreenHome = (props: Props) => {
             onPress={() => navigation.navigate("AccountDetail")}
             subtitle="Manage account details"
             name="Account Settings"
+            icon={"gift-outline"}
+          />
+          <AccountSettingsItem
+            onPress={() => navigation.navigate("PersonalInfo")}
+            subtitle="Personal Information"
+            name="Personal Information"
             icon={"gift-outline"}
           />
           <AccountSettingsItem
@@ -173,19 +236,41 @@ const AccountDetailScreen = () => {
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const { user_email } = useUserDetails();
+  const [loading, setLoading] = React.useState(false);
+  const user_email = getItem("user_email");
+  const user_id = getItem("user_id");
+
+  const changes = React.useMemo(() => {
+    if (email || password || phone) {
+      return true;
+    }
+  }, [email, password, phone]);
 
   async function handlePress() {
-    if (!email || !phone || !password) {
+    if (loading) {
       return;
     }
-    try {
-      const expo_push_token = getItem("expo_push_token");
-      const url = `${baseUrl}/auth/signup?email=${email}`;
-      const res = await fetch(url);
-    } catch (err: any) {
-      console.error(err);
+    setLoading(true);
+    if (email) {
+      const res = await UpdateUserEmail(email, user_id as string);
+      setItem("user_email", email);
     }
+
+    if (password) {
+      const res = await UpdateUserPassword(password, user_id as string);
+      setItem("user_password", password);
+    }
+
+    setEmail("");
+    setPassword("");
+    setLoading(false);
+    Toast.show("Updated successfully.", {
+      duration: Toast.durations.LONG,
+      position: Toast.positions.BOTTOM,
+      backgroundColor: "#90C466",
+      textColor: "#ffffff",
+      opacity: 1,
+    });
   }
 
   return (
@@ -194,6 +279,7 @@ const AccountDetailScreen = () => {
         <View style={{ gap: 4 }}>
           <Text>Email</Text>
           <TextInput
+            autoCapitalize="none"
             value={email}
             onChangeText={(text) => setEmail(text)}
             inputMode="email"
@@ -224,6 +310,7 @@ const AccountDetailScreen = () => {
           <Text>Password</Text>
           <TextInput
             value={password}
+            autoCapitalize="none"
             onChangeText={(text) => setPassword(text)}
             placeholder={"**********"}
             secureTextEntry
@@ -237,15 +324,109 @@ const AccountDetailScreen = () => {
         </View>
 
         <Pressable
+          onPress={handlePress}
           style={{
-            backgroundColor: Colors.primary,
+            backgroundColor: changes ? Colors.primary : Colors.gray,
             padding: 10,
             borderRadius: 10,
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <Text style={{ color: "white" }}>Save</Text>
+          {!loading && (
+            <Text style={{ color: changes ? "white" : "gray" }}>Save</Text>
+          )}
+          {loading && <ActivityIndicator color={"white"} size={20} />}
+        </Pressable>
+      </View>
+    </ScrollView>
+  );
+};
+
+const PersonalInfoScreen = () => {
+  const [firstname, setFirstname] = React.useState("");
+  const [lastname, setLastname] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const user_email = getItem("user_email");
+  const user_id = getItem("user_id");
+
+  const changes = React.useMemo(() => {
+    if (firstname || lastname) {
+      return true;
+    }
+  }, [firstname, lastname]);
+
+  async function handlePress() {
+    if (loading || !firstname || !lastname) {
+      return;
+    }
+    setLoading(true);
+
+    if (firstname || lastname) {
+      await UpdateUserName({
+        user_id: user_id as string,
+        user_firstname: firstname,
+        user_lastname: lastname,
+      });
+    }
+    setFirstname("");
+    setLastname("");
+    setLoading(false);
+    Toast.show("Updated successfully.", {
+      duration: Toast.durations.LONG,
+      position: Toast.positions.BOTTOM,
+      backgroundColor: "#90C466",
+      textColor: "#ffffff",
+      opacity: 1,
+    });
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={{ paddingHorizontal: 10, gap: 20 }}>
+        <View style={{ gap: 4 }}>
+          <Text>First name</Text>
+          <TextInput
+            value={firstname}
+            onChangeText={(text) => setFirstname(text)}
+            placeholder={user_email}
+            style={{
+              height: 40,
+              backgroundColor: Colors.gray,
+              borderRadius: 5,
+              paddingHorizontal: 10,
+            }}
+          />
+        </View>
+        <View style={{ gap: 4 }}>
+          <Text>Last name</Text>
+          <TextInput
+            value={lastname}
+            onChangeText={(text) => setLastname(text)}
+            inputMode="email"
+            style={{
+              height: 40,
+              backgroundColor: Colors.gray,
+              borderRadius: 5,
+              paddingHorizontal: 10,
+            }}
+          />
+        </View>
+
+        <Pressable
+          onPress={handlePress}
+          style={{
+            backgroundColor: changes ? Colors.primary : Colors.gray,
+            padding: 10,
+            borderRadius: 10,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {!loading && (
+            <Text style={{ color: changes ? "white" : "gray" }}>Save</Text>
+          )}
+          {loading && <ActivityIndicator color={"white"} size={20} />}
         </Pressable>
       </View>
     </ScrollView>
@@ -269,6 +450,7 @@ export const AccountScreen = (props: Props) => {
     >
       <Stack.Screen name="AccountHome" component={AccountScreenHome} />
       <Stack.Screen name="AccountDetail" component={AccountDetailScreen} />
+      <Stack.Screen name="PersonalInfo" component={PersonalInfoScreen} />
     </Stack.Navigator>
   );
 };
