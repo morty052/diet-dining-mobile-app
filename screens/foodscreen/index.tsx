@@ -190,12 +190,6 @@ export const FoodScreen = ({ navigation, route }: any) => {
 
   const { _id, image, name, price, description } = route.params;
 
-  function handleRating(rating: number) {
-    console.info(rating);
-    setRating(rating);
-    // setModalVisible(true);
-  }
-
   // async function fetchProduct() {
   //   const res = await fetch(
   //     `http://localhost:3000/stores/get-single-product?product_id=${_id}`
@@ -244,8 +238,6 @@ export const FoodScreen = ({ navigation, route }: any) => {
             name={name as string}
             price={price as number}
           />
-          {/* {!loading && (
-          )} */}
           <View>
             <HorizontalRule marginTop={10} marginBottom={20} />
             <ExtraSelectionsGrid />

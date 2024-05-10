@@ -5,7 +5,18 @@ import HorizontalRule from "../../../components/ui/HorizontalRule";
 
 type Props = {};
 
-const RenderItem = ({ item }) => {
+const RenderItem = ({
+  item,
+}: {
+  item: {
+    name: string;
+    price: number;
+    _id: string;
+    image: string;
+    description: string;
+    vendor: string;
+  };
+}) => {
   return (
     <View style={{ padding: 10 }}>
       <StoreMenuCard

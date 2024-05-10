@@ -22,6 +22,7 @@ import { baseUrl } from "../../constants/baseUrl";
 import { MEDIUM, SEMI_BOLD } from "../../constants/fontNames";
 import { Ionicons } from "@expo/vector-icons";
 import { Button } from "../../components/button";
+import { StatusBar } from "expo-status-bar";
 
 const Stack = createNativeStackNavigator();
 
@@ -218,11 +219,7 @@ const MainSignUpScreen = () => {
           backgroundColor: "rgba(0 0 0 / 0.4)",
         }}
       ></View>
-      <SignUpForm
-        handlePress={onSignUpPress}
-        emailAddress={email}
-        setEmailAddress={setEmail}
-      />
+      {/* TEXT */}
       <View
         style={{
           position: "absolute",
@@ -255,6 +252,13 @@ const MainSignUpScreen = () => {
           Dining
         </Text>
       </View>
+
+      <SignUpForm
+        handlePress={onSignUpPress}
+        emailAddress={email}
+        setEmailAddress={setEmail}
+      />
+      <StatusBar style="light" />
     </ImageBackground>
   );
 };

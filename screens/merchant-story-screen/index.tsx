@@ -334,6 +334,19 @@ function StoryHeader({
 function StoryOrderButton({ product }: { product: ProductProps }) {
   const { isTallScreen } = usePhoneScreen();
 
+  const navigation = useNavigation<any>();
+
+  function handleOrder() {
+    const { _id, image, name, price, description } = product;
+    navigation.navigate("FoodScreen", {
+      _id,
+      image,
+      name,
+      price,
+      description,
+    });
+  }
+
   return (
     <View
       style={{
@@ -354,7 +367,7 @@ function StoryOrderButton({ product }: { product: ProductProps }) {
         }}
       >
         <Pressable
-          onPress={() => console.log(product)}
+          onPress={() => handleOrder()}
           style={{
             backgroundColor: "white",
             paddingHorizontal: 10,
@@ -646,11 +659,13 @@ function FullScreenReel({
   store_name,
   activeStoryIndex,
   setActiveStoryIndex,
+  data,
 }: {
   stories: StoryProps[];
   store_name: string;
   activeStoryIndex: number;
   setActiveStoryIndex: Dispatch<SetStateAction<number>>;
+  data: any;
 }) {
   return (
     <SafeAreaView
@@ -672,9 +687,7 @@ function FullScreenReel({
         />
         <StoryImageRenderer activeStory={stories[activeStoryIndex]} />
         <StoryTextRenderer text={stories[activeStoryIndex].text} bottom />
-        <StoryOrderButton
-          product={stories[activeStoryIndex].product as ProductProps}
-        />
+        <StoryOrderButton product={data[activeStoryIndex] as ProductProps} />
         <StoryControlButtons
           stories={stories}
           setActiveStoryIndex={setActiveStoryIndex}
@@ -688,6 +701,7 @@ function FullScreenReel({
 }
 
 function MediumScreenReel({
+  data,
   stories,
   store_name,
   activeStoryIndex,
@@ -697,6 +711,7 @@ function MediumScreenReel({
   store_name: string;
   activeStoryIndex: number;
   setActiveStoryIndex: Dispatch<SetStateAction<number>>;
+  data: any;
 }) {
   return (
     <SafeAreaView
@@ -734,9 +749,7 @@ function MediumScreenReel({
             bottom
           />
         </View>
-        <StoryOrderButton
-          product={stories[activeStoryIndex].product as ProductProps}
-        />
+        <StoryOrderButton product={data[activeStoryIndex] as ProductProps} />
         <StoryControlButtons
           stories={stories}
           setActiveStoryIndex={setActiveStoryIndex}
@@ -750,6 +763,7 @@ function MediumScreenReel({
 }
 
 const MerchantReelComponent = ({
+  data,
   merchantStory,
   startingIndex,
   store_name,
@@ -757,6 +771,7 @@ const MerchantReelComponent = ({
   merchantStory: MerchantStoryProps;
   startingIndex: number;
   store_name: string;
+  data: any;
 }) => {
   const [stories, setStories] = React.useState<StoryProps[]>(
     merchantStory.reel
@@ -775,6 +790,7 @@ const MerchantReelComponent = ({
     <>
       {!IS_FULL_SCREEN && (
         <MediumScreenReel
+          data={data}
           activeStoryIndex={activeStoryIndex}
           setActiveStoryIndex={setActiveStoryIndex}
           stories={stories}
@@ -783,6 +799,7 @@ const MerchantReelComponent = ({
       )}
       {IS_FULL_SCREEN && (
         <FullScreenReel
+          data={data}
           activeStoryIndex={activeStoryIndex}
           setActiveStoryIndex={setActiveStoryIndex}
           stories={stories}
@@ -794,9 +811,10 @@ const MerchantReelComponent = ({
 };
 
 export const MerchantStoryScreen = ({ route }: any) => {
-  const { startingIndex, store_name } = route.params ?? {};
+  const { startingIndex, store_name, data } = route.params ?? {};
   return (
     <MerchantReelComponent
+      data={data}
       store_name={store_name}
       startingIndex={startingIndex}
       merchantStory={merchantStory}

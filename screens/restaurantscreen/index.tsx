@@ -29,12 +29,27 @@ import { get_single_store } from "../../lib/supabase";
 import { RestaurantSkeleton } from "../../components/ui/SkeletonBase";
 import TstoreProps from "../../types/Store";
 import { Ivendor, useCartStore } from "../../store/cartStore";
-import BuyButton from "../foodscreen/components/BuyButton";
 import Basketbutton from "./components/BasketButton";
 import HorizontalRule from "../../components/ui/HorizontalRule";
 import { SEMI_BOLD } from "../../constants/fontNames";
+import { TcartItem } from "../../types/TCartItem";
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
+
+const fetchStore = async ({
+  store_id,
+  setStore,
+  setLoading,
+}: {
+  store_id: string;
+  setStore: (store: TstoreProps) => void;
+  setLoading: (b: boolean) => void;
+}) => {
+  const data = await get_single_store(store_id);
+  setStore(data[0]);
+  setLoading(false);
+  return data[0];
+};
 
 const Header = ({
   isVisible,
@@ -98,6 +113,49 @@ const Header = ({
   );
 };
 
+const StoryCard = ({
+  image,
+  index,
+  store_name,
+  handlePress,
+}: {
+  image: string;
+  index: number;
+  store_name: string;
+  item: TcartItem;
+  handlePress: (startingIndex: number) => void;
+}) => {
+  const navigation = useNavigation();
+  return (
+    <Pressable onPress={() => handlePress(index)}>
+      <View
+        style={{
+          position: "relative",
+        }}
+      >
+        <Image
+          resizeMode="cover"
+          style={{ width: 80, height: 80, borderRadius: 80 }}
+          source={{ uri: image }}
+        />
+        {/* OVERLAY */}
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: 0,
+            backgroundColor: "black",
+            borderRadius: 80,
+            opacity: 0.1,
+          }}
+        ></View>
+      </View>
+    </Pressable>
+  );
+};
+
 const MerchantStoryGrid = ({
   store_name,
   data,
@@ -105,53 +163,16 @@ const MerchantStoryGrid = ({
   store_name: string;
   data: any;
 }) => {
-  const StoryCard = ({
-    image,
-    index,
-    store_name,
-  }: {
-    image: string;
-    index: number;
-    store_name: string;
-  }) => {
-    const navigation = useNavigation();
-    return (
-      <Pressable
-        onPress={() =>
-          // @ts-ignore
-          navigation.navigate("MerchantStory", {
-            startingIndex: index,
-            store_name,
-          })
-        }
-      >
-        <View
-          style={{
-            position: "relative",
-          }}
-        >
-          <Image
-            resizeMode="cover"
-            style={{ width: 80, height: 80, borderRadius: 80 }}
-            source={{ uri: image }}
-          />
-          {/* OVERLAY */}
-          <View
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              top: 0,
-              backgroundColor: "black",
-              borderRadius: 80,
-              opacity: 0.1,
-            }}
-          ></View>
-        </View>
-      </Pressable>
-    );
-  };
+  const navigation = useNavigation<any>();
+
+  // TODO USE ZUSTAND TO HOLD DATA TEMPORARILY INSTEAD
+  function handlePress(startingIndex: number) {
+    navigation.navigate("MerchantStory", {
+      startingIndex,
+      store_name,
+      data,
+    });
+  }
 
   return (
     <View style={{ paddingHorizontal: 10, paddingTop: 10, gap: 10 }}>
@@ -163,6 +184,8 @@ const MerchantStoryGrid = ({
       >
         {data?.map((item: any, index: number) => (
           <StoryCard
+            handlePress={(index) => handlePress(index)}
+            item={item}
             store_name={store_name}
             key={index}
             index={index}
@@ -174,6 +197,7 @@ const MerchantStoryGrid = ({
   );
 };
 
+// TODO ADD SCROLL TO ON SECTION AND HEADER
 const RestaurantScreen = ({ navigation, route }: any) => {
   const { store_id, store_name } = route.params;
   const [isViewable, setisViewable] = useState(false);
@@ -190,34 +214,9 @@ const RestaurantScreen = ({ navigation, route }: any) => {
     return vendor;
   }, [store_name, cartItems]);
 
-  const fetchStore = async () => {
-    // const res = await fetch(
-    //   `http://localhost:3000/stores/get-single?store_id=${store_id}`
-    //   // `https://diet-dining-server.onrender.com/stores/get-single?store_id=${store_id}`
-    //   // `https://e48d-102-216-10-2.ngrok-free.app/stores/get-single?store_id=${store_id}`
-    // );
-    // const data = await res.json();
-    // console.log(data);
-    // return data[0];
-
-    const data = await get_single_store(store_id);
-    setStore(data[0]);
-    setLoading(false);
-    return data[0];
-  };
-
   useFocusEffect(
     React.useCallback(() => {
       const fetchStore = async () => {
-        // const res = await fetch(
-        //   `http://localhost:3000/stores/get-single?store_id=${store_id}`
-        //   // `https://diet-dining-server.onrender.com/stores/get-single?store_id=${store_id}`
-        //   // `https://e48d-102-216-10-2.ngrok-free.app/stores/get-single?store_id=${store_id}`
-        // );
-        // const data = await res.json();
-        // console.log(data);
-        // return data[0];
-
         const data = await get_single_store(store_id);
         setStore(data[0]);
         setVendorsChoice(data[0].menu[0].products);
@@ -226,10 +225,6 @@ const RestaurantScreen = ({ navigation, route }: any) => {
       };
 
       fetchStore();
-
-      // return () => {
-      //   setStore(null);
-      // };
     }, [store_id])
   );
 
@@ -317,7 +312,6 @@ const RestaurantScreen = ({ navigation, route }: any) => {
           vendorItemsCount={activeVendor.vendorItemsCount}
         />
       )}
-      {/* <StoreSearchModal setSearching={setSearching} searching={searching} /> */}
     </View>
   );
 };

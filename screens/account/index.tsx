@@ -182,20 +182,20 @@ const AccountScreenHome = (props: Props) => {
             onPress={() => navigation.navigate("AccountDetail")}
             subtitle="Manage account details"
             name="Account Settings"
-            icon={"gift-outline"}
+            icon={"at"}
           />
           <AccountSettingsItem
             onPress={() => navigation.navigate("PersonalInfo")}
             subtitle="Personal Information"
             name="Personal Information"
-            icon={"gift-outline"}
+            icon={"person-outline"}
           />
-          <AccountSettingsItem
-            onPress={() => openLink("mailto:support@expo.dev")}
+          {/* <AccountSettingsItem
+            onPress={() => console.log("mailto:support@expo.dev")}
             subtitle="Manage your diet plan settings"
             name="Diet Plan"
-            icon={"gift-outline"}
-          />
+            icon={"fast-food-outline"}
+          /> */}
           <AccountSettingsItem
             onPress={() => console.log("https://merchants.dietdining.org")}
             subtitle="Manage rewards grapes "

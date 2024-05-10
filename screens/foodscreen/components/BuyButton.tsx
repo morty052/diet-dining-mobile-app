@@ -2,7 +2,6 @@ import { TouchableOpacity, View, Text, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
-import Animated from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 
 const ServingsDisplay = ({
@@ -39,7 +38,7 @@ const ServingsDisplay = ({
 };
 
 const ViewCartButton = ({ itemQuantity }: { itemQuantity: number }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate("Cart")}

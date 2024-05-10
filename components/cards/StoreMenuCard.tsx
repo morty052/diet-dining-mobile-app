@@ -20,21 +20,18 @@ export function StoreMenuCard({
   vendor: string;
   description: string;
 }) {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   return (
     <TouchableOpacity
-      onPress={
-        () =>
-          // @ts-ignore
-          navigation.navigate("FoodScreen", {
-            _id,
-            image,
-            name,
-            price,
-            description,
-          })
-        // console.log(_id)
+      onPress={() =>
+        navigation.navigate("FoodScreen", {
+          _id,
+          image,
+          name,
+          price,
+          description,
+        })
       }
       className=" flex flex-row items-center  py-2 justify-between  "
     >
