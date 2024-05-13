@@ -22,6 +22,7 @@ import { TextInput } from "react-native-gesture-handler";
 import { useUserDetails } from "../../hooks/useUserDetails";
 import { baseUrl } from "../../constants/baseUrl";
 import Toast from "react-native-root-toast";
+import BackButton from "../../components/ui/BackButton";
 
 const Stack = createNativeStackNavigator();
 
@@ -145,7 +146,7 @@ const AccountScreenHome = (props: Props) => {
   const navigation = useNavigation<any>();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       <ScrollView style={styles.container}>
         {/* HEADER */}
         <View style={styles.accountPageheader}>
@@ -228,7 +229,7 @@ const AccountScreenHome = (props: Props) => {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -441,9 +442,10 @@ export const AccountScreen = (props: Props) => {
   return (
     <Stack.Navigator
       screenOptions={{
+        headerLeft: () => <BackButton />,
         headerTitle: "Profile",
         headerShown: true,
-        headerBackTitleVisible: false,
+        headerBackTitleVisible: true,
         headerShadowVisible: false,
         headerTitleAlign: "center",
       }}

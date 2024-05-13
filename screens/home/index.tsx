@@ -16,6 +16,7 @@ export const Home = ({}) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [results, setResults] = React.useState<TstoreProps[] | []>([]);
   const [fetchingResults, setFetchingResults] = React.useState(false);
+
   const fetchStores = async () => {
     const latitude = getItem("latitude");
     const longitude = getItem("longitude");
@@ -27,6 +28,11 @@ export const Home = ({}) => {
       return [];
     }
     return data;
+  };
+
+  const resetSearch = () => {
+    setSearchQuery("");
+    setResults([]);
   };
 
   const {
@@ -69,6 +75,7 @@ export const Home = ({}) => {
       <View style={{ flex: 1, paddingHorizontal: 10 }}>
         <View>
           <MenuItemsGrid query={searchQuery} setQuery={setSearchQuery} />
+          {/* DEFAULT UI */}
           {!isLoading &&
             !fetchingResults &&
             stores?.length > 0 &&
@@ -85,8 +92,11 @@ export const Home = ({}) => {
               <Loader />
             </View>
           )}
+
+          {/* RESULTS */}
           {results?.length > 0 && (
             <ResultsGrid
+              onReset={resetSearch}
               setResults={setResults}
               resultsCounts={results?.length}
               results={results}

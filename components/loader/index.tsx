@@ -34,6 +34,22 @@ export const Loader = (props: Props) => {
       </ScrollView>
 
       <Skeleton width={200} colorMode="light" />
+      <ScrollView horizontal className="py-4">
+        <View className="mr-4">
+          <SkeletonBase height={180} width={width * 0.7} shape="square" />
+        </View>
+        <View className="mr-4">
+          <SkeletonBase height={180} width={width * 0.7} shape="square" />
+        </View>
+        <View className="mr-4">
+          <SkeletonBase height={180} width={width * 0.7} shape="square" />
+        </View>
+        <View className="mr-4">
+          <SkeletonBase height={180} width={width * 0.7} shape="square" />
+        </View>
+      </ScrollView>
+
+      <Skeleton width={200} colorMode="light" />
       <ScrollView horizontal className="pt-4">
         <View className="mr-4">
           <SkeletonBase height={180} width={width * 0.7} shape="square" />

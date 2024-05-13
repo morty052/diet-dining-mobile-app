@@ -9,14 +9,20 @@ type Props = {
   resultsCounts: number;
   results: TstoreProps[];
   setResults: React.Dispatch<React.SetStateAction<TstoreProps[] | []>>;
+  onReset: () => void;
 };
 
-export const ResultsGrid = ({ resultsCounts, results, setResults }: Props) => {
+export const ResultsGrid = ({
+  resultsCounts,
+  results,
+  setResults,
+  onReset,
+}: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.resultText}>{`${resultsCounts} results`}</Text>
-        <Pressable style={styles.resetButton} onPress={() => setResults([])}>
+        <Pressable style={styles.resetButton} onPress={onReset}>
           <Text style={{ fontSize: 14, fontFamily: MEDIUM }}>Reset</Text>
         </Pressable>
       </View>

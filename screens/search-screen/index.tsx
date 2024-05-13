@@ -26,6 +26,10 @@ import Colors from "../../constants/colors";
 import LikeButton from "../../components/interaction-buttons/LikeButton";
 import { SEMI_BOLD } from "../../constants/fontNames";
 import { useSearchStore } from "../../store/searchStore";
+import { baseUrl } from "../../constants/baseUrl";
+import TstoreProps from "../../types/Store";
+import { ResultsGrid } from "../home/resultsgrid";
+import { Loader } from "../../components";
 
 const categories = [
   // {
@@ -106,21 +110,17 @@ const CategorySelectItem = ({
 const CategoryCard = ({
   name,
   icon,
-  navigation,
+  setSearchQuery,
 }: {
   name: string;
   icon: any;
-  navigation?: any;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const width = Dimensions.get("screen").width;
   const cardWidth = width * 0.45;
   return (
     <Pressable
-      onPress={() =>
-        navigation.setParams({
-          category: name,
-        })
-      }
+      onPress={() => setSearchQuery(name)}
       style={{
         width: cardWidth,
         borderWidth: 1,
@@ -244,6 +244,33 @@ export const SearchModal = () => {
   );
 };
 
+// export const SearchBar = () => {
+//   return(
+//     <View className=" rounded-2xl flex flex-row items-center border border-gray-300 bg-white py-2   px-4 ">
+//           <TouchableOpacity
+//             onPress={() => {
+//               navigation.goBack();
+//             }}
+//           >
+//             <Ionicons name={"arrow-back"} size={20} color="black" />
+//           </TouchableOpacity>
+//           <TextInput
+//             autoFocus
+//             autoCapitalize="none"
+//             value={query}
+//             onChangeText={(text) => setQuery(text)}
+//             placeholder="Food, drinks, etc..."
+//             className=" bg-transparent flex-1   placeholder:text-left text-[16px]   border-gray-300 mx-2  "
+//           />
+//           {query && (
+//             <TouchableOpacity onPress={() => setQuery("")}>
+//               <Ionicons name={"close"} size={24} color="black" />
+//             </TouchableOpacity>
+//           )}
+//         </View>
+//   )
+// }
+
 type TsearchItem = {
   price: number;
   name: string;
@@ -262,16 +289,17 @@ type TsearchItem = {
 //TODO: HANDLE SEARCH PROPERLY
 export const SearchScreen = ({ navigation, route }: any) => {
   const { category } = route.params ?? {};
-
+  const [searchQuery, setSearchQuery] = React.useState("");
   const [query, setQuery] = useState("");
-  const [focused, setFocused] = useState(false);
-  const inputRef = useRef<TextInput>(null);
-  const [searchArray, setSearchArray] = useState<null | Ivendor[]>(null);
-  // const [products, setProducts] = useState<null | TsearchItem[]>(null);
-  const [activeCategory, setactiveCategory] = useState<null | string>(category);
+  const [fetchingResults, setFetchingResults] = React.useState(false);
+  const [results, setResults] = React.useState<TstoreProps[] | []>([]);
+
+  const resetSearch = () => {
+    setSearchQuery("");
+    setResults([]);
+  };
 
   const { products, stores } = useSearchStore();
-  console.log(products);
 
   const queryResults = useMemo(() => {
     // * RETURN NULL IF FETCHING IS ACTIVE OR USER NOT TYPING OR SEARCH ARRAY IS EMPTY
@@ -322,6 +350,25 @@ export const SearchScreen = ({ navigation, route }: any) => {
     );
   }, [category]);
 
+  useEffect(() => {
+    async function getSearchResults(searchQuery: string) {
+      setFetchingResults(true);
+      const res = await fetch(`${baseUrl}/stores/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ searchQuery }),
+      });
+      const data = await res.json();
+      console.log(data);
+      setResults(data);
+      setFetchingResults(false);
+    }
+    if (!searchQuery) return;
+    getSearchResults(searchQuery);
+  }, [searchQuery]);
+
   return (
     <SafeAreaView className="flex-1">
       <View
@@ -330,35 +377,12 @@ export const SearchScreen = ({ navigation, route }: any) => {
         }}
         className="px-2 flex-1"
       >
-        {/* SEARCHBAR */}
-        <View className=" rounded-2xl flex flex-row items-center border border-gray-300 bg-white py-2   px-4 ">
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
-          >
-            <Ionicons name={"arrow-back"} size={20} color="black" />
-          </TouchableOpacity>
-          <TextInput
-            autoFocus
-            autoCapitalize="none"
-            value={query}
-            onChangeText={(text) => setQuery(text)}
-            placeholder="Food, drinks, etc..."
-            className=" bg-transparent flex-1   placeholder:text-left text-[16px]   border-gray-300 mx-2  "
-          />
-          {query && (
-            <TouchableOpacity onPress={() => setQuery("")}>
-              <Ionicons name={"close"} size={24} color="black" />
-            </TouchableOpacity>
-          )}
-        </View>
         <ScrollView keyboardDismissMode="on-drag" className="  px-2  ">
-          {/*  */}
+          {/* SEARCHBAR */}
 
           {/* CATEGORIES */}
-          {!query && !categoryQueryResults && (
-            <View style={{ paddingTop: 32 }}>
+          {results.length === 0 && !fetchingResults && (
+            <View style={{ paddingTop: 22 }}>
               <Text
                 style={{
                   fontFamily: SEMI_BOLD,
@@ -379,7 +403,7 @@ export const SearchScreen = ({ navigation, route }: any) => {
               >
                 {categories.map((category) => (
                   <CategoryCard
-                    navigation={navigation}
+                    setSearchQuery={setSearchQuery}
                     icon={category.image}
                     name={category.name}
                     key={category.name}
@@ -389,8 +413,8 @@ export const SearchScreen = ({ navigation, route }: any) => {
             </View>
           )}
 
-          {/* STORE SEARCH RESULTS */}
-          <View style={{ rowGap: 14, paddingTop: 40 }}>
+          {/* STORE SEARCH RESULTS OLD*/}
+          {/* <View style={{ rowGap: 14, paddingTop: 40 }}>
             {queryResults && queryResults.length > 0 && (
               <Text
                 style={{ fontWeight: "800", color: Colors.dark, fontSize: 28 }}
@@ -401,7 +425,6 @@ export const SearchScreen = ({ navigation, route }: any) => {
             {queryResults?.map((item) => (
               <Pressable
                 onPress={() =>
-                  // @ts-ignore
                   navigation.navigate("Restaurant", {
                     store_name: item.store_name,
                     store_id: item._id,
@@ -420,7 +443,6 @@ export const SearchScreen = ({ navigation, route }: any) => {
                   style={{ height: 60, width: 60, borderRadius: 50 }}
                   source={{ uri: item.store_image }}
                 />
-                {/* ITEM NAME AND OPENING */}
                 <View style={{ flex: 1 }}>
                   <Text
                     style={{ fontSize: 16, fontWeight: "600" }}
@@ -436,11 +458,26 @@ export const SearchScreen = ({ navigation, route }: any) => {
                   </Text>
                 </View>
 
-                {/* LIKE BUTTON */}
                 <LikeButton item_id={item._id} background />
               </Pressable>
             ))}
-          </View>
+          </View> */}
+
+          {fetchingResults && (
+            <View className="flex-1 items-center justify-center">
+              <Loader />
+            </View>
+          )}
+
+          {/* RESULTS */}
+          {results && results.length > 0 && (
+            <ResultsGrid
+              onReset={resetSearch}
+              setResults={setResults}
+              resultsCounts={results?.length as number}
+              results={results}
+            />
+          )}
           {/* PRODUCTS SEARCH RESULTS */}
           <View style={{ rowGap: 14, marginTop: 20 }}>
             {productsQueryResults && productsQueryResults.length > 0 && (
